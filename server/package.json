@@ -1,0 +1,25 @@
+{
+	"name": "wdom-gql-server",
+	"version": "1.0.0",
+	"description": "",
+	"main": "src/server.js",
+	"scripts": {
+		"test": "jest",
+		"start": "nodemon src/server.js"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"apollo-server": "^2.6.9",
+		"graphql": "^14.4.2",
+		"nodemon": "^1.19.1"
+	},
+	"devDependencies": {
+		"jest": "^24.8.0"
+	},
+	"jest": {
+		"testPathIgnorePatterns": [
+			"/node_modules/"
+		]
+	}
+}
