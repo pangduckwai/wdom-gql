@@ -7,7 +7,8 @@ type Query {
 	# 	pageSize: Int
 	# 	after: String
 	# ): GameConnection!
-	# game(id: ID!): Game
+	game(id: ID!): Game
+	gameByHost(host: Player!): Game
 }
 
 # type GameConnection {
@@ -17,37 +18,37 @@ type Query {
 # }
 
 type Mutation {
-	join(name: String!): Player
+	register(name: String!): Player
 	leave(token: String!): Player
 }
 
 type Player {
 	token: String!
 	name: String!
-	seq: Int
-#	joint: Game
+	joined: Game
 }
 
-# type Game {
-# 	id: ID!
-# 	name: String!
-# 	host: Player!
-# 	rounts: Int!
-# 	cardReinforcement: Int!
-# 	territories: Territory
-# }
+type Game {
+	id: ID!
+	name: String!
+	host: String!
+	rounds: Int!
+	cardReinforcement: Int!
+	continents: [Continent]!
+	territories: [Territory]!
+}
 
-# type Territory {
-# 	id: String!
-# 	continent: Continent!
-# 	owner: Player
-# 	army: Int!
-# }
+type Territory {
+	name: String!
+	continent: String!
+	owner: Player
+	army: Int!
+}
 
-# type Continent {
-#	id: String!
-#	reinforcement: Int!
-# }
+type Continent {
+	name: String!
+	reinforcement: Int!
+}
 `;
 
 module.exports = typeDefs;

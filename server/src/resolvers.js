@@ -4,8 +4,8 @@ module.exports = {
 		me: (_, { token }, { dataSources }) => dataSources.playerDS.find({ token })
 	},
 	Mutation: {
-		join: async (_, { name }, { dataSources }) => {
-			const player = await dataSources.playerDS.join({ name });
+		register: async (_, { name }, { dataSources }) => {
+			const player = await dataSources.playerDS.register({ name });
 			if (player)
 				return player;
 		},

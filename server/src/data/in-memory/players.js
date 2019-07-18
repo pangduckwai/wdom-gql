@@ -4,51 +4,73 @@ let store = [];
 let idxToken = {};
 let idxName = {};
 
-module.exports.list = () => {
-	return new Promise((resolve, reject) => {
-		resolve({ store, idxToken, idxName });
+let rebuildIndex = () => {
+	idxToken = {};
+	idxName = {};
+
+	for (let idx = 0; idx < store.length; idx ++) {
+		idxToken[store[idx].token] = idx;
+		idxName[store[idx].name.toUpperCase()] = idx;
+	}
+};
+
+module.exports.listAll = () => {
+	return new Promise((resolve, _) => {
+		resolve(store);
 	});
 };
 
-module.exports.find = ({ token, name }) => {
+module.exports.list = ({ id }) => {
+	return new Promise((resolve, _) => {
+		resolve(store.filter(p => p.joined && p.joined.id === id));
+	});
+};
+
+module.exports.find = ({ token }) => {
 	return new Promise((resolve, reject) => {
 		if (token) {
 			const result = store[idxToken[token]];
-			if (result && result.active) {
+			if (result) {
 				resolve(result);
 			} else {
 				reject("Player not found");
 			}
-		} else if (name) {
+		} else {
+			reject("Must provide either the token of the player");
+		}
+	});
+};
+
+module.exports.findByName = ({ name }) => {
+	return new Promise((resolve, reject) => {
+		if (name) {
 			const result = store[idxName[name.toUpperCase()]];
-			if (result && result.active) {
+			if (result) {
 				resolve(result);
 			} else {
 				reject(`Player '${name}' not found`);
 			}
 		} else {
-			reject("Must provide either the token or name of the player");
+			reject("Must provide the name of the player");
 		}
 	});
-};
+}
 
-module.exports.join = ({ name }) => {
+module.exports.create = ({ name }) => {
 	return new Promise((resolve, reject) => {
 		if (name) {
 			const result = store[idxName[name.toUpperCase()]];
-			if (result && result.active) {
+			if (result) {
 				reject(`Player '${result.name}' already exists`);
 			} else {
 				let token = crypto.createHash('sha256').update(name + (Math.floor(Math.random()*10000)).toString()).digest('base64');
 				let player = {
 					token: token,
-					name: name,
-					active: true
+					name: name
 				}
 				let len = store.push(player);
 				if (len > 0) {
-					idxToken[token] = len - 1;
-					idxName[name.toUpperCase()] = len - 1;
+					rebuildIndex();
 					resolve(player);
 				} else {
 					reject(`Add player '${name}' failed`);
@@ -60,12 +82,31 @@ module.exports.join = ({ name }) => {
 	});
 };
 
-module.exports.leave = ({ token }) => {
+module.exports.update = (p) => {
+	return new Promise((resolve, reject) => {
+		if (p && p.token) {
+			const player = store[idxToken[p.token]];
+			if (player) {
+				if (p.joined) {
+					player.joined = p.joined;
+				} else {
+					delete player.joined;
+				}
+				resolve(player);
+			}
+		} else {
+			reject("Invalid player input");
+		}
+	});
+};
+
+module.exports.remove = ({ token }) => {
 	return new Promise((resolve, reject) => {
 		if (token) {
 			const result = store[idxToken[token]];
 			if (result) {
-				result.active = false;
+				store.splice(idxToken[token], 1);
+				rebuildIndex();
 				resolve(result);
 			} else {
 				reject("Player not found");
