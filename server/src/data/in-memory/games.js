@@ -1,103 +1,122 @@
+const { copyGame } = require('./copy');
 
-let store = [];
+//type Game {
+// 	id: ID!
+// 	name: String!
+// 	host: String!      #### player token
+// 	rounds: Int!
+// 	cardReinforcement: Int!
+// 	territories: [Territory]!
+//}
+//type Territory {
+// 	name: String!
+// 	continent: String!
+// 	owner: String!     #### player token
+// 	army: Int!
+//}
+class GameStore {
+	constructor() {
+		this.store = [];
+	}
 
-module.exports.list = () => {
-	return new Promise((resolve, _) => {
-		resolve(store);
-	});
-};
+	list() {
+		return new Promise((resolve, _) => {
+			resolve(this.store.map(g => copyGame(g)));
+		});
+	};
 
-module.exports.find = ({ id }) => {
-	return new Promise((resolve, reject) => {
-		const result = store[id];
-		if (result && result.active) {
-			resolve(result);
-		} else {
-			reject(`Game ${id} not found`);
-		}
-	});
-};
-
-module.exports.create = (name, player) => {
-	return new Promise((resolve, reject) => {
-		const rslt = store.filter(g => g.active && ((g.name === name) || (g.host === player.token)));
-		if (player.joined && player.joined.active) {
-			reject(`Player '${player.name}' already joined game ${player.joined.name}`);
-		} else if (rslt.length > 0) {
-			reject(`Game '${name}' already exists`);
-		} else {
-			const id = store.length;
-			const game = {
-				id: id,
-				name: name,
-				host: player.token,
-				rounds: 0,
-				cardReinforcement: 4,
-				continents: [],
-				territories: [],
-				active: true
-			};
-			const len = store.push(game);
-			if (len > 0) {
-				player.joined = game;
-				resolve(game);
+	find({ id }) {
+		return new Promise((resolve, reject) => {
+			const result = this.store[id];
+			if (result && result.active) {
+				resolve(copyGame(result));
 			} else {
-				reject(`Add game '${game.name}' failed`);
+				reject(new Error(`Game ${id} not found`));
 			}
-		}
-	});
+		});
+	};
+
+	findByHost({ token }) {
+		return new Promise((resolve, reject) => {
+			const result = this.store.filter(g => g.active && (g.host === token));
+			if (result.length === 1) {
+				resolve(copyGame(result[0]));
+			} else {
+				reject(new Error(`Player is not hosting any game`));
+			}
+		});
+	};
+
+	create({ name }, { token }) {
+		return new Promise((resolve, reject) => {
+			const rslt = this.store.filter(g => g.active && ((g.name === name) || (g.host === token)));
+			if (rslt.length > 0) {
+				reject(new Error(`Game '${name}' already exists`));
+			} else {
+				const id = this.store.length;
+				const game = {
+					id: id,
+					name: name,
+					host: token,
+					rounds: 0,
+					cardReinforcement: 4,
+					territories: this.territoryReducer(),
+					active: true
+				};
+				const len = this.store.push(game);
+				if (len > 0) {
+					resolve(copyGame(game));
+				} else {
+					reject(new Error(`Add game '${game.name}' failed`));
+				}
+			}
+		});
+	};
+
+	updateRound({ id }) {
+		return new Promise((resolve, reject) => {
+			const game = this.store[id];
+			if (game && game.active) {
+				game.rounds = game.rounds + 1;
+				resolve(copyGame(game));
+			} else {
+				reject(new Error(`Game '${id}' not found`));
+			}
+		});
+	};
+
+	updateReinforcement({ id }) {
+		return new Promise((resolve, reject) => {
+			const game = this.store[id];
+			if (game && game.active) {
+				game.cardReinforcement = game.cardReinforcement + 5;
+				resolve(copyGame(game));
+			} else {
+				reject(new Error(`Game '${id}' not found`));
+			}
+		});
+	};
+
+	remove({ id }) {
+		return new Promise((resolve, reject) => {
+			const game = this.store[id];
+			if (game && game.active) {
+				game.active = false;
+				resolve(copyGame(game));
+			} else {
+				reject(new Error(`Game ${id} not removed`));
+			}
+		});
+	};
+
+	territoryReducer() {
+		return Object.keys(TERRITORIES).map(name => {
+			let territory = {};
+			territory["name"] = name;
+			territory["continent"] = TERRITORIES[name].continent;
+			territory["army"] = 0;
+		});
+	};
 };
 
-module.exports.updateRound = ({ id }) => {
-	return new Promise((resolve, reject) => {
-		const game = store[id];
-		if (game && game.active) {
-			game.rounds = game.rounds + 1;
-		} else {
-			reject(`Game '${id}' not found`);
-		}
-	});
-};
-
-
-module.exports.updateReinforcement = ({ id }) => {
-	return new Promise((resolve, reject) => {
-		const game = store[id];
-		if (game && game.active) {
-			game.cardReinforcement = game.cardReinforcement + 5;
-		} else {
-			reject(`Game '${id}' not found`);
-		}
-	});
-};
-
-
-module.exports.delete = ({ id }) => {
-	return new Promise((resolve, reject) => {
-		const game = store[id];
-		if (game) {
-			game.active = false;
-			resolve(game);
-		} else {
-			reject(`Game ${id} not ended`);
-		}
-	});
-};
-
-
-// let conReducer = () => {
-// 	return Object.keys(CONTINENTS).map(name => {
-// 		let continent = {};
-// 		continent["name"] = name;
-// 		continent["reinforcement"] = CONTINENTS[name].reinforcement;
-// 	});
-// }
-
-// let trrReducer = () => {
-// 	return Object.keys(TERRITORIES).map(name => {
-// 		let territory = {};
-// 		territory["name"] = name;
-// 		territory["continent"] = TERRITORIES[name].continent;
-// 		territory["army"] = 0;
-// 	});
-// }
+module.exports = GameStore;

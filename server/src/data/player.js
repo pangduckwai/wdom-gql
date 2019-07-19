@@ -25,6 +25,15 @@ class PlayerDS extends DataSource {
 		return player ? player : null;
 	}
 
+	async me() {
+		if (this.context && this.context.player) {
+			const token = this.context.player.token;
+			const player = await this.store.find({ token });
+			return player ? player : null;
+		}
+		return null;
+	}
+
 	async findByName({ name }) {
 		const player = await this.store.findByName({ name });
 		return player ? player : null;
@@ -35,9 +44,13 @@ class PlayerDS extends DataSource {
 		return player ? player : null;
 	}
 
-	async update(player) {
-		const player = await this.store.update(player);
-		return player ? player : null;
+	async update({ id }) {
+		if (this.context && this.context.player) {
+			const token = this.context.player.token;
+			const player = await this.store.update({ token }, { id });
+			return player ? player : null;
+		}
+		return null;
 	}
 
 	async remove({ token }) {

@@ -1,11 +1,13 @@
-const { register, find } = require("../players");
-const { list, create, join, end, findById, findByHost } = require("../games");
+const players = require("../players");
+const { list, create, remove, find, findByHost, updateRound, updateReinforcement } = require("../games");
+// import { create as createPlayer, findByName} from '../players';
+// import { list, create, updateRound, updateReinforcement, remove, find, findByHost } from '../games';
 
 beforeAll(() => {
-	register({ name: "Paul" });
-	register({ name: "Rick" });
-	register({ name: "John" });
-	register({ name: "Josh" });
+	players.create({ name: "Paul" });
+	players.create({ name: "Rick" });
+	players.create({ name: "John" });
+	players.create({ name: "Josh" });
 });
 
 afterAll(() => {
@@ -14,95 +16,53 @@ afterAll(() => {
 	});
 });
 
+let id = -1;
+
 test("Add new game 'Pauls Game'", () => {
-	return find({ name: "Paul" }).then(player => {
-		let lst = [];
-		lst.push(player);
-		create({
-			name: "Pauls Game",
-			players: lst,
-			rounds: 0,
-			cardReinforcement: 0,
-			continents: [],
-			territories: []
-		}).then(game => {
+	return players.findByName({ name: "Paul" }).then(player => {
+		create("Pauls Game", player).then(game => {
+			id = game.id;
 			expect(game.name).toBe("Pauls Game");
 		});
 	});
 });
 
 test("Add new game 'Ricks Game'", () => {
-	return find({ name: "Rick" }).then(player => {
-		let lst = [];
-		lst.push(player);
-		create({
-			name: "Ricks Game",
-			players: lst,
-			rounds: 0,
-			cardReinforcement: 0,
-			continents: [],
-			territories: []
-		}).then(game => {
+	return players.findByName({ name: "Rick" }).then(player => {
+		create("Ricks Game", player).then(game => {
 			expect(game.name).toBe("Ricks Game");
 		});
 	});
 });
 
 test("Add game with duplicated name", () => {
-	return find({ name: "John" }).then(player => {
-		let lst = [];
-		lst.push(player);
-		expect(create({
-			name: "Ricks Game",
-			players: lst,
-			rounds: 0,
-			cardReinforcement: 0,
-			continents: [],
-			territories: []
-		})).rejects.toBe("Game 'Ricks Game' already exists");
+	return players.findByName({ name: "John" }).then(player => {
+		expect(create("Ricks Game", player)).rejects.toBe("Game 'Ricks Game' already exists");
 	});
 });
 
 test("Add new game 'Joshs Game'", () => {
-	return find({ name: "Josh" }).then(player => {
-		let lst = [];
-		lst.push(player);
-		create({
-			name: "Joshs Game",
-			players: lst,
-			rounds: 0,
-			cardReinforcement: 0,
-			continents: [],
-			territories: []
-		}).then(game => {
+	return players.findByName({ name: "Josh" }).then(player => {
+		create("Joshs Game", player).then(game => {
 			expect(game.name).toBe("Joshs Game");
 		});
 	});
 });
 
 test("Add game with a busy host", () => {
-	return find({ name: "Paul" }).then(player => {
-		let lst = [];
-		lst.push(player);
-		expect(create({
-			name: "New Game",
-			players: lst,
-			rounds: 0,
-			cardReinforcement: 0,
-			continents: [],
-			territories: []
-		})).rejects.toBe("Player 'Paul' already hosting another game");
+	return players.findByName({ name: "Paul" }).then(player => {
+		expect(create("New Game", player)).rejects.toBe("Player 'Paul' already joined game 'Pauls Game'");
 	});
 });
 
 test("Find game", () => {
-	return findById({ id: 0 }).then(game => {
+	return find({ id: id }).then(game => {
 		expect(game.name).toBe("Pauls Game");
 	});
 });
 
 test("Find game by host", () => {
-	return find({ name: "Paul" }).then(player => {
+	return players.findByName({ name: "Paul" }).then(player => {
 		findByHost(player).then(game => {
 			expect(game.name).toBe("Pauls Game");
 		}).catch(error => {
@@ -112,66 +72,40 @@ test("Find game by host", () => {
 });
 
 test("Player not hosting game", () => {
-	return find({ name: "John" }).then(player => {
-		expect(findByHost(player)).rejects.toBe("Player 'John' not hosting any game");
+	return players.findByName({ name: "John" }).then(player => {
+		expect(findByHost(player)).rejects.toBe("Player is not hosting any game");
 	});
 });
 
-test("End someone else's game", () => {
-	return find({ name: "Paul" }).then(p1 => {
-		find({ name: "Rick" }).then(p2 => {
+test("Remove someone else's game", () => {
+	return players.findByName({ name: "Paul" }).then(p1 => {
+		players.findByName({ name: "Rick" }).then(p2 => {
 			findByHost(p2).then(game => {
-				expect(end(game, p1)).rejects.toBe(`Game ${game.id} not ended`);
+				expect(remove(game, p1)).rejects.toBe(`Game ${game.id} not removed`);
 			});
 		});
 	});
 });
 
-test("End game", () => {
-	return find({ name: "Paul" }).then(player => {
+test("Next Round", () => {
+	return updateRound({ id: id }).then(game => {
+		expect(game.name).toBe("Pauls Game");
+	});
+});
+
+test("Trade cards", () => {
+	return updateReinforcement({ id: id }).then(game => {
+		expect(game.name).toBe("Pauls Game");
+	});
+});
+
+test("Remove game", () => {
+	return players.findByName({ name: "Paul" }).then(player => {
 		findByHost(player).then(game => {
-			end(game, player).then(game => {
+			remove(game, player).then(game => {
 				expect(game.name).toBe("Pauls Game");
 			}).catch(error => {
 				console.log(error);
-			});
-		});
-	});
-});
-
-test("Joining two games", () => {
-	return find({ name: "Josh" }).then(p1 => {
-		find({ name: "Rick" }).then(p2 => {
-			findByHost(p2).then(game => {
-				expect(join(game, p1)).rejects.toBe("Unable to join game 'Ricks Game'");
-			});
-		});
-	});
-});
-
-test("Join game", () => {
-	return find({ name: "Paul" }).then(p1 => {
-		find({ name: "Rick" }).then(p2 => {
-			findByHost(p2).then(game => {
-				join(game, p1).then(game => {
-					expect(game.name).toBe("Ricks Game");
-				}).catch(error => {
-					console.log(error);
-				});
-			});
-		});
-	});
-});
-
-test("Join game", () => {
-	return find({ name: "John" }).then(p1 => {
-		find({ name: "Rick" }).then(p2 => {
-			findByHost(p2).then(game => {
-				join(game, p1).then(game => {
-					expect(game.name).toBe("Ricks Game");
-				}).catch(error => {
-					console.log(error);
-				});
 			});
 		});
 	});

@@ -2,13 +2,16 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
 type Query {
-	me(token: String!): Player
+	players: [Player]!
+	player(token: String!): Player
+	me: Player
 	# games(
 	# 	pageSize: Int
 	# 	after: String
 	# ): GameConnection!
+	games: [Game]!
 	game(id: ID!): Game
-	gameByHost(host: Player!): Game
+	gameByHost(token: String!): Game
 }
 
 # type GameConnection {
@@ -20,6 +23,7 @@ type Query {
 type Mutation {
 	register(name: String!): Player
 	leave(token: String!): Player
+	create(name: String!): Game
 }
 
 type Player {
@@ -31,10 +35,9 @@ type Player {
 type Game {
 	id: ID!
 	name: String!
-	host: String!
+	host: Player!
 	rounds: Int!
 	cardReinforcement: Int!
-	continents: [Continent]!
 	territories: [Territory]!
 }
 
@@ -45,10 +48,10 @@ type Territory {
 	army: Int!
 }
 
-type Continent {
-	name: String!
-	reinforcement: Int!
-}
+# type Continent {
+#	name: String!
+#	reinforcement: Int!
+# }
 `;
 
 module.exports = typeDefs;
