@@ -55,3 +55,61 @@ type Territory {
 `;
 
 module.exports = typeDefs;
+
+/*
+mutation Reg {
+	register(name: "Paul") {
+		name
+		token
+	}
+}
+
+query Myself {
+	me {
+		name
+		token
+		joined {
+			name
+		}
+	}
+}
+
+query Players {
+  players {
+    name
+    token
+    joined {
+      name
+    }
+  }
+}
+
+query Player {
+	player(token: "kFSAgDddROFgB1dfoixpOV0dlC2ldqZ3cnppA7DyZF8=") {
+		name
+		joined {
+			name
+		}
+	}
+}
+
+mutation NewGame {
+  create(name: "My Game") {
+    id
+    name
+    host {
+      name
+    }
+  }
+}
+
+query Games {
+  games {
+    id
+    name
+    host {
+      name
+    }
+  }
+}
+*/

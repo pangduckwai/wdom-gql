@@ -1,5 +1,4 @@
 const { DataSource } = require('apollo-datasource');
-const { CONTINENTS, TERRITORIES } = require('./constants');
 
 class GameDS extends DataSource {
 	constructor({ store }) {
@@ -24,6 +23,22 @@ class GameDS extends DataSource {
 	async findByHost({ token }) {
 		const game = await this.store.findByHost({ token });
 		return game ? game : null;
+	}
+
+	async findHost({ id }) {
+		const game = await this.store.find({ id });
+		return game ? game.ptkn : null;
+	}
+
+	async findOwner({ id }, { name }) {
+		const game = await this.store.find({ id });
+		if (game) {
+			for (let t of game.territories) {
+				if (t.name === name)
+					return t.ptkn;
+			}
+		}
+		return null;
 	}
 
 	async create({ name }) {

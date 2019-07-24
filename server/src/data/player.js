@@ -39,6 +39,11 @@ class PlayerDS extends DataSource {
 		return player ? player : null;
 	}
 
+	async findJoined({ token }) {
+		const player = await this.store.find({ token });
+		return player.gid ? player.gid : null;
+	}
+
 	async create({ name }) {
 		const player = await this.store.create({ name });
 		return player ? player : null;

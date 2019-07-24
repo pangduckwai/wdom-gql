@@ -16,11 +16,14 @@ const server = new ApolloServer({
 		const token = (req.headers && req.headers.token) ? req.headers.token : null;
 		let ret = { player: {} };
 		if (token) {
-			const player = await playerStore.find({ token: token });
-			const p = player ? player : {};
-			ret = { player: p };
+			try {
+				const player = await playerStore.find({ token: token });
+				const p = player ? player : {};
+				ret = { player: p };
+				return ret;
+			} catch (e) {}
 		}
-		return ret;
+		return null;
 	},
 	typeDefs,
 	resolvers,

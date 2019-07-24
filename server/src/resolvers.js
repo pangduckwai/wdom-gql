@@ -24,7 +24,29 @@ module.exports = {
 	},
 	Player: {
 		joined: async (player, _, { dataSources }) => {
-			return dataSources.gameDS.find({ id: player.gid });
+			const gid = await dataSources.playerDS.findJoined({ token: player.token });
+			if (gid !== null)
+				return dataSources.gameDS.find({ id: gid });
+			else
+				return null;
+		}
+	},
+	Game: {
+		host: async (game, _, { dataSources }) => {
+			const token = await dataSources.gameDS.findHost({ id: game.id});
+			if (token !== null)
+				return dataSources.playerDS.find({ token: token });
+			else
+				return null;
+		}
+	},
+	Territory: {
+		owner: async (territory, _, { dataSources }) => {
+			const token = await dataSources.gameDS.findOwner({ id: territory.gid }, { name: territory.name });
+			if (token !== null)
+				return dataSources.playerDS.find({ token: token });
+			else
+				return null;
 		}
 	}
 };

@@ -1,17 +1,19 @@
 const { copyGame } = require('./copy');
+const { TERRITORIES } = require('../constants');
 
 //type Game {
 // 	id: ID!
 // 	name: String!
-// 	host: String!      #### player token
+// 	ptkn: String!      #### player token (host)
 // 	rounds: Int!
 // 	cardReinforcement: Int!
 // 	territories: [Territory]!
 //}
 //type Territory {
 // 	name: String!
+//  gid: ID!
 // 	continent: String!
-// 	owner: String!     #### player token
+// 	ptkn: String       #### player token (owner)
 // 	army: Int!
 //}
 class GameStore {
@@ -38,7 +40,7 @@ class GameStore {
 
 	findByHost({ token }) {
 		return new Promise((resolve, reject) => {
-			const result = this.store.filter(g => g.active && (g.host === token));
+			const result = this.store.filter(g => g.active && (g.ptkn === token));
 			if (result.length === 1) {
 				resolve(copyGame(result[0]));
 			} else {
@@ -49,7 +51,7 @@ class GameStore {
 
 	create({ name }, { token }) {
 		return new Promise((resolve, reject) => {
-			const rslt = this.store.filter(g => g.active && ((g.name === name) || (g.host === token)));
+			const rslt = this.store.filter(g => g.active && ((g.name === name) || (g.ptkn === token)));
 			if (rslt.length > 0) {
 				reject(new Error(`Game '${name}' already exists`));
 			} else {
@@ -57,10 +59,10 @@ class GameStore {
 				const game = {
 					id: id,
 					name: name,
-					host: token,
+					ptkn: token,
 					rounds: 0,
 					cardReinforcement: 4,
-					territories: this.territoryReducer(),
+					territories: this.territoryReducer({ id }),
 					active: true
 				};
 				const len = this.store.push(game);
@@ -109,12 +111,32 @@ class GameStore {
 		});
 	};
 
-	territoryReducer() {
+	conquer({ id }, { name }, { token }) {
+		return new Promise((resolve, reject) => {
+			const game = this.store[id];
+			if (game && game.active) {
+				for (let t of game.territories) {
+					if (t.name === name) {
+						t.ptkn = token;
+						resolve(copyGame(game));
+						return;
+					}
+				}
+				reject(new Error(`Invalid territory ${name}`));
+			} else {
+				reject(new Error(`Game '${id}' not found`));
+			}
+		});
+	};
+
+	territoryReducer({ id }) {
 		return Object.keys(TERRITORIES).map(name => {
 			let territory = {};
 			territory["name"] = name;
+			territory["gid"] = id;
 			territory["continent"] = TERRITORIES[name].continent;
 			territory["army"] = 0;
+			return territory;
 		});
 	};
 };
