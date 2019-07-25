@@ -16,24 +16,26 @@ class GameDS extends DataSource {
 	}
 
 	async find({ id }) {
-		const game = await this.store.find({ id });
-		return game ? game : null;
+		return this.store.find({ id });
 	}
 
-	async findByHost({ token }) {
-		const game = await this.store.findByHost({ token });
-		return game ? game : null;
+	async findByHost() {
+		if (this.context && this.context.player) {
+			const token = this.context.player.token;
+			return this.store.findByHost({ token });
+		}
+		return [];
 	}
 
 	async findHost({ id }) {
-		const game = await this.store.find({ id });
-		return game ? game.ptkn : null;
+		const games = await this.store.findAny({ id });
+		return (games.length > 0) ? games[0].ptkn : null;
 	}
 
 	async findOwner({ id }, { name }) {
-		const game = await this.store.find({ id });
-		if (game) {
-			for (let t of game.territories) {
+		const games = await this.store.findAny({ id });
+		if (games.length > 0) {
+			for (let t of games[0].territories) {
 				if (t.name === name)
 					return t.ptkn;
 			}
@@ -43,7 +45,7 @@ class GameDS extends DataSource {
 
 	async create({ name }) {
 		if (this.context && this.context.player) {
-			const token = this.context.player.token
+			const token = this.context.player.token;
 			const game = await this.store.create({ name }, { token });
 			return game ? game : null;
 		}
@@ -51,9 +53,9 @@ class GameDS extends DataSource {
 	}
 
 	async updateRound({ id }) {
-		const game = await this.store.find({ id });
-		if (game) {
-			if (this.context && this.context.player && (this.context.player.token === game.host)) {
+		const games = await this.store.find({ id });
+		if (games.length > 0) {
+			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
 				const game = await this.store.updateRound({ id });
 				return game ? game : null;
 			}
@@ -62,9 +64,9 @@ class GameDS extends DataSource {
 	}
 
 	async updateReinforcement({ id }) {
-		const game = await this.store.find({ id });
-		if (game) {
-			if (this.context && this.context.player && (this.context.player.token === game.host)) {
+		const games = await this.store.find({ id });
+		if (games.length > 0) {
+			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
 				const game = await this.store.updateReinforcement({ id });
 				return game ? game : null;
 			}
@@ -73,32 +75,15 @@ class GameDS extends DataSource {
 	}
 
 	async remove({ id }) {
-		const game = await this.store.find({ id });
-		if (game) {
-			if (this.context && this.context.player && (this.context.player.token === game.host)) {
+		const games = await this.store.find({ id });
+		if (games.length > 0) {
+			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
 				const game = await this.store.remove({ id });
 				return game ? game : null;
 			}
 		}
 		return null;
 	}
-
-	// conReducer() {
-	// 	return Object.keys(CONTINENTS).map(name => {
-	// 		let continent = {};
-	// 		continent["name"] = name;
-	// 		continent["reinforcement"] = CONTINENTS[name].reinforcement;
-	// 	});
-	// }
-
-	// trrReducer() {
-	// 	return Object.keys(TERRITORIES).map(name => {
-	// 		let territory = {};
-	// 		territory["name"] = name;
-	// 		territory["continent"] = TERRITORIES[name].continent;
-	// 		territory["army"] = 0;
-	// 	});
-	// }
 }
 
 module.exports = GameDS;

@@ -25,13 +25,20 @@ class PlayerStore {
 
 	listAll() {
 		return new Promise((resolve, _) => {
-			resolve(this.store.map(p => copyPlayer(p)));
+			resolve(this.store.map(p => {
+				return copyPlayer(p);
+			}));
 		});
 	};
 
 	list({ id }) {
-		return new Promise((resolve, _) => {
-			resolve(this.store.filter(p => p.gid && p.gid === id).map(p => copyPlayer(p)));
+		return new Promise((resolve, reject) => {
+			const players = this.store.filter(p => (typeof(p.gid) !== "undefined") && (p.gid === id));
+			if (players.length > 0) {
+				resolve(players.map(q => copyPlayer(q)));
+			} else {
+				reject(new Error(`No player in the game ${id}`));
+			}
 		});
 	};
 
@@ -96,7 +103,7 @@ class PlayerStore {
 			if (token) {
 				const player = this.store[this.idxToken[token]];
 				if (player) {
-					if (id) {
+					if ((typeof(id) !== "undefined") && (id !== null)) {
 						player.gid = id;
 					} else {
 						delete player.gid;

@@ -23,29 +23,34 @@ class GameStore {
 
 	list() {
 		return new Promise((resolve, _) => {
-			resolve(this.store.map(g => copyGame(g)));
+			resolve(this.store.filter(g => g.active).map(g => copyGame(g)));
 		});
 	};
 
 	find({ id }) {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _) => {
+			let ret = [];
 			const result = this.store[id];
-			if (result && result.active) {
-				resolve(copyGame(result));
-			} else {
-				reject(new Error(`Game ${id} not found`));
-			}
+			if (result && result.active) ret.push(copyGame(result));
+			resolve(ret);
+		});
+	};
+
+	findAny({ id }) {
+		return new Promise((resolve, _) => {
+			let ret = [];
+			const result = this.store[id];
+			if (result) ret.push(copyGame(result));
+			resolve(ret);
 		});
 	};
 
 	findByHost({ token }) {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _) => {
+			let ret = [];
 			const result = this.store.filter(g => g.active && (g.ptkn === token));
-			if (result.length === 1) {
-				resolve(copyGame(result[0]));
-			} else {
-				reject(new Error(`Player is not hosting any game`));
-			}
+			if (result.length === 1) ret.push(copyGame(result[0]));
+			resolve(ret);
 		});
 	};
 
@@ -55,7 +60,7 @@ class GameStore {
 			if (rslt.length > 0) {
 				reject(new Error(`Game '${name}' already exists`));
 			} else {
-				const id = this.store.length;
+				const id = '' + this.store.length;
 				const game = {
 					id: id,
 					name: name,

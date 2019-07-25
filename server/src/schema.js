@@ -2,28 +2,28 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
 type Query {
+	me: Player
 	players: [Player]!
 	player(token: String!): Player
-	me: Player
-	# games(
-	# 	pageSize: Int
-	# 	after: String
-	# ): GameConnection!
+	playersInGame(id: ID!): [Player]!
 	games: [Game]!
 	game(id: ID!): Game
-	gameByHost(token: String!): Game
+	gameByHost: Game
 }
 
-# type GameConnection {
-# 	cursor: String!
-# 	hasMore: Boolean!
-# 	games: [Game]!
-# }
-
 type Mutation {
+	# Someone register to the game server from a browser.
 	register(name: String!): Player
+	# Player denoted by 'token' leave the game server.
 	leave(token: String!): Player
+	# The current player (with token in http header) create a game.
 	create(name: String!): Game
+	# End a game hosted by the current player (with token in http header).
+	end: Game
+	# The current player (with token in http header) join a game.
+	join(id: ID!): Game
+	# The current player (with token in http header) quit a game.
+	quit: Game
 }
 
 type Player {
@@ -47,69 +47,6 @@ type Territory {
 	owner: Player
 	army: Int!
 }
-
-# type Continent {
-#	name: String!
-#	reinforcement: Int!
-# }
 `;
 
 module.exports = typeDefs;
-
-/*
-mutation Reg {
-	register(name: "Paul") {
-		name
-		token
-	}
-}
-
-query Myself {
-	me {
-		name
-		token
-		joined {
-			name
-		}
-	}
-}
-
-query Players {
-  players {
-    name
-    token
-    joined {
-      name
-    }
-  }
-}
-
-query Player {
-	player(token: "kFSAgDddROFgB1dfoixpOV0dlC2ldqZ3cnppA7DyZF8=") {
-		name
-		joined {
-			name
-		}
-	}
-}
-
-mutation NewGame {
-  create(name: "My Game") {
-    id
-    name
-    host {
-      name
-    }
-  }
-}
-
-query Games {
-  games {
-    id
-    name
-    host {
-      name
-    }
-  }
-}
-*/

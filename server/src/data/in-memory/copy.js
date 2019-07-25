@@ -4,7 +4,7 @@ module.exports.copyTerritory = (orig) => {
 	copy.name = orig.name;
 	copy.gid = orig.gid;
 	copy.continent = orig.continent;
-	if (orig.ptkn) copy.ptkn = orig.ptkn; //(Player token)
+	if (typeof(orig.ptkn) !== "undefined") copy.ptkn = orig.ptkn; //(Player token)
 	copy.army = orig.army;
 	return copy;
 };
@@ -24,6 +24,6 @@ module.exports.copyPlayer = (orig) => {
 	let copy = {};
 	copy.token = orig.token;
 	copy.name = orig.name;
-	if (orig.gid) copy.gid = orig.gid; //(Game id)
+	if (typeof(orig.gid) !== "undefined") copy.gid = orig.gid; //(Game id)
 	return copy;
 };
