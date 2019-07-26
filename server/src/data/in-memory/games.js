@@ -54,7 +54,7 @@ class GameStore {
 		});
 	};
 
-	create({ name }, { token }) {
+	create({ name, token }) {
 		return new Promise((resolve, reject) => {
 			const rslt = this.store.filter(g => g.active && ((g.name === name) || (g.ptkn === token)));
 			if (rslt.length > 0) {
@@ -80,29 +80,60 @@ class GameStore {
 		});
 	};
 
-	updateRound({ id }) {
+	update({ id, rounds, cardReinforcement, territory = { name: null, owner: null, army: -1 }}) {
 		return new Promise((resolve, reject) => {
-			const game = this.store[id];
-			if (game && game.active) {
-				game.rounds = game.rounds + 1;
-				resolve(copyGame(game));
-			} else {
-				reject(new Error(`Game '${id}' not found`));
-			}
+			if ((typeof(id) !== "undefined") && (id !== null)) {
+				const game = this.store[id];
+				if (game && game.active) {
+					if (rounds) {
+						game.rounds = game.rounds + 1;
+					}
+					if (cardReinforcement) {
+						game.cardReinforcement = game.cardReinforcement + 5; //TODO HERE increment not constant
+					}
+					if (territory.name !== null) {
+						for (let t of game.territories) {
+							if (t.name === territory.name) {
+								if (territory.owner !== null) {
+									t.ptkn = territory.owner;
+								}
+								if (territory.amry >= 0) {
+									t.army = territory.army;
+								}
+								break;
+							}
+						}
+					}
+					resolve(copyGame(game));
+				} else
+					reject(new Error(`Game '${id} not found`));
+			} else
+				reject(new Error("Invalid game input"));
 		});
 	};
+	// updateRound({ id }) {
+	// 	return new Promise((resolve, reject) => {
+	// 		const game = this.store[id];
+	// 		if (game && game.active) {
+	// 			game.rounds = game.rounds + 1;
+	// 			resolve(copyGame(game));
+	// 		} else {
+	// 			reject(new Error(`Game '${id}' not found`));
+	// 		}
+	// 	});
+	// };
 
-	updateReinforcement({ id }) {
-		return new Promise((resolve, reject) => {
-			const game = this.store[id];
-			if (game && game.active) {
-				game.cardReinforcement = game.cardReinforcement + 5;
-				resolve(copyGame(game));
-			} else {
-				reject(new Error(`Game '${id}' not found`));
-			}
-		});
-	};
+	// updateReinforcement({ id }) {
+	// 	return new Promise((resolve, reject) => {
+	// 		const game = this.store[id];
+	// 		if (game && game.active) {
+	// 			game.cardReinforcement = game.cardReinforcement + 5;
+	// 			resolve(copyGame(game));
+	// 		} else {
+	// 			reject(new Error(`Game '${id}' not found`));
+	// 		}
+	// 	});
+	// };
 
 	remove({ id }) {
 		return new Promise((resolve, reject) => {
@@ -116,23 +147,23 @@ class GameStore {
 		});
 	};
 
-	conquer({ id }, { name }, { token }) {
-		return new Promise((resolve, reject) => {
-			const game = this.store[id];
-			if (game && game.active) {
-				for (let t of game.territories) {
-					if (t.name === name) {
-						t.ptkn = token;
-						resolve(copyGame(game));
-						return;
-					}
-				}
-				reject(new Error(`Invalid territory ${name}`));
-			} else {
-				reject(new Error(`Game '${id}' not found`));
-			}
-		});
-	};
+	// conquer({ id }, { name }, { token }) {
+	// 	return new Promise((resolve, reject) => {
+	// 		const game = this.store[id];
+	// 		if (game && game.active) {
+	// 			for (let t of game.territories) {
+	// 				if (t.name === name) {
+	// 					t.ptkn = token;
+	// 					resolve(copyGame(game));
+	// 					return;
+	// 				}
+	// 			}
+	// 			reject(new Error(`Invalid territory ${name}`));
+	// 		} else {
+	// 			reject(new Error(`Game '${id}' not found`));
+	// 		}
+	// 	});
+	// };
 
 	territoryReducer({ id }) {
 		return Object.keys(TERRITORIES).map(name => {

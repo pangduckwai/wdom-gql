@@ -17,13 +17,16 @@ type Mutation {
 	# Player denoted by 'token' leave the game server.
 	leave(token: String!): Player
 	# The current player (with token in http header) create a game.
-	create(name: String!): Game
+	start(name: String!): Game
 	# End a game hosted by the current player (with token in http header).
-	end: Game
+	end: [Player]!
 	# The current player (with token in http header) join a game.
-	join(id: ID!): Game
+	join(id: ID!): Player
 	# The current player (with token in http header) quit a game.
-	quit: Game
+	quit: Player
+
+	# Test 1 - conquer
+	#test1(territory: String!): Game
 }
 
 type Player {

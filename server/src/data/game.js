@@ -32,7 +32,7 @@ class GameDS extends DataSource {
 		return (games.length > 0) ? games[0].ptkn : null;
 	}
 
-	async findOwner({ id }, { name }) {
+	async findOwner({ id, name }) {
 		const games = await this.store.findAny({ id });
 		if (games.length > 0) {
 			for (let t of games[0].territories) {
@@ -46,33 +46,46 @@ class GameDS extends DataSource {
 	async create({ name }) {
 		if (this.context && this.context.player) {
 			const token = this.context.player.token;
-			const game = await this.store.create({ name }, { token });
+			const game = await this.store.create({ name, token });
 			return game ? game : null;
 		}
 		return null;
 	}
 
-	async updateRound({ id }) {
-		const games = await this.store.find({ id });
-		if (games.length > 0) {
-			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
-				const game = await this.store.updateRound({ id });
-				return game ? game : null;
-			}
+	/////////////
+	// these functions should be called something like 'nextRound', 'reinforce', 'conquer', etc
+	/////////////
+
+	async conquer({ id, name }) {
+		if (this.context && this.context.player) {
+			const token = this.context.player.token;
+			const game = await this.store.update({ id: id, territory: { name: name, owner: token } });
+			return game ? game : null;
 		}
 		return null;
 	}
 
-	async updateReinforcement({ id }) {
-		const games = await this.store.find({ id });
-		if (games.length > 0) {
-			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
-				const game = await this.store.updateReinforcement({ id });
-				return game ? game : null;
-			}
-		}
-		return null;
-	}
+	// async updateRound({ id }) {
+	// 	const games = await this.store.find({ id });
+	// 	if (games.length > 0) {
+	// 		if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
+	// 			const game = await this.store.updateRound({ id });
+	// 			return game ? game : null;
+	// 		}
+	// 	}
+	// 	return null;
+	// }
+
+	// async updateReinforcement({ id }) {
+	// 	const games = await this.store.find({ id });
+	// 	if (games.length > 0) {
+	// 		if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
+	// 			const game = await this.store.updateReinforcement({ id });
+	// 			return game ? game : null;
+	// 		}
+	// 	}
+	// 	return null;
+	// }
 
 	async remove({ id }) {
 		const games = await this.store.find({ id });

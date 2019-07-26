@@ -23,19 +23,19 @@ let testPrepare = async (players, games) => {
 
 	let g2, g5;
 	if (p2) {
-		g2 = await games.create({ name: "John's Game" }, { token: p2.token });
-		if (g2) await players.update({ token: p2.token }, { id: g2.id });
+		g2 = await games.create({ name: "John's Game", token: p2.token });
+		if (g2) await players.update({ token: p2.token, id: g2.id });
 	}
 	if (p5) {
-		g5 = await games.create({ name: "Paul's Game" }, { token: p5.token });
-		if (g5) await players.update({ token: p5.token }, { id: g5.id });
+		g5 = await games.create({ name: "Paul's Game", token: p5.token });
+		if (g5) await players.update({ token: p5.token, id: g5.id });
 	}
 
-	if (p1) await players.update({ token: p1.token }, { id: g5.id });
-	if (p3) await players.update({ token: p3.token }, { id: g5.id });
-	if (p4) await players.update({ token: p4.token }, { id: g5.id });
-	if (p6) await players.update({ token: p6.token }, { id: g5.id });
-	// if (p7) await players.update({ token: p7.token }, { id: g2.id });
+	if (p1) await players.update({ token: p1.token, id: g5.id });
+	if (p3) await players.update({ token: p3.token, id: g5.id });
+	if (p4) await players.update({ token: p4.token, id: g5.id });
+	if (p6) await players.update({ token: p6.token, id: g5.id });
+	// if (p7) await players.update({ token: p7.token, id: g2.id });
 
 	console.log("🚀  Test data prepared !!!!!");
 };

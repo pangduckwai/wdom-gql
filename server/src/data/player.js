@@ -52,7 +52,7 @@ class PlayerDS extends DataSource {
 	async update({ id }) {
 		if (this.context && this.context.player) {
 			const token = this.context.player.token;
-			const player = await this.store.update({ token }, { id });
+			const player = await this.store.update({ token, id });
 			return player ? player : null;
 		}
 		return null;
@@ -61,6 +61,17 @@ class PlayerDS extends DataSource {
 	async remove({ token }) {
 		const player = await this.store.remove({ token });
 		return player ? player : null;
+	}
+
+	async cleanup({ id }) {
+		const players = await this.store.list({ id });
+		let q;
+		let ret = 0;
+		for (let p of players) {
+			q = await this.store.update({ token: p.token });
+			if (q) ret ++;
+		}
+		return (players.length === ret) ? players : null;
 	}
 }
 

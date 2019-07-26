@@ -98,9 +98,9 @@ class PlayerStore {
 		});
 	};
 
-	update({ token }, { id }) {
+	update({ token, id }) {
 		return new Promise((resolve, reject) => {
-			if (token) {
+			if ((typeof(token) !== "undefined") && (token !== null)) {
 				const player = this.store[this.idxToken[token]];
 				if (player) {
 					if ((typeof(id) !== "undefined") && (id !== null)) {
