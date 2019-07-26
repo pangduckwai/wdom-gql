@@ -49,18 +49,22 @@ class PlayerDS extends DataSource {
 		return player ? player : null;
 	}
 
-	async update({ id }) {
+	async remove() {
+		if (this.context && this.context.player) {
+			const token = this.context.player.token;
+			const player = await this.store.remove({ token });
+			return player ? player : null;
+		}
+		return null;
+	}
+
+	async join({ id }) {
 		if (this.context && this.context.player) {
 			const token = this.context.player.token;
 			const player = await this.store.update({ token, id });
 			return player ? player : null;
 		}
 		return null;
-	}
-
-	async remove({ token }) {
-		const player = await this.store.remove({ token });
-		return player ? player : null;
 	}
 
 	async cleanup({ id }) {
@@ -72,6 +76,10 @@ class PlayerDS extends DataSource {
 			if (q) ret ++;
 		}
 		return (players.length === ret) ? players : null;
+	}
+
+	async assignReinforcement({ token, reinforcement }) {
+		return this.store.update({ token, id: "", reinforcement });
 	}
 }
 

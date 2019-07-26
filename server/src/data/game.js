@@ -52,14 +52,63 @@ class GameDS extends DataSource {
 		return null;
 	}
 
-	/////////////
+	async remove({ id }) {
+		const games = await this.store.find({ id });
+		if (games.length > 0) {
+			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
+				const game = await this.store.remove({ id });
+				return game ? game : null;
+			}
+		}
+		return null;
+	}
+
+
+	// *****************************************************************************************
 	// these functions should be called something like 'nextRound', 'reinforce', 'conquer', etc
-	/////////////
+	async begin({ id, deck }) {
+		const games = await this.store.find({ id });
+		if (games.length > 0) {
+			let game;
+			let count = 0;
+			for (let t of games[0].territories) {
+				game = await this.store.update({ id: id, territory: { name: t.name, owner: deck[t.name], army: 1 }});
+				if (game) count ++;
+			}
+			if (game && (count === games[0].territories.length)) {
+				return this.store.update({ id: id, rounds: true });
+			}
+		}
+		return null;
+	}
+
+	// async begin({ id, tokens }) {
+	// 	if (tokens.length >= minPlayersPerGame()) {
+	// 		const games = await this.store.find({ id });
+	// 		if (games.length > 0) {
+	// 			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
+	// 				const deck = shuffleCards(tokens);
+	// 				let game;
+	// 				let count = 0;
+	// 				for (let t of games[0].territories) {
+	// 					game = await this.store.update({ id: id, territory: { name: t.name, owner: deck[t.name], army: 1 }});
+	// 					if (game) count ++;
+	// 				}
+	// 				if (game && (count === games[0].territories.length)) {
+	// 					return this.store.update({ id: id, rounds: true });
+	// 				}
+	// 			}
+	// 		}
+	// 	} else
+	// 		console.log(`Need at least ${minPlayersPerGame()} players to start a game`);
+
+	// 	return null;
+	// }
 
 	async conquer({ id, name }) {
 		if (this.context && this.context.player) {
 			const token = this.context.player.token;
-			const game = await this.store.update({ id: id, territory: { name: name, owner: token } });
+			const game = await this.store.update({ id: id, territory: { name: name, owner: token }});
 			return game ? game : null;
 		}
 		return null;
@@ -86,17 +135,6 @@ class GameDS extends DataSource {
 	// 	}
 	// 	return null;
 	// }
-
-	async remove({ id }) {
-		const games = await this.store.find({ id });
-		if (games.length > 0) {
-			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
-				const game = await this.store.remove({ id });
-				return game ? game : null;
-			}
-		}
-		return null;
-	}
 }
 
 module.exports = GameDS;

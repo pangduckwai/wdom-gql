@@ -1,5 +1,5 @@
 const { copyGame } = require('./copy');
-const { TERRITORIES } = require('../constants');
+const { territoryReducer } = require('../rules');
 
 //type Game {
 // 	id: ID!
@@ -65,9 +65,9 @@ class GameStore {
 					id: id,
 					name: name,
 					ptkn: token,
-					rounds: 0,
+					rounds: -1,
 					cardReinforcement: 4,
-					territories: this.territoryReducer({ id }),
+					territories: territoryReducer(id),
 					active: true
 				};
 				const len = this.store.push(game);
@@ -97,7 +97,7 @@ class GameStore {
 								if (territory.owner !== null) {
 									t.ptkn = territory.owner;
 								}
-								if (territory.amry >= 0) {
+								if (territory.army >= 0) {
 									t.army = territory.army;
 								}
 								break;
@@ -165,16 +165,16 @@ class GameStore {
 	// 	});
 	// };
 
-	territoryReducer({ id }) {
-		return Object.keys(TERRITORIES).map(name => {
-			let territory = {};
-			territory["name"] = name;
-			territory["gid"] = id;
-			territory["continent"] = TERRITORIES[name].continent;
-			territory["army"] = 0;
-			return territory;
-		});
-	};
+	// territoryReducer({ id }) {
+	// 	return Object.keys(TERRITORIES).map(name => {
+	// 		let territory = {};
+	// 		territory["name"] = name;
+	// 		territory["gid"] = id;
+	// 		territory["continent"] = TERRITORIES[name].continent;
+	// 		territory["army"] = 0;
+	// 		return territory;
+	// 	});
+	// };
 };
 
 module.exports = GameStore;

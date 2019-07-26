@@ -24,6 +24,7 @@ module.exports.copyPlayer = (orig) => {
 	let copy = {};
 	copy.token = orig.token;
 	copy.name = orig.name;
+	copy.reinforcement = orig.reinforcement;
 	if (typeof(orig.gid) !== "undefined") copy.gid = orig.gid; //(Game id)
 	return copy;
 };

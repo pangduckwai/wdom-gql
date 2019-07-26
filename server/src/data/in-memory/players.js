@@ -4,6 +4,7 @@ const { copyPlayer } = require('./copy');
 //type Player {
 // 	token: String!
 // 	name:  String!
+//	reinforcement: Int!
 // 	gid:   Int     #### game id
 //}
 class PlayerStore {
@@ -82,7 +83,8 @@ class PlayerStore {
 					let token = crypto.createHash('sha256').update(name + (Math.floor(Math.random()*10000)).toString()).digest('base64');
 					let player = {
 						token: token,
-						name: name
+						name: name,
+						reinforcement: 0
 					}
 					let len = this.store.push(player);
 					if (len > 0) {
@@ -98,15 +100,18 @@ class PlayerStore {
 		});
 	};
 
-	update({ token, id }) {
+	update({ token, id, reinforcement }) {
 		return new Promise((resolve, reject) => {
 			if ((typeof(token) !== "undefined") && (token !== null)) {
 				const player = this.store[this.idxToken[token]];
 				if (player) {
 					if ((typeof(id) !== "undefined") && (id !== null)) {
-						player.gid = id;
+						if (id !== "") player.gid = id; // id = "" noop
 					} else {
 						delete player.gid;
+					}
+					if ((typeof(reinforcement) !== "undefined") && (reinforcement !== null) && (reinforcement >= 0)) {
+						player.reinforcement = reinforcement;
 					}
 					resolve(copyPlayer(player));
 				}
