@@ -123,6 +123,27 @@ module.exports = {
 				}
 			}
 			return null;
+		},
+		setupAddArmy: async (_, { name }, { dataSources }) => {
+			const me = await dataSources.playerDS.me();
+			if (me) {
+				if ((typeof(me.gid) !== "undefined") && (me.gid !== null)) {
+					const games = await dataSources.gameDS.find({ id: me.gid });
+					if (games.length > 0) {
+						if (games[0].rounds === 0) { // Is setup round
+							const tlist = games[0].territories.filter(t => t.ptkn && (t.ptkn === me.token) && (t.name === name));
+							if (tlist.length === 1) {
+								const game = await dataSources.gameDS.setArmy({ id: me.gid, name: tlist[0].name, army: tlist[0].army + 1 });
+								if (game) {
+									const player = await dataSources.playerDS.assignReinforcement({ token: me.token, reinforcement: me.reinforcement - 1 });
+									return player ? game : null;
+								}
+							}
+						}
+					}
+				}
+			}
+			return null;
 		}
 		// test1: async (_, { territory }, { dataSources }) => {
 		// 	const player = await dataSources.playerDS.me();

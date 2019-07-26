@@ -111,11 +111,11 @@ let TERRITORIES = {
 
 module.exports.minPlayersPerGame = () => {
 	return 3;
-}
+};
 
 module.exports.maxPlayersPerGame = () => {
 	return 6;
-}
+};
 
 module.exports.initialArmies = (players) => {
 	switch(players) {
@@ -128,7 +128,40 @@ module.exports.initialArmies = (players) => {
 		case 6:
 			return 20;
 	}
-}
+};
+
+module.exports.continentReinforcement = (continent) => {
+	const cont = CONTINENTS[continent];
+	if (cont) return cont.reinforcement;
+	return -1;
+};
+
+module.exports.cardReinforcement = (last) => {
+	switch(last) {
+		case 0:
+			return 4;
+		case 4:
+			return 6;
+		case 6:
+			return 8;
+		case 8:
+			return 10;
+		default:
+			if (last >= 10) {
+				if (last < 65) {
+					return (5 * Math.floor(last/5)) + 5;
+				} else {
+					return 65;
+				}
+			}
+			return -1;
+	}
+};
+
+module.exports.basicReinforcement = (holdings) => {
+	const ret = Math.floor(holdings.length / 3);
+	return (ret < 3) ? 3 : ret;
+};
 
 module.exports.territoryReducer = (id) => {
     return Object.keys(TERRITORIES).map(name => {

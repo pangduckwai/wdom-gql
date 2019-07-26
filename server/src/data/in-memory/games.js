@@ -1,5 +1,5 @@
 const { copyGame } = require('./copy');
-const { territoryReducer } = require('../rules');
+const { territoryReducer, cardReinforcement } = require('../rules');
 
 //type Game {
 // 	id: ID!
@@ -66,7 +66,7 @@ class GameStore {
 					name: name,
 					ptkn: token,
 					rounds: -1,
-					cardReinforcement: 4,
+					cardReinforcement: 0,
 					territories: territoryReducer(id),
 					active: true
 				};
@@ -80,7 +80,7 @@ class GameStore {
 		});
 	};
 
-	update({ id, rounds, cardReinforcement, territory = { name: null, owner: null, army: -1 }}) {
+	update({ id, rounds, cards, territory = { name: null, owner: null, army: -1 }}) {
 		return new Promise((resolve, reject) => {
 			if ((typeof(id) !== "undefined") && (id !== null)) {
 				const game = this.store[id];
@@ -88,13 +88,13 @@ class GameStore {
 					if (rounds) {
 						game.rounds = game.rounds + 1;
 					}
-					if (cardReinforcement) {
-						game.cardReinforcement = game.cardReinforcement + 5; //TODO HERE increment not constant
+					if (cards) {
+						game.cardReinforcement = cardReinforcement(game.cardReinforcement);
 					}
 					if (territory.name !== null) {
 						for (let t of game.territories) {
 							if (t.name === territory.name) {
-								if (territory.owner !== null) {
+								if ((typeof(territory.owner) !== "undefined") && (territory.owner !== null)) {
 									t.ptkn = territory.owner;
 								}
 								if (territory.army >= 0) {
@@ -111,29 +111,6 @@ class GameStore {
 				reject(new Error("Invalid game input"));
 		});
 	};
-	// updateRound({ id }) {
-	// 	return new Promise((resolve, reject) => {
-	// 		const game = this.store[id];
-	// 		if (game && game.active) {
-	// 			game.rounds = game.rounds + 1;
-	// 			resolve(copyGame(game));
-	// 		} else {
-	// 			reject(new Error(`Game '${id}' not found`));
-	// 		}
-	// 	});
-	// };
-
-	// updateReinforcement({ id }) {
-	// 	return new Promise((resolve, reject) => {
-	// 		const game = this.store[id];
-	// 		if (game && game.active) {
-	// 			game.cardReinforcement = game.cardReinforcement + 5;
-	// 			resolve(copyGame(game));
-	// 		} else {
-	// 			reject(new Error(`Game '${id}' not found`));
-	// 		}
-	// 	});
-	// };
 
 	remove({ id }) {
 		return new Promise((resolve, reject) => {
@@ -146,35 +123,6 @@ class GameStore {
 			}
 		});
 	};
-
-	// conquer({ id }, { name }, { token }) {
-	// 	return new Promise((resolve, reject) => {
-	// 		const game = this.store[id];
-	// 		if (game && game.active) {
-	// 			for (let t of game.territories) {
-	// 				if (t.name === name) {
-	// 					t.ptkn = token;
-	// 					resolve(copyGame(game));
-	// 					return;
-	// 				}
-	// 			}
-	// 			reject(new Error(`Invalid territory ${name}`));
-	// 		} else {
-	// 			reject(new Error(`Game '${id}' not found`));
-	// 		}
-	// 	});
-	// };
-
-	// territoryReducer({ id }) {
-	// 	return Object.keys(TERRITORIES).map(name => {
-	// 		let territory = {};
-	// 		territory["name"] = name;
-	// 		territory["gid"] = id;
-	// 		territory["continent"] = TERRITORIES[name].continent;
-	// 		territory["army"] = 0;
-	// 		return territory;
-	// 	});
-	// };
 };
 
 module.exports = GameStore;

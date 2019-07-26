@@ -300,3 +300,97 @@ test("Shuffle", () => {
 	console.log(JSON.stringify(result));
 	expect(Object.keys(result).length).toBe(42);
 });
+
+let CONTINENTS = {
+	"Africa": {
+	 reinforcement: 3,
+	 territories: ["Congo", "East-Africa", "Egypt", "Madagascar", "North-Africa", "South-Africa"]
+ }, "Asia": {
+	 reinforcement: 7,
+	 territories: ["Afghanistan", "China", "India", "Irkutsk", "Japan", "Kamchatka", "Manchuria", "Middle-East", "Siam", "Siberia", "Ural", "Yakutsk"]
+ }, "Australia": {
+	 reinforcement: 2,
+	 territories: ["Eastern-Australia", "Indonesia", "New-Guinea", "Western-Australia"]
+ }, "Europe": {
+	 reinforcement: 5,
+	 territories: ["Great-Britain", "Iceland", "Northern-Europe", "Scandinavia", "Southern-Europe", "Ukraine", "Western-Europe"]
+ }, "North-America": {
+	 reinforcement: 5,
+	 territories: ["Alaska", "Alberta", "Eastern-United-States", "Greenland", "Mexico", "Northwest-Territory", "Ontario", "Quebec", "Western-United-States"]
+ }, "South-America": {
+	 reinforcement: 2,
+	 territories: ["Argentina", "Brazil", "Peru", "Venezuela"]
+ },
+};
+
+let continentReinforcement = (continent) => {
+	const cont = CONTINENTS[continent];
+	if (cont) return cont.reinforcement;
+	return -1;
+};
+
+test("Continents Asia", () => {
+	expect(continentReinforcement("Asia")).toBe(7);
+});
+
+test("Continents NA", () => {
+	expect(continentReinforcement("North-America")).toBe(5);
+});
+
+test("Continents Europe", () => {
+	expect(continentReinforcement("Europe")).toBe(5);
+});
+
+test("Continents Africa", () => {
+	expect(continentReinforcement("Africa")).toBe(3);
+});
+
+test("Continents SA", () => {
+	expect(continentReinforcement("South-America")).toBe(2);
+});
+
+test("Continents Australia", () => {
+	expect(continentReinforcement("Australia")).toBe(2);
+});
+
+let cardReinforcement = (last) => {
+	switch(last) {
+		case 0:
+			return 4;
+		case 4:
+			return 6;
+		case 6:
+			return 8;
+		case 8:
+			return 10;
+		default:
+			if (last >= 10) {
+				if (last < 65) {
+					return (5 * Math.floor(last/5)) + 5;
+				} else {
+					return 65;
+				}
+			}
+			return -1;
+	}
+};
+
+test("Cards 1", () => {
+	expect(cardReinforcement(0)).toBe(4);
+});
+
+test("Cards 2", () => {
+	expect(cardReinforcement(5)).toBe(-1);
+});
+
+test("Cards 3", () => {
+	expect(cardReinforcement(8)).toBe(10);
+});
+
+test("Cards 4", () => {
+	expect(cardReinforcement(10)).toBe(15);
+});
+
+test("Cards 5", () => {
+	expect(cardReinforcement(17)).toBe(20);
+});
