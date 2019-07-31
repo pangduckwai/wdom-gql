@@ -33,7 +33,7 @@ afterAll(() => {
 	// console.log(JSON.stringify(ids));
 });
 
-let createServer = (player) => {
+let createServer = (token) => {
 	let obj = {
 		typeDefs,
 		resolvers,
@@ -42,9 +42,9 @@ let createServer = (player) => {
 			gameDS: gameDS
 		})
 	};
-	if (player) {
+	if (token) {
 		return {
-			context: () => ({ player: player }),
+			context: () => ({ player: {token: token} }),
 			...obj
 		};
 	} else {
@@ -60,7 +60,7 @@ describe('Prepare players', () => {
 			mutation: REGISTER,
 			variables: { name: 'Rick' },
 		});
-		tokens.push(res.data.register);
+		tokens.push(res.data.register.token);
 		expect(res.data.register.name).toEqual('Rick');
 	});
 
@@ -71,7 +71,7 @@ describe('Prepare players', () => {
 			mutation: REGISTER,
 			variables: { name: 'John' },
 		});
-		tokens.push(res.data.register);
+		tokens.push(res.data.register.token);
 		expect(res.data.register.name).toEqual('John');
 	});
 
@@ -82,7 +82,7 @@ describe('Prepare players', () => {
 			mutation: REGISTER,
 			variables: { name: 'Josh' },
 		});
-		tokens.push(res.data.register);
+		tokens.push(res.data.register.token);
 		expect(res.data.register.name).toEqual('Josh');
 	});
 
@@ -93,7 +93,7 @@ describe('Prepare players', () => {
 			mutation: REGISTER,
 			variables: { name: 'Nick' },
 		});
-		tokens.push(res.data.register);
+		tokens.push(res.data.register.token);
 		expect(res.data.register.name).toEqual('Nick');
 	});
 
@@ -104,7 +104,7 @@ describe('Prepare players', () => {
 			mutation: REGISTER,
 			variables: { name: 'Paul' },
 		});
-		tokens.push(res.data.register);
+		tokens.push(res.data.register.token);
 		expect(res.data.register.name).toEqual('Paul');
 	});
 
@@ -115,7 +115,7 @@ describe('Prepare players', () => {
 			mutation: REGISTER,
 			variables: { name: "Bill" },
 		});
-		tokens.push(res.data.register);
+		tokens.push(res.data.register.token);
 		expect(res.data.register.name).toEqual("Bill");
 	});
 
@@ -126,7 +126,7 @@ describe('Prepare players', () => {
 			mutation: REGISTER,
 			variables: { name: "Fred" },
 		});
-		tokens.push(res.data.register);
+		tokens.push(res.data.register.token);
 		expect(res.data.register.name).toEqual("Fred");
 	});
 
@@ -215,7 +215,7 @@ describe('List players and games', () => {
 		expect(res.data.players.length).toEqual(7);
 	});
 
-	it("List players in John's game", async () => {
+	it("List players in Game 1", async () => {
 		const server = new ApolloServer(createServer());
 		const { query } = createTestClient(server);
 		const res = await query({
@@ -225,7 +225,7 @@ describe('List players and games', () => {
 		expect(res.data.joined.length).toEqual(1);
 	});
 
-	it("List players in Paul's game", async () => {
+	it("List players in Game 2", async () => {
 		const server = new ApolloServer(createServer());
 		const { query } = createTestClient(server);
 		const res = await query({
@@ -236,14 +236,14 @@ describe('List players and games', () => {
 	});
 
 	it("Find game hosted by John", async () => {
-		const server = new ApolloServer(createServer(tokens[1]));
+		const server = new ApolloServer(createServer(ids[0].host.token));
 		const { query } = createTestClient(server);
 		const res = await query({ query: HOSTED });
 		expect(res.data.hosted.host.name).toEqual("John");
 	});
 
 	it("Find game hosted by Paul", async () => {
-		const server = new ApolloServer(createServer(tokens[4]));
+		const server = new ApolloServer(createServer(ids[1].host.token));
 		const { query } = createTestClient(server);
 		const res = await query({ query: HOSTED });
 		expect(res.data.hosted.host.name).toEqual("Paul");
@@ -259,14 +259,14 @@ describe('List players and games', () => {
 
 describe('Starting a game', () => {
 	it('Try to begin a not-ready game', async () => {
-		const server = new ApolloServer(createServer(tokens[1]));
+		const server = new ApolloServer(createServer(ids[0].host.token));
 		const { mutate } = createTestClient(server);
 		const res = await mutate({ mutation: BEGIN });
 		expect(res.data.begin).toBeNull();
 	});
 
 	it('End a game', async () => {
-		const server = new ApolloServer(createServer(tokens[1]));
+		const server = new ApolloServer(createServer(ids[0].host.token));
 		const { mutate } = createTestClient(server);
 		const res = await mutate({ mutation: END });
 		expect(res.data.end[0].name).toEqual("John");
@@ -290,7 +290,7 @@ describe('Starting a game', () => {
 	});
 
 	it('Begin a game', async () => {
-		const server = new ApolloServer(createServer(tokens[4]));
+		const server = new ApolloServer(createServer(ids[1].host.token));
 		const { mutate } = createTestClient(server);
 		const res = await mutate({ mutation: BEGIN });
 		expect(res.data.begin.rounds).toEqual(0);
@@ -337,11 +337,27 @@ describe('Starting a game', () => {
 
 describe('Playing a game', () => {
 	it("Next player's turn", async () => {
-		const server = new ApolloServer(createServer(tokens[4]));
-		const { mutate } = createTestClient(server);
-		const res = await mutate({ mutation: NEXT });
-		console.log(JSON.stringify(res));
-		expect(res.data.next.turn.name).toEqual("Rick");
+		const { query } = createTestClient(new ApolloServer(createServer()));
+		let res = await query({
+			query: JOINED,
+			variables: { id: ids[1].id },
+		});
+		const count = res.data.joined.length;
+
+		let index = 0;
+		for (let i = 0; i < count; i ++) {
+			if (ids[1].host.token === res.data.joined[i].token) {
+				index = i;
+				break;
+			}
+		}
+
+		for (let i = 0; i < count; i ++) {
+			let { mutate } = createTestClient(new ApolloServer(createServer(tokens[index ++])));
+			res = await mutate({ mutation: NEXT });
+			if (index >= count) index = 0;
+		}
+		expect(res.data.next.turn.name).toEqual("Paul");
 	});
 
 });
