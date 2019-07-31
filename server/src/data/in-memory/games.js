@@ -4,7 +4,7 @@ const { territoryReducer, cardReinforcement } = require('../rules');
 //type Game {
 // 	id: ID!
 // 	name: String!
-// 	ptkn: String!      #### player token (host)
+// 	htkn: String!      #### player token (host)
 // 	rounds: Int!
 // 	cardReinforcement: Int!
 // 	territories: [Territory]!
@@ -13,7 +13,7 @@ const { territoryReducer, cardReinforcement } = require('../rules');
 // 	name: String!
 //  gid: ID!
 // 	continent: String!
-// 	ptkn: String       #### player token (owner)
+// 	otkn: String       #### player token (owner)
 // 	army: Int!
 //}
 class GameStore {
@@ -48,7 +48,7 @@ class GameStore {
 	findByHost({ token }) {
 		return new Promise((resolve, _) => {
 			let ret = [];
-			const result = this.store.filter(g => g.active && (g.ptkn === token));
+			const result = this.store.filter(g => g.active && (g.htkn === token));
 			if (result.length === 1) ret.push(copyGame(result[0]));
 			resolve(ret);
 		});
@@ -56,7 +56,7 @@ class GameStore {
 
 	create({ name, token }) {
 		return new Promise((resolve, reject) => {
-			const rslt = this.store.filter(g => g.active && ((g.name === name) || (g.ptkn === token)));
+			const rslt = this.store.filter(g => g.active && ((g.name === name) || (g.htkn === token)));
 			if (rslt.length > 0) {
 				reject(new Error(`Game '${name}' already exists`));
 			} else {
@@ -64,7 +64,7 @@ class GameStore {
 				const game = {
 					id: id,
 					name: name,
-					ptkn: token,
+					htkn: token,
 					rounds: -1,
 					cardReinforcement: 0,
 					territories: territoryReducer(id),
@@ -80,11 +80,14 @@ class GameStore {
 		});
 	};
 
-	update({ id, rounds, cards, territory = { name: null, owner: null, army: -1 }}) {
+	update({ id, turn, rounds, cards, territory = { name: null, owner: null, army: -1 }}) {
 		return new Promise((resolve, reject) => {
 			if ((typeof(id) !== "undefined") && (id !== null)) {
 				const game = this.store[id];
 				if (game && game.active) {
+					if (turn) {
+						game.ttkn = turn;
+					}
 					if (rounds) {
 						game.rounds = game.rounds + 1;
 					}
@@ -95,7 +98,7 @@ class GameStore {
 						for (let t of game.territories) {
 							if (t.name === territory.name) {
 								if ((typeof(territory.owner) !== "undefined") && (territory.owner !== null)) {
-									t.ptkn = territory.owner;
+									t.otkn = territory.owner;
 								}
 								if (territory.army >= 0) {
 									t.army = territory.army;

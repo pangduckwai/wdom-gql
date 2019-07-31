@@ -5,11 +5,11 @@ type Query {
 	me: Player
 	players: [Player]!
 	player(token: String!): Player
-	playersInGame(id: ID!): [Player]!
+	joined(id: ID!): [Player]!
 
 	games: [Game]!
 	game(id: ID!): Game
-	gameByHost: Game
+	hosted: Game
 
 	holdings: [Territory]!
 }
@@ -31,9 +31,14 @@ type Mutation {
 	join(id: ID!): Player
 	# The current player (with token in http header) quit a game.
 	quit: Player
-	# Add 1 army to an owned territory during the setup phase.
-	setupAddArmy(name: String!): Game
 
+	# Give the turn to the next player
+	next: Game
+	# Add 1 army to a territory
+	addArmy(name: String!): Game
+
+	# Add 1 army to an owned territory during the setup phase.
+	# setupAddArmy(name: String!): Game
 	# Test 1 - conquer
 	#test1(territory: String!): Game
 }
@@ -52,6 +57,7 @@ type Game {
 	id: ID!
 	name: String!
 	host: Player!
+	turn: Player
 	rounds: Int!
 	cardReinforcement: Int!
 	territories: [Territory]!

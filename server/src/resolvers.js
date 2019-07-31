@@ -5,7 +5,7 @@ module.exports = {
 		me: async (_, __, { dataSources }) => dataSources.playerDS.me(),
 		players: async (_, __, { dataSources }) => dataSources.playerDS.listAll(),
 		player: async (_, { token }, { dataSources }) => dataSources.playerDS.find({ token }),
-		playersInGame: async (_, { id }, { dataSources }) => dataSources.playerDS.list({ id }),
+		joined: async (_, { id }, { dataSources }) => dataSources.playerDS.list({ id }),
 		games: async (_, __, { dataSources }) => dataSources.gameDS.list(),
 		game: async (_, { id }, { dataSources }) => {
 			const games = await dataSources.gameDS.find({ id });
@@ -14,7 +14,7 @@ module.exports = {
 			else
 				return null;
 		},
-		gameByHost: async (_, __, { dataSources }) => {
+		hosted: async (_, __, { dataSources }) => {
 			const games = await dataSources.gameDS.findByHost();
 			if (games.length > 0)
 				return games[0];
@@ -28,7 +28,7 @@ module.exports = {
 					const games = await dataSources.gameDS.find({ id: me.gid });
 					if (games.length > 0) {
 						if (games[0].rounds >= 0) {
-							return games[0].territories.filter(t => t.ptkn && (t.ptkn === me.token));
+							return games[0].territories.filter(t => t.otkn && (t.otkn === me.token));
 						} else
 							console.log(`Game '${games[0].name}' not yet started`);
 					}
@@ -81,7 +81,7 @@ module.exports = {
 						let q;
 						let count = 0;
 						for (let p of players) {
-							let holdings = game.territories.filter(t => t.ptkn && (t.ptkn === p.token));
+							let holdings = game.territories.filter(t => t.otkn && (t.otkn === p.token));
 							q = await dataSources.playerDS.assignReinforcement({ token: p.token, reinforcement: initialArmies(len) - holdings.length });
 							if (q) count ++;
 						}
@@ -124,27 +124,64 @@ module.exports = {
 			}
 			return null;
 		},
-		setupAddArmy: async (_, { name }, { dataSources }) => {
+		next: async(_, __, { dataSources }) => {
 			const me = await dataSources.playerDS.me();
-			if (me) {
-				if ((typeof(me.gid) !== "undefined") && (me.gid !== null)) {
-					const games = await dataSources.gameDS.find({ id: me.gid });
-					if (games.length > 0) {
-						if (games[0].rounds === 0) { // Is setup round
-							const tlist = games[0].territories.filter(t => t.ptkn && (t.ptkn === me.token) && (t.name === name));
-							if (tlist.length === 1) {
-								const game = await dataSources.gameDS.setArmy({ id: me.gid, name: tlist[0].name, army: tlist[0].army + 1 });
-								if (game) {
-									const player = await dataSources.playerDS.assignReinforcement({ token: me.token, reinforcement: me.reinforcement - 1 });
-									return player ? game : null;
-								}
-							}
+			if (me && (typeof(me.gid) !== "undefined") && (me.gid !== null)) {
+				const games = await dataSources.gameDS.find({ id: me.gid });
+				if ((games.length > 0) && (games[0].ttkn === me.token)) {
+					const players = await dataSources.playerDS.list({ id: me.gid });
+					let idx = -1;
+					for (let i = 0; i < players.length; i ++) {
+						if (players[i].token === me.token) {
+							idx = i + 1;
+							break;
+						}
+					}
+					if (idx >= players.length) idx = 0;
+					const game = await dataSources.gameDS.next({ id: me.gid, token: players[idx].token });
+					if (game) return game;
+				}
+			}
+			return null;
+		},
+		addArmy: async (_, { name }, { dataSources }) => {
+			const me = await dataSources.playerDS.me();
+			if (me && (typeof(me.gid) !== "undefined") && (me.gid !== null)) {
+				const games = await dataSources.gameDS.find({ id: me.gid });
+				if ((games.length > 0) && (games[0].ttkn === me.token) && (me.reinforcement > 0)) {
+					const territories = games[0].territories.filter(t => t.otkn && (t.otkn === me.token) && (t.name === name));
+					if (territories.length === 1) {
+						const game = await dataSources.gameDS.setArmy({ id: me.gid, name: territories[0].name, army: territories[0].army + 1 });
+						if (game) {
+							const player = await dataSources.playerDS.assignReinforcement({ token: me.token, reinforcement: me.reinforcement - 1 });
+							return player ? game : null;
 						}
 					}
 				}
 			}
 			return null;
 		}
+		// setupAddArmy: async (_, { name }, { dataSources }) => {
+		// 	const me = await dataSources.playerDS.me();
+		// 	if (me) {
+		// 		if ((typeof(me.gid) !== "undefined") && (me.gid !== null)) {
+		// 			const games = await dataSources.gameDS.find({ id: me.gid });
+		// 			if (games.length > 0) {
+		// 				if (games[0].rounds === 0) { // Is setup round
+		// 					const tlist = games[0].territories.filter(t => t.otkn && (t.otkn === me.token) && (t.name === name));
+		// 					if (tlist.length === 1) {
+		// 						const game = await dataSources.gameDS.setArmy({ id: me.gid, name: tlist[0].name, army: tlist[0].army + 1 });
+		// 						if (game) {
+		// 							const player = await dataSources.playerDS.assignReinforcement({ token: me.token, reinforcement: me.reinforcement - 1 });
+		// 							return player ? game : null;
+		// 						}
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// 	return null;
+		// }
 		// test1: async (_, { territory }, { dataSources }) => {
 		// 	const player = await dataSources.playerDS.me();
 		// 	if (player && (typeof(player.gid) !== "undefined") && (player.gid !== null)) {
@@ -166,6 +203,13 @@ module.exports = {
 	Game: {
 		host: async (game, _, { dataSources }) => {
 			const token = await dataSources.gameDS.findHost({ id: game.id });
+			if (token)
+				return dataSources.playerDS.find({ token: token });
+			else
+				return null;
+		},
+		turn: async (game, _, { dataSources }) => {
+			const token = await dataSources.gameDS.findTurn({ id: game.id });
 			if (token)
 				return dataSources.playerDS.find({ token: token });
 			else

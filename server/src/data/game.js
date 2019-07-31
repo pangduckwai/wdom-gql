@@ -29,7 +29,13 @@ class GameDS extends DataSource {
 
 	async findHost({ id }) {
 		const games = await this.store.findAny({ id });
-		return (games.length > 0) ? games[0].ptkn : null;
+		return (games.length > 0) ? games[0].htkn : null;
+	}
+
+	// find out whose turn it is
+	async findTurn({ id }) {
+		const games = await this.store.findAny({ id });
+		return (games.length > 0) ? games[0].ttkn : null;
 	}
 
 	async findOwner({ id, name }) {
@@ -37,7 +43,7 @@ class GameDS extends DataSource {
 		if (games.length > 0) {
 			for (let t of games[0].territories) {
 				if (t.name === name)
-					return t.ptkn;
+					return t.otkn;
 			}
 		}
 		return null;
@@ -55,7 +61,7 @@ class GameDS extends DataSource {
 	async remove({ id }) {
 		const games = await this.store.find({ id });
 		if (games.length > 0) {
-			if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
+			if (this.context && this.context.player && (this.context.player.token === games[0].htkn)) {
 				const game = await this.store.remove({ id });
 				return game ? game : null;
 			}
@@ -75,10 +81,15 @@ class GameDS extends DataSource {
 				if (game) count ++;
 			}
 			if (game && (count === games[0].territories.length)) {
-				return this.store.update({ id: id, rounds: true, cards: true });
+				return this.store.update({ id: id, turn: game.htkn, rounds: true, cards: true });
 			}
 		}
 		return null;
+	}
+
+	async next({ id, token }) {
+		const game = this.store.update({ id: id, turn: token });
+		return game ? game : null;
 	}
 
 	async setArmy({ id, name, army }) {
@@ -102,7 +113,7 @@ class GameDS extends DataSource {
 	// async updateRound({ id }) {
 	// 	const games = await this.store.find({ id });
 	// 	if (games.length > 0) {
-	// 		if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
+	// 		if (this.context && this.context.player && (this.context.player.token === games[0].htkn)) {
 	// 			const game = await this.store.updateRound({ id });
 	// 			return game ? game : null;
 	// 		}
@@ -113,7 +124,7 @@ class GameDS extends DataSource {
 	// async updateReinforcement({ id }) {
 	// 	const games = await this.store.find({ id });
 	// 	if (games.length > 0) {
-	// 		if (this.context && this.context.player && (this.context.player.token === games[0].ptkn)) {
+	// 		if (this.context && this.context.player && (this.context.player.token === games[0].htkn)) {
 	// 			const game = await this.store.updateReinforcement({ id });
 	// 			return game ? game : null;
 	// 		}
