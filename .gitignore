@@ -62,3 +62,4 @@ typings/
 .next
 
 note.txt
+*.old/
