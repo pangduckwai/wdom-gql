@@ -17,7 +17,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	// console.log("Games", queries.listGames());
+	console.log("Games", queries.listGames());
 	console.log("Players", queries.listPlayers());
 
 	// console.log(JSON.stringify(queries.idxPlayerName));
@@ -73,10 +73,7 @@ test("Open new game", async () => {
 		await commands.openGame({ token: ptokens[game.index], name: game.name }).then(value => {
 			gtokens.push(value.event.token);
 			okay ++;
-		}).catch(r => {
-			console.log(r.message);
-			fail ++;
-		});
+		}).catch(r => fail ++);
 	}
 	expect((okay === 2) && (fail === 2)).toBeTruthy();
 });
@@ -89,8 +86,46 @@ test("Take snapshot", () => {
 	});
 });
 
+const JOINING = [0, 1, 2, 3, 6];
+test("Join game", async () => {
+	let okay = 0, fail = 0;
+	for (const idx of JOINING) {
+		await commands.joinGame({ player: ptokens[idx], game: gtokens[1] }).then(value => {
+			okay ++;
+		}).catch(error => fail ++);
+	}
+	expect((okay === 4) && (fail === 1)).toBeTruthy();
+});
+
+test("Leave game", () => {
+	return commands.leaveGame({ token: ptokens[6] }).then(_ => {
+		const p = queries.findPlayerByToken({ token: ptokens[6] });
+		expect(typeof(p.joined) === "undefined").toBeTruthy();
+	});
+});
+
+test("Leave one's own game", () => {
+	return commands.leaveGame({ token: ptokens[1] }).catch(error => {
+		expect(error.message).toEqual("[LEAVE] Cannot leave player John's own game");
+	});
+});
+
+test("Close game", () => {
+	return commands.closeGame({ token: ptokens[1] }).then(_ => {
+		const games = queries.listGames();
+		expect(games.length).toEqual(1);
+	});
+});
+
+test("Close other people's game", () => {
+	return commands.closeGame({ token: ptokens[0] }).catch(error => {
+		expect(error.message).toEqual("[CLOSE] Can only close player Rick's own game");
+	});
+});
+
 test("Join game", () => {
-	return commands.joinGame({ player: ptokens[0], game: gtokens[1] }).then(r => {
-		expect(r.successful).toBeTruthy();
+	return commands.joinGame({ player: ptokens[1], game: gtokens[1] }).then(_ => {
+		const players = queries.listPlayersByGame({ token: gtokens[1] });
+		expect(players.length).toEqual(5);
 	});
 });
