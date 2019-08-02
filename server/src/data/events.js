@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const evn = require('../constants');
+const evn = require('../events');
 
 /*
 	type Event {
@@ -38,22 +38,7 @@ let populate = (event, token) => {
 class EventStore {
 	constructor() {
 		this.events = [];
-		// this.idxToken = {};
-		// this.idxName = {};
 	}
-
-	// rebuildIndex() {
-	// 	this.idxToken = {};
-	// 	// this.idxName = {};
-
-	// 	for (let idx = 0; idx < this.events.length; idx ++) {
-	// 		this.idxToken[this.events[idx].token] = idx;
-	// 		// if (!this.idxName[this.events[idx].name.toUpperCase()]) {
-	// 		// 	this.idxName[this.events[idx].name.toUpperCase()] = [];
-	// 		// }
-	// 		// this.idxName[this.events[idx].name.toUpperCase()].push(idx);
-	// 	}
-	// };
 
 	find({ from, to, type, event, token }) {
 		return new Promise((resolve, _) => {
@@ -111,14 +96,14 @@ class EventStore {
 					if (payload.tokens.length < 2) {
 						rspn.message = "[JOIN] Missing player and/or game IDs";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game to join
+						rspn.successful = populate(obj, payload.tokens[0]); //token of the player joining a game
 					}
 					break;
 				case evn.GAME_LEFT.id:
 					if (payload.tokens.length < 2) {
 						rspn.message = "[LEAVE] Missing player and/or game IDs";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game to leave
+						rspn.successful = populate(obj, payload.tokens[0]); //token of the player leaving a game
 					}
 					break;
 				case evn.NEXT_PLAYER.id:
@@ -174,6 +159,19 @@ class EventStore {
 						rspn.message = "[ADD] Missing number of troops";
 					} else {
 						rspn.successful = populate(obj, payload.tokens[1]); //token of the game in question
+					}
+					break;
+				case evn.TROOP_ASSIGNED.id:
+					// NOTE - use for assigning troops to a player at:
+					//  1. during setup phase, assigning remaining troops after adding 1 troop to each owned territory
+					//  2. at the begining of each turn when receiving reinforcement
+					//  3. after redeem cards for additional reinforcement
+					if (payload.tokens.length < 2) {
+						rspn.message = "[REINFORCEMENT] Missing player and/or game IDs";
+					} else if (payload.amount < 0) {
+						rspn.message = "[REINFORCEMENT] Missing number of troops";
+					} else {
+						rspn.successful = populate(obj, payload.tokens[0]); //token of the player in question
 					}
 					break;
 				case evn.TROOP_DEPLOYED.id:

@@ -4,13 +4,14 @@ module.exports = Object.freeze({
 	}, PLAYER_QUITTED: {
 		id: 2, type: "P"
 	}, GAME_JOINED: {
-		id: 3, type: "G"
+		id: 3, type: "P"
 	}, GAME_LEFT: {
-		id: 4, type: "G"
+		id: 4, type: "P"
 	}, NEXT_PLAYER: {
 		id: 5, type: "G"
-	}, GAME_OPENED: 6,
-	GAME_CLOSED: {
+	}, GAME_OPENED: {
+		id: 6, type: "G"
+	}, GAME_CLOSED: {
 		id: 7, type: "G"
 	}, GAME_STARTED: {
 		id: 8, type: "G"
@@ -18,7 +19,9 @@ module.exports = Object.freeze({
 		id: 9, type: "T"
 	}, TROOP_ADDED: {
 		id: 10, type: "T"
-	}, TROOP_DEPLOYED: {
+	}, TROOP_ASSIGNED: {
 		id: 11, type: "P"
+	}, TROOP_DEPLOYED: {
+		id: 12, type: "P"
 	}
 });
