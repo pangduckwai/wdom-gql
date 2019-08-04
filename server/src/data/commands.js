@@ -20,7 +20,7 @@ class Commands extends DataSource {
 		} else {
 			const q = await this.store.add({ event: evn.PLAYER_REGISTERED, payload: { name: name }});
 			if (q) {
-				await this.queries.rebuildSnapshot();
+				await this.queries.updateSnapshot();
 				return q;
 			}
 		}
@@ -31,7 +31,7 @@ class Commands extends DataSource {
 		if (p) {
 			const q = await this.store.add({ event: evn.PLAYER_QUITTED, payload: { tokens: [token] }});
 			if (q) {
-				await this.queries.rebuildSnapshot();
+				await this.queries.updateSnapshot();
 				return q;
 			}
 		} else
@@ -56,7 +56,7 @@ class Commands extends DataSource {
 		if (h) {
 			if (h.successful) {
 				await this.store.add({ event: evn.GAME_JOINED, payload: { tokens: [token, h.event.token] }});
-				await this.queries.rebuildSnapshot();
+				await this.queries.updateSnapshot();
 			}
 			return h;
 		}
@@ -73,7 +73,7 @@ class Commands extends DataSource {
 						if (k) {
 							if (k.successful) {
 								await this.store.add({ event: evn.GAME_LEFT, payload: { tokens: [token, g.token] }});
-								await this.queries.rebuildSnapshot();
+								await this.queries.updateSnapshot();
 							}
 							return k;
 						}
@@ -106,7 +106,7 @@ class Commands extends DataSource {
 
 					const k = await this.store.add({ event: evn.GAME_JOINED, payload: { tokens: [player, game] }});
 					if (k) {
-						await this.queries.rebuildSnapshot();
+						await this.queries.updateSnapshot();
 						return k;
 					}
 				} else
@@ -125,7 +125,7 @@ class Commands extends DataSource {
 					if (g.host !== token) {
 						const k = await this.store.add({ event: evn.GAME_LEFT, payload: { tokens: [token, g.token] }});
 						if (k) {
-							await this.queries.rebuildSnapshot();
+							await this.queries.updateSnapshot();
 							return k;
 						}
 					} else
@@ -173,7 +173,7 @@ class Commands extends DataSource {
 										});
 									}
 
-									await this.queries.rebuildSnapshot();
+									await this.queries.updateSnapshot();
 								}
 								return k;
 							}
@@ -209,6 +209,7 @@ class Commands extends DataSource {
 											event: evn.TROOP_DEPLOYED,
 											payload: { amount: 1, tokens: [token, g.token] }
 										});
+
 										// TODO!!! Move this to a proper place to control game flow
 										if (m && (g.rounds === 0)) {
 											await this.store.add({
@@ -216,7 +217,7 @@ class Commands extends DataSource {
 												payload: { tokens: [token, g.token] }
 											});
 										}
-										await this.queries.rebuildSnapshot();
+										await this.queries.updateSnapshot();
 										return k;
 									}
 								}

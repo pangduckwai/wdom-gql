@@ -39,6 +39,7 @@ class Queries extends DataSource {
 		this.idxPlayerName = {};
 		this.idxGameToken = {};
 		this.idxGameName = {};
+		this.snapshot = -1;
 	}
 
 	rebuildPlayerIndex() {
@@ -207,59 +208,55 @@ class Queries extends DataSource {
 		}
 	}
 
-	async rebuildSnapshot() {
+	async takeSnapshot() {
 		return new Promise(async (resolve, _) => {
-			//Players
+			const { lastIndex, eventList } = await this.store.list({ index: 0 }); // get all
+			this.snapshot = lastIndex;
+
 			this.players = [];
 			this.idxPlayerToken = {};
 			this.idxPlayerName = {};
-			const registered = await this.store.find({ type: "P", event: evn.PLAYER_REGISTERED.id }); // to: this.snapshot,
-			for (const player of registered) {
-				const events = await this.store.find({ token: player.eventid });
-				for (const v of events) {
-					this.process(v);
-				}
-			}
 
-			//Games...
 			this.games = [];
 			this.idxGameToken = {};
 			this.idxGameName = {};
-			const opened = await this.store.find({ type: "G", event: evn.GAME_OPENED.id });
-			for (const game of opened) {
-				const events = await this.store.find({ token: game.eventid });
-				for (const v of events) {
-					this.process(v);
+
+			if (lastIndex >= 0) {
+				//Players
+				const registered = eventList.filter(e => (e.type === "P") && (e.event === evn.PLAYER_REGISTERED.id)); //await this.store.find({ type: "P", event: evn.PLAYER_REGISTERED.id }); // to: this.snapshot,
+				for (const player of registered) {
+					const events = eventList.filter(e => (e.token === player.eventid)); //await this.store.find({ token: player.eventid });
+					for (const v of events) {
+						this.process(v);
+					}
+				}
+
+				//Games
+				const opened = eventList.filter(e => (e.type === "G") && (e.event === evn.GAME_OPENED.id)); //await this.store.find({ type: "G", event: evn.GAME_OPENED.id });
+				for (const game of opened) {
+					const events = eventList.filter(e => (e.token === game.eventid)); //await this.store.find({ token: game.eventid });
+					for (const v of events) {
+						this.process(v);
+					}
 				}
 			}
-
 			resolve(true);
 		});
 	}
 
-	// async refreshSnapshot() {
-	// 	return new Promise(async (resolve, _) => {
-	// 		//Players
-	// 		const registered = await this.store.find({ type: "P", event: evn.PLAYER_REGISTERED.id });
-	// 		for (const player of registered) {
-	// 			const events = await this.store.find({ token: player.eventid });
-	// 			for (const v of events) {
-	// 				this.process(v);
-	// 			}
-	// 		}
+	async updateSnapshot() {
+		return new Promise(async (resolve, _) => {
+			const { lastIndex, eventList } = await this.store.list({ index: this.snapshot + 1 });
+			this.snapshot = lastIndex;
 
-	// 		//Games
-	// 		const opened = await this.store.find({ type: "G", event: evn.GAME_OPENED.id });
-	// 		for (const game of opened) {
-	// 			const events = await this.store.find({ token: game.eventid });
-	// 			for (const v of events) {
-	// 				this.process(v);
-	// 			}
-	// 		}
-
-	// 		resolve(true);
-	// 	});
-	// }
+			if (lastIndex >= 0) {
+				for (const event of eventList) {
+					this.process(event);
+				}
+			}
+			resolve(true);
+		});
+	}
 };
 
 module.exports = Queries;

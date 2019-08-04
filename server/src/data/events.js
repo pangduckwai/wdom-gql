@@ -40,11 +40,13 @@ class EventStore {
 		this.events = [];
 	}
 
-	// list() {
-	// 	return new Promise((resolve, _) => {
-	// 		resolve(this.events.map(v => copy(v)));
-	// 	});
-	// }
+	list({ index }) {
+		return new Promise((resolve, _) => {
+			const len = this.events.length;
+			const lst = (len > 0) ? this.events.slice(index).map(v => copy(v)) : [];
+			resolve({ lastIndex: len - 1, eventList: lst });
+		});
+	}
 
 	find({ from, to, type, event, token }) {
 		return new Promise((resolve, _) => {
