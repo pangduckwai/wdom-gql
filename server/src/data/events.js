@@ -40,14 +40,20 @@ class EventStore {
 		this.events = [];
 	}
 
+	// list() {
+	// 	return new Promise((resolve, _) => {
+	// 		resolve(this.events.map(v => copy(v)));
+	// 	});
+	// }
+
 	find({ from, to, type, event, token }) {
 		return new Promise((resolve, _) => {
 			resolve(this.events.filter(v =>
-				((typeof(from) === "undefined")   || (from === null)   || (v.timestamp >= from)) &&
-				((typeof(to) === "undefined")     || (to === null)     || (v.timestamp < to)) &&
-				((typeof(type) === "undefined")   || (type === null)   || (v.type === type)) &&
-				((typeof(event) === "undefined")  || (event === null)  || (v.event === event)) &&
-				((typeof(token) === "undefined")  || (token === null)  || (v.token === token))
+				((typeof(from) === "undefined")  || (from === null)  || (v.timestamp >= from)) &&
+				((typeof(to) === "undefined")    || (to === null)    || (v.timestamp < to)) &&
+				((typeof(type) === "undefined")  || (type === null)  || (v.type === type)) &&
+				((typeof(event) === "undefined") || (event === null) || (v.event === event)) &&
+				((typeof(token) === "undefined") || (token === null) || (v.token === token))
 			).map(v => copy(v)));
 		});
 	}
@@ -106,7 +112,7 @@ class EventStore {
 						rspn.successful = populate(obj, payload.tokens[0]); //token of the player leaving a game
 					}
 					break;
-				case evn.NEXT_PLAYER.id:
+				case evn.TURN_TAKEN.id:
 					if (payload.tokens.length < 2) {
 						rspn.message = "[NEXT] Missing player and/or game IDs";
 					} else {

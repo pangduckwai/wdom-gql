@@ -13,12 +13,14 @@ let gtokens = [];
 
 beforeAll(async () => {
 	console.log("Test setup...");
-	await queries.snapshot();
+	await queries.rebuildSnapshot();
 });
 
 afterAll(() => {
+	// console.log("Games", JSON.stringify(queries.listGames()[0].territories));
 	console.log("Games", queries.listGames());
 	console.log("Players", queries.listPlayers());
+	console.log("Players", queries.idxPlayerName);
 
 	// console.log(JSON.stringify(queries.idxPlayerName));
 
@@ -79,7 +81,7 @@ test("Open new game", async () => {
 });
 
 test("Take snapshot", () => {
-	return queries.snapshot().then(_ => {
+	return queries.rebuildSnapshot().then(_ => {
 		const p = queries.listPlayers();
 		const g = queries.listGames();
 		expect((p.length === 6) && (g.length === 2)).toBeTruthy();
@@ -127,5 +129,20 @@ test("Join game", () => {
 	return commands.joinGame({ player: ptokens[1], game: gtokens[1] }).then(_ => {
 		const players = queries.listPlayersByGame({ token: gtokens[1] });
 		expect(players.length).toEqual(5);
+	});
+});
+
+test("Start game", () => {
+	return commands.startGame({ token: ptokens[4] }).then(value => {
+		expect(value.successful).toBeTruthy();
+	});
+});
+
+test("Setup troops", () => {
+	const p = queries.listTerritoryByPlayer({ token: ptokens[4] })
+	const g = queries.findGameByToken({ token: gtokens[1] });
+	return commands.deployTroops({ token: p[0].owner, territory: p[0].name }).then(value => {
+		console.log("Deploy", JSON.stringify(p[0]));
+		expect(value.successful).toBeTruthy();
 	});
 });

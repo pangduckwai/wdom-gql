@@ -7,7 +7,7 @@ module.exports = Object.freeze({
 		id: 3, type: "P"
 	}, GAME_LEFT: {
 		id: 4, type: "P"
-	}, NEXT_PLAYER: {
+	}, TURN_TAKEN: {
 		id: 5, type: "G"
 	}, GAME_OPENED: {
 		id: 6, type: "G"

@@ -117,7 +117,7 @@ module.exports.maxPlayersPerGame = () => {
 	return 6;
 };
 
-module.exports.initialArmies = (players) => {
+module.exports.initialTroops = (players) => {
 	switch(players) {
 		case 3:
 			return 35;
@@ -163,11 +163,11 @@ module.exports.basicReinforcement = (holdings) => {
 	return (ret < 3) ? 3 : ret;
 };
 
-module.exports.territoryReducer = (id) => {
+module.exports.buildTerritory = () => {
     return Object.keys(TERRITORIES).map(name => {
         let territory = {};
         territory["name"] = name;
-        territory["game"] = id;
+        // territory["game"] = id;
         territory["continent"] = TERRITORIES[name].continent;
         territory["troops"] = 0;
         return territory;
