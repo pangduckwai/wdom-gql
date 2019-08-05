@@ -1,0 +1,66 @@
+const { gql } = require('apollo-server');
+
+const typeDefs = gql`
+type Query {
+    me: Player
+    myTerritories: [Territory]!
+    myFellowPlayers: [Player]!
+    myGame: Game
+    listPlayers: [Player]!
+    listGames: [Game]!
+}
+
+type Mutation {
+    registerPlayer(name: String!): Response
+    quitPlayer: Response
+    openGame(name: String!): Response
+    closeGame: Response
+    joinGame(token: String!): Response
+    leaveGame: Response
+    startGame: Response
+    deployTroops(name: String!): Response
+}
+
+type Player {
+	token: String!
+	name: String!
+	reinforcement: Int!
+	joined: Game
+}
+
+type Game {
+	token: String!
+	name: String!
+	host: Player!
+	turn: Player
+	rounds: Int!
+	redeemed: Int!
+	territories: [Territory]!
+}
+
+type Territory {
+	name: String!
+	continent: String!
+	owner: Player
+	troops: Int!
+}
+
+type Event {
+    eventid: String!
+    timestamp: String!
+    event: Int!
+    type: String!
+    name: String
+    amount: Int
+    tokens: [String]
+    token: String!
+}
+
+type Response {
+    successful: Boolean!
+    message: String
+    event: Event
+}
+`;
+
+module.exports = typeDefs;

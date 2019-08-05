@@ -29,7 +29,7 @@ type Territory {
 	troops: Int!
 }
 */
-class Queries extends DataSource {
+class EventDS extends DataSource {
 	constructor({ store }) {
 		super();
 		this.store = store;
@@ -40,6 +40,10 @@ class Queries extends DataSource {
 		this.idxGameToken = {};
 		this.idxGameName = {};
 		this.snapshot = -1;
+	}
+
+	initialize(config) {
+		this.context = config.context;
 	}
 
 	rebuildPlayerIndex() {
@@ -60,6 +64,12 @@ class Queries extends DataSource {
 		}
 	};
 
+	me() {
+		if (this.context && this.context.token)
+			return this.findPlayerByToken({ token: this.context.token });
+		else
+			return null;
+	}
 	listPlayers() {
 		return this.players;
 	};
@@ -83,7 +93,7 @@ class Queries extends DataSource {
 		return this.games[this.idxGameName[name]];
 	}
 
-	listTerritoryByPlayer({ token }) {
+	listTerritoriesByPlayer({ token }) {
 		return this.games[this.idxGameToken[this.players[this.idxPlayerToken[token]].joined]].territories.filter(t => 
 			(typeof(t.owner) !== "undefined") && (t.owner === token)
 		);
@@ -257,6 +267,10 @@ class Queries extends DataSource {
 			resolve(true);
 		});
 	}
+
+	async add({ event, payload }) {
+		return this.store.add({ event, payload });
+	}
 };
 
-module.exports = Queries;
+module.exports = EventDS;

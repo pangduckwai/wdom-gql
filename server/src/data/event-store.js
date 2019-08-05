@@ -82,7 +82,7 @@ class EventStore {
 			if (payload.tokens && (payload.tokens.length > 0)) {
 				obj.tokens = [];
 				for (let t of payload.tokens)
-				obj.tokens.push(t);
+					obj.tokens.push(t);
 			}
 
 			switch (event.id) {

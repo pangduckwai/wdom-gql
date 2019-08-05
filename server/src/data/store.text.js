@@ -1,11 +1,11 @@
 const evn = require('../events');
 const { redeemReinforcement } = require("../rules");
-const EventStore = require("./events");
-const Queries = require("./queries");
+const EventStore = require("./event-store");
+const EventDS = require("./event-ds");
 const Commands = require("./commands");
 
 const eventStore = new EventStore();
-const queries = new Queries({ store: eventStore });
+const queries = new EventDS({ store: eventStore });
 const commands = new Commands({ queries: queries });
 
 let ptokens = [];
@@ -51,15 +51,6 @@ test("Register new players", async () => {
 // 	expect(troops).toEqual(25);
 // });
 
-// test("Troop deployed", async () => {
-// 	let index = 0, okay = 0, fail = 0;
-// 	for (const p of queries.listPlayers()) {
-// 		await eventStore.add({ event: evn.TROOP_DEPLOYED, payload: { tokens: [ptokens[index ++], 'ABCD1234'], amount: 1 }})
-// 			.then(_ => okay ++).catch(_ => fail ++);
-// 	}
-// 	expect((okay === 7) && (fail === 0)).toBeTruthy();
-// });
-
 test("Player quit", () => {
 	return commands.quitPlayer({ token: ptokens[5] }).then(_ => {
 		expect(queries.listPlayers().length).toEqual(6);
@@ -79,14 +70,6 @@ test("Open new game", async () => {
 	}
 	expect((okay === 2) && (fail === 2)).toBeTruthy();
 });
-
-// test("Take snapshot", () => {
-// 	return queries.takeSnapshot().then(_ => {
-// 		const p = queries.listPlayers();
-// 		const g = queries.listGames();
-// 		expect((p.length === 6) && (g.length === 2)).toBeTruthy();
-// 	});
-// });
 
 const JOINING = [0, 1, 2, 3, 6];
 test("Join game", async () => {
@@ -139,12 +122,11 @@ test("Start game", () => {
 });
 
 test("Setup troops", () => {
-	// const p = queries.listTerritoryByPlayer({ token: ptokens[4] })
-	// return commands.deployTroops({ token: p[0].owner, territory: p[0].name }).then(value => {
-	// 	console.log("Deploy", JSON.stringify(p[0]));
-	// 	expect(value.successful).toBeTruthy();
-	// });
-
-	const g = queries.findGameByToken({ token: gtokens[1] });
-	const t = queries.listTerritoryByPlayer({ token: g.turn });
+	const p = queries.listTerritoriesByPlayer({ token: ptokens[4] })
+	return commands.deployTroops({ token: p[0].owner, territory: p[0].name }).then(value => {
+		console.log("Deploy", JSON.stringify(p[0]));
+		expect(value.successful).toBeTruthy();
+	});
+	// const g = queries.findGameByToken({ token: gtokens[1] });
+	// const t = queries.listTerritoriesByPlayer({ token: g.turn });
 });
