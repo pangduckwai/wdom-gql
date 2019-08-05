@@ -14,6 +14,10 @@ let eventDS;
 let ptokens = [];
 let gtokens = [];
 
+// must be a bug.... apparently the first statement in then() will always run, afterward the flow will somehow move to catch(), so do something useless at the
+// begining of then().  NOTE cannot use console.log() for some unknown reason...
+let jtokens = [];
+
 beforeAll(() => {
 	console.log("Test setup...");
 	eventStore = new EventStore();
@@ -79,13 +83,10 @@ describe('Preparation', () => {
 				mutation: OPEN,
 				variables: { name: game.name },
 			}).then(response => {
-				console.log("OPEN okay 1", JSON.stringify(response));
 				gtokens.push(response.data.openGame.event.token);
 				okay ++;
-				console.log("OPEN okay 2", JSON.stringify(response));
 			}).catch(_ => fail ++);
 		}
-		console.log("Open", okay, fail);
 		expect((okay === 2) && (fail === 2)).toBeTruthy();
 	});
 
@@ -98,13 +99,10 @@ describe('Preparation', () => {
 				mutation: JOIN,
 				variables: { token: gtokens[1] },
 			}).then(response => {
-				console.log("JOIN okay", JSON.stringify(response));
+				jtokens.push(response.data.joinGame.event.token);
 				okay ++;
-			}).catch(e => {
-				fail ++;
-			});
+			}).catch(_ => fail ++);
 		}
-		console.log("Join", okay, fail);
 		expect((okay === 4) && (fail === 1)).toBeTruthy();
 	});
 });
@@ -114,7 +112,7 @@ describe('Wrap up', () => {
 		const server = new ApolloServer(createServer());
 		const { query } = createTestClient(server);
 		await query({ query: PLAYERS }).then(v => {
-			console.log("Players", JSON.stringify(v.data.listPlayers));
+			console.log("Players", JSON.stringify(v.data.listPlayers, null, 3));
 			expect(v.data.listPlayers.length).toEqual(6);
 		});
 	});
@@ -123,7 +121,7 @@ describe('Wrap up', () => {
 		const server = new ApolloServer(createServer());
 		const { query } = createTestClient(server);
 		await query({ query: GAMES }).then(v => {
-			console.log("Games", JSON.stringify(v.data.listGames));
+			console.log("Games", JSON.stringify(v.data.listGames, null, 3));
 			expect(v.data.listGames.length).toEqual(2);
 		});
 	});
