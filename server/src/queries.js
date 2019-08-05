@@ -16,6 +16,15 @@ module.exports = Object.freeze({
 			}
 		}
 	}`,
+	FELLOW: gql`
+	query Fellow {
+		myFellowPlayers {
+			name
+			joined {
+				name
+			}
+		}
+	}`,
 	GAMES: gql`
 	query Games {
 		listGames {

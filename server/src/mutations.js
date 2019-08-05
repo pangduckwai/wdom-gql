@@ -56,8 +56,7 @@ module.exports = Object.freeze({
                 token
             }
         }
-    }
-    `,
+    }`,
 	JOIN: gql`
 	mutation Join($token: String!) {
 		joinGame(token: $token) {

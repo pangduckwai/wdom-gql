@@ -2,7 +2,7 @@ const { ApolloServer } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
 
 const { REGISTER, QUIT, OPEN, CLOSE, JOIN, LEAVE, START, DEPLOY } = require('./mutations');
-const { PLAYERS, GAMES } = require('./queries');
+const { PLAYERS, GAMES, FELLOW } = require('./queries');
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
 const EventDS = require('./data/event-ds');
@@ -105,6 +105,45 @@ describe('Preparation', () => {
 		}
 		expect((okay === 4) && (fail === 1)).toBeTruthy();
 	});
+
+	it('Leave game', async () => {
+		const server1 = new ApolloServer(createServer(ptokens[6]));
+		const { mutate } = createTestClient(server1);
+		await mutate({ mutation: LEAVE });
+
+		const server2 = new ApolloServer(createServer(ptokens[0]));
+		const { query } = createTestClient(server2);
+		const res = await query({ query: FELLOW });
+		expect(res.data.myFellowPlayers.length).toEqual(4);
+	});
+
+	it("Leave one's own game", async () => {
+		const server = new ApolloServer(createServer(ptokens[1]));
+		const { mutate } = createTestClient(server);
+		await mutate({ mutation: LEAVE }).then(e =>
+			expect(e.errors[0].message).toEqual("[LEAVE] Cannot leave your own game")
+		);
+	});
+
+	it("Close one's own game", async () => {
+		const server1 = new ApolloServer(createServer(ptokens[1]));
+		const { mutate } = createTestClient(server1);
+		await mutate({ mutation: CLOSE });
+
+		const server2 = new ApolloServer(createServer(ptokens[0]));
+		const { query } = createTestClient(server2);
+		const res = await query({ query: GAMES });
+		expect(res.data.listGames.length).toEqual(1);
+	});
+
+	it("Close other's game", async () => {
+		const server = new ApolloServer(createServer(ptokens[0]));
+		const { mutate } = createTestClient(server);
+		await mutate({ mutation: CLOSE }).then(e =>
+			expect(e.errors[0].message).toEqual("[CLOSE] Can only close your own game")
+		);
+	});
+
 });
 
 describe('Wrap up', () => {
@@ -122,7 +161,7 @@ describe('Wrap up', () => {
 		const { query } = createTestClient(server);
 		await query({ query: GAMES }).then(v => {
 			console.log("Games", JSON.stringify(v.data.listGames, null, 3));
-			expect(v.data.listGames.length).toEqual(2);
+			expect(v.data.listGames.length).toEqual(1);
 		});
 	});
 });
