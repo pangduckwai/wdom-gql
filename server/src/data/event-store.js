@@ -101,17 +101,11 @@ class EventStore {
 					}
 					break;
 				case evn.GAME_JOINED.id:
-					if (payload.tokens.length < 2) {
-						rspn.message = "[JOIN] Missing player and/or game IDs";
-					} else {
-						rspn.successful = populate(obj, payload.tokens[0]); //token of the player joining a game
-					}
-					break;
 				case evn.GAME_LEFT.id:
 					if (payload.tokens.length < 2) {
-						rspn.message = "[LEAVE] Missing player and/or game IDs";
+						rspn.message = "Missing player and/or game IDs";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[0]); //token of the player leaving a game
+						rspn.successful = populate(obj, payload.tokens[0]);
 					}
 					break;
 				case evn.GAME_OPENED.id:
@@ -124,27 +118,24 @@ class EventStore {
 					}
 					break;
 				case evn.GAME_CLOSED.id:
-					if (payload.tokens.length < 2) {
-						rspn.message = "[CLOSE] Missing player and/or game IDs";
-					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game to close
-					}
-					break;
 				case evn.GAME_STARTED.id:
-					// NOTE - trigger events to assign territories to players
+				case evn.ACTION_TAKEN.id:
+				case evn.TURN_TAKEN.id:
+				case evn.SETUP_FINISHED.id:
 					if (payload.tokens.length < 2) {
-						rspn.message = "[START] Missing player and/or game IDs";
+						rspn.message = "Missing player and/or game IDs";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game to start
+						rspn.successful = populate(obj, payload.tokens[1]);
 					}
 					break;
 				case evn.TERRITORY_ASSIGNED.id:
+				case evn.TERRITORY_SELECTED.id:
 					if (payload.tokens.length < 2) {
-						rspn.message = "[ASSIGN] Missing player and/or game IDs";
+						rspn.message = "Missing player and/or game IDs";
 					} else if (payload.name === null) {
-						rspn.message = "[ASSIGN] Missing territory name";
+						rspn.message = "Missing territory name";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game in question
+						rspn.successful = populate(obj, payload.tokens[1]);
 					}
 					break;
 				case evn.TROOP_ADDED.id:
@@ -163,56 +154,18 @@ class EventStore {
 					}
 					break;
 				case evn.TROOP_ASSIGNED.id:
-					// NOTE - use for assigning troops to a player at:
+					// TROOP_ASSIGNED: NOTE - use for assigning troops to a player at:
 					//  1. during setup phase, assigning remaining troops after adding 1 troop to each owned territory
 					//  2. at the begining of each turn when receiving reinforcement
 					//  3. after redeem cards for additional reinforcement
-					if (payload.tokens.length < 2) {
-						rspn.message = "[REINFORCEMENT] Missing player and/or game IDs";
-					} else if (payload.amount < 0) {
-						rspn.message = "[REINFORCEMENT] Missing number of troops";
-					} else {
-						rspn.successful = populate(obj, payload.tokens[0]); //token of the player in question
-					}
-					break;
 				case evn.TROOP_DEPLOYED.id:
-					// NOTE - subtract currently available reinforcement of a player after troops added to a territory
+					// TROOP_DEPLOYED: NOTE - subtract currently available reinforcement of a player after troops added to a territory
 					if (payload.tokens.length < 2) {
-						rspn.message = "[DEPLOY] Missing player and/or game IDs";
+						rspn.message = "Missing player and/or game IDs";
 					} else if (payload.amount < 0) {
-						rspn.message = "[DEPLOY] Missing number of troops";
+						rspn.message = "Missing number of troops";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[0]); //token of the player in question
-					}
-					break;
-				case evn.ACTION_TAKEN.id:
-					if (payload.tokens.length < 2) {
-						rspn.message = "[ACTION] Missing player and/or game IDs";
-					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game to move control to the next player
-					}
-					break;
-				case evn.TERRITORY_SELECTED.id:
-					if (payload.tokens.length < 2) {
-						rspn.message = "[CURRENT] Missing player and/or game IDs";
-					} else if (payload.name === null) {
-						rspn.message = "[CURRENT] Missing territory name";
-					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game in question
-					}
-					break;
-				case evn.TURN_TAKEN.id:
-					if (payload.tokens.length < 2) {
-						rspn.message = "[TURN] Missing player and/or game IDs";
-					} else {
-						rspn.successful = populate(obj, payload.tokens[1]);
-					}
-					break;
-				case evn.SETUP_FINISHED.id:
-					if (payload.tokens.length < 2) {
-						rspn.message = "[SETUP] Missing player and/or game IDs";
-					} else {
-						rspn.successful = populate(obj, payload.tokens[1]);
+						rspn.successful = populate(obj, payload.tokens[0]);
 					}
 					break;
 			}
