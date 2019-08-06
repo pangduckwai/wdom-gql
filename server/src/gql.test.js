@@ -2,7 +2,7 @@ const { ApolloServer } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
 
 const { REGISTER, QUIT, OPEN, CLOSE, JOIN, LEAVE, START, DEPLOY } = require('./mutations');
-const { PLAYERS, GAMES, FELLOW } = require('./queries');
+const { MY_GAME, FELLOW, PLAYERS, GAMES } = require('./queries');
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
 const EventDS = require('./data/event-ds');
@@ -144,6 +144,25 @@ describe('Preparation', () => {
 		);
 	});
 
+	it("Join game", async () => {
+		const server = new ApolloServer(createServer(ptokens[1]));
+		const { mutate, query } = createTestClient(server);
+		await mutate({
+			mutation: JOIN,
+			variables: { token: gtokens[1] },
+		});
+		const res = await query({ query: FELLOW });
+		expect(res.data.myFellowPlayers.length).toEqual(5);
+	});
+
+	it("Start game", async () => {
+		const server = new ApolloServer(createServer(ptokens[4]));
+		const { mutate, query } = createTestClient(server);
+		await mutate({ mutation: START });
+
+		const res = await query({ query: MY_GAME });
+		expect(res.data.myGame.rounds).toEqual(0);
+	});
 });
 
 describe('Wrap up', () => {
@@ -151,7 +170,7 @@ describe('Wrap up', () => {
 		const server = new ApolloServer(createServer());
 		const { query } = createTestClient(server);
 		await query({ query: PLAYERS }).then(v => {
-			console.log("Players", JSON.stringify(v.data.listPlayers, null, 3));
+			console.log("Players", v.data.listPlayers.length, JSON.stringify(v.data.listPlayers, null, 3));
 			expect(v.data.listPlayers.length).toEqual(6);
 		});
 	});
@@ -160,8 +179,17 @@ describe('Wrap up', () => {
 		const server = new ApolloServer(createServer());
 		const { query } = createTestClient(server);
 		await query({ query: GAMES }).then(v => {
-			console.log("Games", JSON.stringify(v.data.listGames, null, 3));
+			console.log("Games", v.data.listGames.length, JSON.stringify(v.data.listGames, null, 3));
 			expect(v.data.listGames.length).toEqual(1);
+		});
+	});
+
+	it('Active game', async () => {
+		const server = new ApolloServer(createServer(ptokens[4]));
+		const { query } = createTestClient(server);
+		await query({ query: MY_GAME }).then(v => {
+			console.log("My game", JSON.stringify(v.data.myGame, null, 3));
+			expect(v.data.myGame.rounds).toEqual(0);
 		});
 	});
 });

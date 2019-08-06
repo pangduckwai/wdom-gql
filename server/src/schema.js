@@ -3,9 +3,9 @@ const { gql } = require('apollo-server');
 const typeDefs = gql`
 type Query {
     me: Player
+    myGame: Game
     myTerritories: [Territory]!
     myFellowPlayers: [Player]!
-    myGame: Game
     listPlayers: [Player]!
     listGames: [Game]!
 }

@@ -5,6 +5,12 @@ const { UserInputError } = require('apollo-server');
 module.exports = {
 	Query: {
 		me: (_, __, { dataSources }) => dataSources.eventDS.me(),
+		myGame: (_, __, { dataSources }) => {
+			const p = dataSources.eventDS.me();
+			if (p && (typeof(p.joined) !== "undefined") && (p.joined !== null))
+				return dataSources.eventDS.findGameByToken({ token: p.joined });
+			return null;
+		},
 		myTerritories: (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();
 			if (p)
@@ -16,12 +22,6 @@ module.exports = {
 			if (p && (typeof(p.joined) !== "undefined") && (p.joined !== null))
 				return dataSources.eventDS.listPlayersByGame({ token: p.joined });
 			return [];
-		},
-		myGame: (_, __, { dataSources }) => {
-			const p = dataSources.eventDS.me();
-			if (p && (typeof(p.joined) !== "undefined") && (p.joined !== null))
-				return dataSources.eventDS.findGameByToken({ token: p.joined });
-			return null;
 		},
 		listPlayers: (_, __, { dataSources }) => dataSources.eventDS.listPlayers(),
 		listGames: (_, __, { dataSources }) => dataSources.eventDS.listGames()
