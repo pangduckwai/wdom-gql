@@ -2,23 +2,23 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
 type Query {
-    me: Player
-    myGame: Game
-    myTerritories: [Territory]!
-    myFellowPlayers: [Player]!
-    listPlayers: [Player]!
-    listGames: [Game]!
+	me: Player
+	myGame: Game
+	myTerritories: [Territory]!
+	myFellowPlayers: [Player]!
+	listPlayers: [Player]!
+	listGames: [Game]!
 }
 
 type Mutation {
-    registerPlayer(name: String!): Response
-    quitPlayer: Response
-    openGame(name: String!): Response
-    closeGame: Response
-    joinGame(token: String!): Response
-    leaveGame: Response
-    startGame: Response
-    deployTroops(name: String!): Response
+	registerPlayer(name: String!): Response
+	quitPlayer: Response
+	openGame(name: String!): Response
+	closeGame: Response
+	joinGame(token: String!): Response
+	leaveGame: Response
+	startGame: Response
+	takeAction(name: String!): Response
 }
 
 type Player {
@@ -35,6 +35,7 @@ type Game {
 	turn: Player
 	rounds: Int!
 	redeemed: Int!
+	current: Territory
 	territories: [Territory]!
 }
 
@@ -46,20 +47,20 @@ type Territory {
 }
 
 type Event {
-    eventid: String!
-    timestamp: String!
-    event: Int!
-    type: String!
-    name: String
-    amount: Int
-    tokens: [String]
-    token: String!
+	eventid: String!
+	timestamp: String!
+	event: Int!
+	type: String!
+	name: String
+	amount: Int
+	tokens: [String]
+	token: String!
 }
 
 type Response {
-    successful: Boolean!
-    message: String
-    event: Event
+	successful: Boolean!
+	message: String
+	event: Event
 }
 `;
 

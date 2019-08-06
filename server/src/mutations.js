@@ -99,9 +99,9 @@ module.exports = Object.freeze({
             }
 		}
 	}`,
-	DEPLOY: gql`
-	mutation Deploy {
-		deployTroops {
+	ACTION: gql`
+	mutation Action($name: String!) {
+		takeAction(name: $name) {
 			successful
             message
             event {

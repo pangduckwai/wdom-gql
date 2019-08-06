@@ -19,6 +19,7 @@ type Game {
 	turn: Player
 	rounds: Int!
 	redeemed: Int!
+	current: Territory
 	territories: [Territory]!
 }
 
@@ -200,19 +201,51 @@ class EventDS extends DataSource {
 					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
 				}
 				break;
+			case evn.ACTION_TAKEN.id:
+				//TODO HERE - 
+				//NOTE!!! Event 'ACTION_TAKEN' not needed during setup phase, leave it just in case needed in playing phase
+				break;
+			case evn.TERRITORY_SELECTED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.tokens[0])) {
+					obj.current = v.name;
+				}
+				break;
 			case evn.TURN_TAKEN.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj) {
-					if (obj.turn === v.tokens[0]) {
-						plys = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === v.token));
-						let idx = 0;
-						for (const ply of plys) {
-							idx ++;
-							if (ply.token === v.tokens[0]) break;
+				if (obj && (obj.turn === v.tokens[0])) {
+					plys = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === v.token));
+					let idx = 0;
+					for (const ply of plys) {
+						idx ++;
+						if (ply.token === v.tokens[0]) break;
+					}
+					if (idx >= plys.length) idx = 0;
+
+					if (obj.rounds === 0) {
+						// Setup phase
+						let off = idx;
+						let finished = false;
+						while (plys[off].reinforcement <= 0) {
+							off ++;
+							if (off >= plys.length) off = 0;
+							if (off === idx) {
+								finished = true;
+								break; //No one has reinforcement left
+							}
 						}
-						if (idx >= plys.length) idx = 0;
+						if (!finished) obj.turn = plys[off].token;
+					} else if (obj.rounds > 0) {
+						//TODO skip if already defeated
 						obj.turn = plys[idx].token;
 					}
+				}
+				break;
+			case evn.SETUP_FINISHED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.rounds === 0)) {
+					obj.turn = obj.host;
+					obj.rounds = 1;
 				}
 				break;
 		}

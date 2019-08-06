@@ -14,6 +14,9 @@ module.exports = Object.freeze({
 			}
 			rounds
 			redeemed
+			current {
+				name
+			}
 			territories {
 				name
 				owner {
@@ -21,6 +24,16 @@ module.exports = Object.freeze({
 				}
 				troops
 			}
+		}
+	}`,
+	MY_HOLDING: gql`
+	query MyHolding {
+		myTerritories {
+			name
+			owner {
+				name
+			}
+			troops
 		}
 	}`,
 	FELLOW: gql`
@@ -62,22 +75,4 @@ module.exports = Object.freeze({
 			redeemed
 		}
 	}`
-	// JOINED: gql`
-	// query Joined($id: ID!) {
-	// 	joined(id: $id) {
-	// 		token
-	// 		name
-	// 	}
-	// }`,
-	// HOSTED: gql`
-	// query Hosted {
-	// 	hosted {
-	// 		id
-	// 		name
-	// 		host {
-	// 			token
-	// 			name
-	// 		}
-	// 	}
-	// }`
 });

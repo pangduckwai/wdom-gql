@@ -13,8 +13,7 @@ module.exports = {
 		},
 		myTerritories: (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p)
-				return dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
+			if (p) return dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
 			return [];
 		},
 		myFellowPlayers: (_, __, { dataSources }) => {
@@ -29,231 +28,198 @@ module.exports = {
 	Mutation: {
 		registerPlayer: async (_, { name }, { dataSources }) => {
 			const p = dataSources.eventDS.findPlayerByName({ name });
-			if (p) {
-				throw new UserInputError(`[REGISTER] Player '${name}' already exists`);
-			} else {
-				const q = await dataSources.eventDS.add({ event: evn.PLAYER_REGISTERED, payload: { name: name }});
-				if (q.successful) {
-					await dataSources.eventDS.updateSnapshot();
-					return q;
-				} else
-					throw new UserInputError(q.message);
-			}
+			if (p) throw new UserInputError(`[REGISTER] Player '${name}' already exists`);
+
+			const q = await dataSources.eventDS.add({ event: evn.PLAYER_REGISTERED, payload: { name: name }});
+			if (!q.successful) throw new UserInputError(q.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return q;
 		},
 		quitPlayer: async (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p) {
-				const q = await dataSources.eventDS.add({ event: evn.PLAYER_QUITTED, payload: { tokens: [p.token] }});
-				if (q.successful) {
-					await dataSources.eventDS.updateSnapshot();
-					return q;
-				} else
-					throw new UserInputError(q.message);
-			} else
-				throw new UserInputError("[QUIT] You are not a registered player yet");
+			if (!p) throw new UserInputError("[QUIT] You are not a registered player yet");
+
+			const q = await dataSources.eventDS.add({ event: evn.PLAYER_QUITTED, payload: { tokens: [p.token] }});
+			if (!q.successful) throw new UserInputError(q.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return q;
 		},
 		openGame: async (_, { name }, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p) {
-				if (p.joined) {
-					const j = dataSources.eventDS.findGameByToken({ token: p.joined });
-					if (j) throw new UserInputError(`[OPEN] You are already in the game '${j.name}'`);
-				}
-			} else
-				throw new UserInputError("[OPEN] You are not a registered player yet");
+			if (!p) throw new UserInputError("[OPEN] You are not a registered player yet");
+			if (p.joined) {
+				const j = dataSources.eventDS.findGameByToken({ token: p.joined });
+				if (j) throw new UserInputError(`[OPEN] You are already in the game '${j.name}'`);
+			}
 
 			const g = dataSources.eventDS.findGameByName({ name });
 			if (g) throw new UserInputError(`[OPEN] Game '${name}' already exists`);
-	
+
 			const h = await dataSources.eventDS.add({ event: evn.GAME_OPENED, payload: { name: name, tokens: [ p.token ] }});
-			if (h.successful) {
-				const q = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, h.event.token] }});
-				if (q.successful) {
-					await dataSources.eventDS.updateSnapshot();
-					return h;
-				} else
-					throw new UserInputError(q.message);
-			} else
-				throw new UserInputError(h.message);
+			if (!h.successful) throw new UserInputError(h.message);
+
+			const q = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, h.event.token] }});
+			if (!q.successful) throw new UserInputError(q.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return h;
 		},
 		closeGame: async (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p) {
-				if (p.joined) {
-					const g = dataSources.eventDS.findGameByToken({ token: p.joined });
-					if (g) {
-						if (g.host === p.token) {
-							const k = await dataSources.eventDS.add({ event: evn.GAME_CLOSED, payload: { tokens: [p.token, g.token] }});
-							if (k.successful) {
-								const q = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { tokens: [p.token, g.token] }});
-								if (q.successful) {
-									await dataSources.eventDS.updateSnapshot();
-									return k;
-								} else
-									throw new UserInputError(q.message);
-							} else
-								throw new UserInputError(k.message);
-						} else
-							throw new UserInputError("[CLOSE] Can only close your own game");
-					} else
-						throw new UserInputError(`[CLOSE] Game '${p.joined}' not found`);
-				} else
-					throw new UserInputError("[CLOSE] You are not in any game");
-			} else
-				throw new UserInputError("[CLOSE] You are not a registered player yet");
+			if (!p) throw new UserInputError("[CLOSE] You are not a registered player yet");
+			if (!p.joined) throw new UserInputError("[CLOSE] You are not in any game");
+
+			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+			if (!g) throw new UserInputError(`[CLOSE] Game '${p.joined}' not found`);
+			if (g.host !== p.token) throw new UserInputError("[CLOSE] Can only close your own game");
+
+			const k = await dataSources.eventDS.add({ event: evn.GAME_CLOSED, payload: { tokens: [p.token, g.token] }});
+			if (!k.successful) throw new UserInputError(k.message);
+
+			const q = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { tokens: [p.token, g.token] }});
+			if (!q.successful) throw new UserInputError(q.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return k;
 		},
 		joinGame: async (_, { token }, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p) {
-				if (p.joined) {
-					const j = dataSources.eventDS.findGameByToken({ token: p.joined });
-					if (j)
-						throw new UserInputError(`[JOIN] You are already in the game '${j.name}'`);
-				} else {
-					const g = dataSources.eventDS.findGameByToken({ token: token });
-					if (g) {
-						if (g.rounds >= 0) throw new UserInputError(`[JOIN] Game '${g.name}' already started`);
+			if (!p) throw new UserInputError("[JOIN] You are not a registered player yet");
+			if (p.joined) {
+				const j = dataSources.eventDS.findGameByToken({ token: p.joined });
+				if (j) throw new UserInputError(`[JOIN] You are already in the game '${j.name}'`);
+			}
 
-						const players = dataSources.eventDS.listPlayersByGame({ token: token });
-						if (players.length >= maxPlayersPerGame())
-							throw new UserInputError(`[JOIN] Game '${g.name}' is full already`);
+			const g = dataSources.eventDS.findGameByToken({ token: token });
+			if (!g) throw new UserInputError(`[JOIN] Game '${token}' not found`);
+			if (g.rounds >= 0) throw new UserInputError(`[JOIN] Game '${g.name}' already started`);
 
-						const k = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, token] }});
-						if (k.successful) {
-							await dataSources.eventDS.updateSnapshot();
-							return k;
-						} else
-							throw new UserInputError(k.message);
-					} else
-						throw new UserInputError(`[JOIN] Game '${token}' not found`);
-				}
-			} else
-				throw new UserInputError("[JOIN] You are not a registered player yet");
+			const players = dataSources.eventDS.listPlayersByGame({ token: token });
+			if (players.length >= maxPlayersPerGame())
+				throw new UserInputError(`[JOIN] Game '${g.name}' is full already`);
+
+			const k = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, token] }});
+			if (!k.successful) throw new UserInputError(k.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return k;
 		},
 		leaveGame: async (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p) {
-				if (p.joined) {
-					const g = dataSources.eventDS.findGameByToken({ token: p.joined });
-					if (g) {
-						if (g.host !== p.token) {
-							const k = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { tokens: [p.token, g.token] }});
-							if (k.successful) {
-								await dataSources.eventDS.updateSnapshot();
-								return k;
-							} else
-								throw new UserInputError(k.message);
-						} else
-							throw new UserInputError("[LEAVE] Cannot leave your own game");
-					} else
-						throw new UserInputError(`[LEAVE] Game '${p.joined}' not found`);
-				} else
-					throw new UserInputError("[LEAVE] Your are not in any game");
-			} else
-				throw new UserInputError("[LEAVE] You are not a registered player yet");
+			if (!p) throw new UserInputError("[LEAVE] You are not a registered player yet");
+			if (!p.joined) throw new UserInputError("[LEAVE] Your are not in any game");
+
+			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+			if (!g) throw new UserInputError(`[LEAVE] Game '${p.joined}' not found`);
+			if (g.host === p.token) throw new UserInputError("[LEAVE] Cannot leave your own game");
+
+			const k = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { tokens: [p.token, g.token] }});
+			if (!k.successful) throw new UserInputError(k.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return k;
 		},
 		startGame: async (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p) {
-				if (p.joined) {
-					const g = dataSources.eventDS.findGameByToken({ token: p.joined });
-					if (g) {
-						if (g.host === p.token) {
-							const players = dataSources.eventDS.listPlayersByGame({ token: p.joined });
-							if (players.length >= minPlayersPerGame()) {
-								const k = await dataSources.eventDS.add({ event: evn.GAME_STARTED, payload: { tokens: [p.token, g.token] }});
-								if (k) {
-									if (k.successful) {
-										const deck = shuffleCards(players.map(q => q.token));
-										const hold = {};
-										for (const c of Object.keys(deck)) {
-											if (!hold[deck[c]]) {
-												hold[deck[c]] = 1;
-											} else {
-												hold[deck[c]] = hold[deck[c]] + 1;
-											}
-	
-											const m = await dataSources.eventDS.add({
-												event: evn.TERRITORY_ASSIGNED,
-												payload: { name: c, tokens: [deck[c], g.token] }
-											});
-											if (!m || !m.successful)
-												throw new UserInputError(m.message);
-										}
+			if (!p) throw new UserInputError("[START] You are not a registered player yet");
+			if (!p.joined) throw new UserInputError("[START] You are not in any game");
 
-										const troops = initialTroops(players.length);
-										for (const player of players) {
-											const n = await dataSources.eventDS.add({
-												event: evn.TROOP_ASSIGNED,
-												payload: { amount: (troops - hold[player.token]), tokens: [player.token, g.token] }
-											});
-											if (!n || !n.successful)
-												throw new UserInputError(n.message);
-										}
+			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+			if (!g) throw new UserInputError(`[START] Game '${p.joined}' not found`);
+			if (g.host !== p.token) throw new UserInputError("[START] Can only start your own game");
 
-										await dataSources.eventDS.updateSnapshot();
-									}
-									return k;
-								}
-							} else
-								throw new UserInputError(`[START] Minimum number of players is ${minPlayersPerGame()}`);
-						} else
-							throw new UserInputError("[START] Can only start your own game");
-					} else
-						throw new UserInputError(`[START] Game '${p.joined}' not found`);
-				} else
-					throw new UserInputError("[START] You are not in any game");
-			} else
-				throw new UserInputError("[START] You are not a registered player yet");
+			const players = dataSources.eventDS.listPlayersByGame({ token: p.joined });
+			if (players.length < minPlayersPerGame())
+				throw new UserInputError(`[START] Minimum number of players is ${minPlayersPerGame()}`);
+
+			const k = await dataSources.eventDS.add({ event: evn.GAME_STARTED, payload: { tokens: [p.token, g.token] }});
+			if (!k.successful) throw new UserInputError(k);
+
+			const deck = shuffleCards(players.map(q => q.token));
+			const hold = {};
+			for (const c of Object.keys(deck)) {
+				if (!hold[deck[c]]) {
+					hold[deck[c]] = 1;
+				} else {
+					hold[deck[c]] = hold[deck[c]] + 1;
+				}
+
+				const m = await dataSources.eventDS.add({
+					event: evn.TERRITORY_ASSIGNED,
+					payload: { name: c, tokens: [deck[c], g.token] }
+				});
+				if (!m.successful) throw new UserInputError(m.message);
+			}
+
+			const troops = initialTroops(players.length);
+			for (const player of players) {
+				const n = await dataSources.eventDS.add({
+					event: evn.TROOP_ASSIGNED,
+					payload: { amount: (troops - hold[player.token]), tokens: [player.token, g.token] }
+				});
+				if (!n.successful) throw new UserInputError(n.message);
+			}
+
+			await dataSources.eventDS.updateSnapshot();
+			return k;
 		},
-		deployTroops: async (_, { name }, { dataSources }) => {
+		takeAction: async (_, { name }, { dataSources }) => {
 			const p = dataSources.eventDS.me();
-			if (p) {
-				if (p.joined) {
-					const g = dataSources.eventDS.findGameByToken({ token: p.joined });
-					if (g) {
-						if (g.turn === p.token) {
-							if (p.reinforcement > 0) {
-								if (g.territories[g.t_index[name]].owner === p.token) {
-									const k = await dataSources.eventDS.add({
-										event: evn.TROOP_ADDED,
-										payload: { name: name, amount: 1, tokens: [p.token, g.token] }
-									});
-									if (k.successful) {
-										const m = await dataSources.eventDS.add({
-											event: evn.TROOP_DEPLOYED,
-											payload: { amount: 1, tokens: [p.token, g.token] }
-										});
+			if (!p) throw new UserInputError("[ACTION] You are not a registered player yet");
+			if (!p.joined) throw new UserInputError("[ACTION] Your are not in any game");
 
-										if (m.successful) {
-											// TODO!!! Move this to a proper place to control game flow
-											if (g.rounds === 0) {
-												const n = await dataSources.eventDS.add({
-													event: evn.TURN_TAKEN,
-													payload: { tokens: [p.token, g.token] }
-												});
-												if (!n || !n.successful)
-													throw new UserInputError(n.message);
-											}
-										} else
-											throw new UserInputError(m.message);
+			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+			if (!g) throw new UserInputError(`[ACTION] Game '${p.joined}' not found`);
+			if (g.rounds < 0) throw new UserInputError("[ACTION] The game is not started yet");
+			if (g.turn !== p.token) throw new UserInputError("[ACTION] Now is not your turn yet");
 
-										await dataSources.eventDS.updateSnapshot();
-										return k;
-									} else
-										throw new UserInputError(k.message);
-								} else
-									throw new UserInputError(`[DEPLOY] Territory '${g.territories[g.t_index[name]].name}' is not owned by you`);
-							} else
-								throw new UserInputError("[DEPLOY] Your have no more reinforcement to deploy");
-						} else
-							throw new UserInputError("[DEPLOY] Now is not your turn");
-					} else
-						throw new UserInputError(`[DEPLOY] Game '${p.joined}' not found`);
-				} else
-					throw new UserInputError("[DEPLOY] Your are not in any game");
-			} else
-				throw new UserInputError("[DEPLOY] You are not a registered player yet");
+			const owned = (g.territories[g.t_index[name]].owner === p.token);
+			if (owned) {
+				const c = await dataSources.eventDS.add({
+					event: evn.TERRITORY_SELECTED,
+					payload: { name: name, tokens: [p.token, g.token] }
+				});
+				if (!c.successful) throw new UserInputError(c.message);
+			}
+
+			if (g.rounds === 0) { // Setup phase
+				if (owned && (p.reinforcement > 0)) {
+					const a = await dataSources.eventDS.add({
+						event: evn.TROOP_ADDED,
+						payload: { name: name, amount: 1, tokens: [p.token, g.token] }
+					});
+					if (!a.successful) throw new UserInputError(a.message);
+
+					const d = await dataSources.eventDS.add({
+						event: evn.TROOP_DEPLOYED,
+						payload: { amount: 1, tokens: [p.token, g.token] }
+					});
+					if (!d.successful) throw new UserInputError(d.message);
+					await dataSources.eventDS.updateSnapshot();
+
+					const plys = dataSources.eventDS.listPlayersByGame({ token: g.token }).filter(p => p.reinforcement > 0);
+					if (plys.length > 0) {
+						const n = await dataSources.eventDS.add({
+							event: evn.TURN_TAKEN,
+							payload: { tokens: [p.token, g.token] }
+						});
+						if (!n.successful) throw new UserInputError(n.message);
+					} else {
+						const s = await dataSources.eventDS.add({
+							event: evn.SETUP_FINISHED,
+							payload: { tokens: [p.token, g.token] }
+						});
+						if (!s.successful) throw new UserInputError(s.message);
+					}
+
+					await dataSources.eventDS.updateSnapshot();
+					return a;
+				}
+			} else { // rounds > 0, playing phase
+				//TODO HERE!!!
+			}
 		}
 	},
 	Player: {
@@ -271,6 +237,12 @@ module.exports = {
 		turn: (game, _, { dataSources }) => {
 			if ((typeof(game.turn) !== "undefined") && (game.turn !== null)) {
 				return dataSources.eventDS.findPlayerByToken({ token: game.turn });
+			}
+			return null;
+		},
+		current: (game, _, __) => {
+			if ((typeof(game.current) !== "undefined") && (game.current !== null)) {
+				return game.territories[game.t_index[game.current]];
 			}
 			return null;
 		}

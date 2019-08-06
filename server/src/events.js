@@ -7,21 +7,27 @@ module.exports = Object.freeze({
 		id: 3, type: "P"
 	}, GAME_LEFT: {
 		id: 4, type: "P"
-	}, TURN_TAKEN: {
-		id: 5, type: "G"
 	}, GAME_OPENED: {
-		id: 6, type: "G"
+		id: 5, type: "G"
 	}, GAME_CLOSED: {
-		id: 7, type: "G"
+		id: 6, type: "G"
 	}, GAME_STARTED: {
-		id: 8, type: "G"
+		id: 7, type: "G"
 	}, TERRITORY_ASSIGNED: {
-		id: 9, type: "T"
+		id: 8, type: "T"
 	}, TROOP_ADDED: {
-		id: 10, type: "T"
+		id: 9, type: "T"
 	}, TROOP_ASSIGNED: {
-		id: 11, type: "P"
+		id: 10, type: "P"
 	}, TROOP_DEPLOYED: {
-		id: 12, type: "P"
+		id: 11, type: "P"
+	}, ACTION_TAKEN: {
+		id: 12, type: "G"
+	}, TERRITORY_SELECTED: {
+		id: 13, type: "G"
+	}, TURN_TAKEN: {
+		id: 14, type: "G"
+	}, SETUP_FINISHED: {
+		id: 15, type: "G"
 	}
 });
