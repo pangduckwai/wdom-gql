@@ -17,6 +17,10 @@ module.exports = Object.freeze({
 			current {
 				name
 			}
+			cards {
+				name
+				type
+			}
 			territories {
 				name
 				owner {

@@ -19,12 +19,14 @@ type Mutation {
 	leaveGame: Response
 	startGame: Response
 	takeAction(name: String!): Response
+#	startTurn: Response
 }
 
 type Player {
 	token: String!
 	name: String!
 	reinforcement: Int!
+	cards: [Card]!
 	joined: Game
 }
 
@@ -36,6 +38,7 @@ type Game {
 	rounds: Int!
 	redeemed: Int!
 	current: Territory
+	cards: [Card]!
 	territories: [Territory]!
 }
 
@@ -44,6 +47,11 @@ type Territory {
 	continent: String!
 	owner: Player
 	troops: Int!
+}
+
+type Card {
+	name: String!
+	type: String!
 }
 
 type Event {

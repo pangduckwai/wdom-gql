@@ -29,7 +29,5 @@ module.exports = Object.freeze({
 		id: 14, type: "G"
 	}, SETUP_FINISHED: {
 		id: 15, type: "G"
-	}, TURN_STARTED: {
-		id: 16, type: "G"
 	}
 });

@@ -1,6 +1,6 @@
 const { DataSource } = require('apollo-datasource');
 const evn = require('../events');
-const { buildTerritory } = require('../rules');
+const { buildTerritory, shuffleCards } = require('../rules');
 
 /*
 type Player {
@@ -110,7 +110,8 @@ class EventDS extends DataSource {
 					ready: true,
 					token: v.token,
 					name: v.name,
-					reinforcement: 0
+					reinforcement: 0,
+					cards: [],
 				};
 				len = this.players.push(obj);
 				if (len > 0) this.rebuildPlayerIndex();
@@ -164,6 +165,7 @@ class EventDS extends DataSource {
 					host: v.tokens[0],
 					rounds: -1,
 					redeemed: 0,
+					cards: [],
 					territories: buildTerritory(),
 					t_index: {}
 				};

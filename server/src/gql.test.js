@@ -8,6 +8,8 @@ const resolvers = require('./resolvers');
 const EventDS = require('./data/event-ds');
 const EventStore = require('./data/event-store');
 
+const { buildTerritory, continentReinforcement } = require('./rules');
+
 let eventStore;
 let eventDS;
 
@@ -45,6 +47,51 @@ let createServer = (token) => {
 		return obj;
 	}
 }
+
+describe('Test rules', () => {
+	it('Continent Reinforcement - All', () => {
+		const territories = buildTerritory();
+		const reinforcement = continentReinforcement(territories);
+		expect(reinforcement).toEqual(24);
+	});
+
+	it('Continent Reinforcement - Africa', () => {
+		const territories = buildTerritory().filter(t => t.continent === 'Africa');
+		const reinforcement = continentReinforcement(territories);
+		expect(reinforcement).toEqual(3);
+	});
+
+	it('Continent Reinforcement - Asia', () => {
+		const territories = buildTerritory().filter(t => t.continent === 'Asia');
+		const reinforcement = continentReinforcement(territories);
+		expect(reinforcement).toEqual(7);
+	});
+
+	it('Continent Reinforcement - Australia', () => {
+		const territories = buildTerritory().filter(t => t.continent === 'Australia');
+		const reinforcement = continentReinforcement(territories);
+		expect(reinforcement).toEqual(2);
+	});
+
+	it('Continent Reinforcement - Europe', () => {
+		const territories = buildTerritory().filter(t => t.continent === 'Europe');
+		const reinforcement = continentReinforcement(territories);
+		expect(reinforcement).toEqual(5);
+	});
+
+	it('Continent Reinforcement - North-America', () => {
+		const territories = buildTerritory().filter(t => t.continent === 'North-America');
+		const reinforcement = continentReinforcement(territories);
+		expect(reinforcement).toEqual(5);
+	});
+
+	it('Continent Reinforcement - South-America', () => {
+		const territories = buildTerritory().filter(t => t.continent === 'South-America');
+		const reinforcement = continentReinforcement(territories);
+		expect(reinforcement).toEqual(2);
+	});
+
+});
 
 const PLAYER_NAMES = ['Rick', 'John', 'Josh', 'Nick', 'Rick', 'Paul', 'Bill', 'Fred'];
 const GAME_NAMES = [{ name: "John's Game", index: 'John' }, { name: "Paul's Game", index: 'Paul' }, { name: "John's Game", index: 'Rick' }, { name: "Some game", index: 'John'}];

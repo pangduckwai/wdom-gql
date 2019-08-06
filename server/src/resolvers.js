@@ -1,6 +1,6 @@
 const evn = require('./events');
-const { minPlayersPerGame, maxPlayersPerGame, shuffleCards, initialTroops } = require('./rules');
 const { UserInputError } = require('apollo-server');
+const { minPlayersPerGame, maxPlayersPerGame, shuffleCards, initialTroops, basicReinforcement, continentReinforcement } = require('./rules');
 
 module.exports = {
 	Query: {
@@ -220,6 +220,20 @@ module.exports = {
 			} else { // rounds > 0, playing phase
 				//TODO HERE!!!
 			}
+		// },
+		// startTurn: async (_, __, { dataSources }) => {
+		// 	const p = dataSources.eventDS.me();
+		// 	if (!p) throw new UserInputError("[TURN] You are not a registered player yet");
+		// 	if (!p.joined) throw new UserInputError("[TURN] You are not in any game");
+
+		// 	const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+		// 	if (!g) throw new UserInputError(`[TURN] Game '${p.joined}' not found`);
+		// 	if (g.rounds < 0) throw new UserInputError("[TURN] The game is not started yet");
+		// 	if (g.turn !== p.token) throw new UserInputError("[TURN] Now is not your turn yet");
+
+		// 	const deck = shuffleCards(); // Need to do it here because need to record each card in a event, otherwise cannot replay
+		// 	const holdings = dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
+		// 	const reinforcement = basicReinforcement(holdings) + continentReinforcement(holdings); //TODO - Plus troops from trading in cards
 		}
 	},
 	Player: {
@@ -253,6 +267,20 @@ module.exports = {
 				return dataSources.eventDS.findPlayerByToken({ token: territory.owner });
 			}
 			return null;
+		}
+	},
+	Card: {
+		type: (card, _, __) => {
+			switch (card.type) {
+				case "A":
+					return "Artillery";
+				case "C":
+					return "Cavalry";
+				case "I":
+					return "Infantry";
+				default:
+					return "Wildcard";
+			}
 		}
 	}
 };

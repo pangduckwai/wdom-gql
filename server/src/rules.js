@@ -23,89 +23,89 @@ let CONTINENTS = {
 
 let TERRITORIES = {
 	   "Congo": {
-		continent: "Africa", connected: ["East-Africa", "North-Africa", "South-Africa"]
+		continent: "Africa", card: "A", connected: ["East-Africa", "North-Africa", "South-Africa"]
 	}, "East-Africa": {
-		continent: "Africa", connected: ["Congo", "Egypt", "Madagascar", "North-Africa", "South-Africa", "Middle-East"]
+		continent: "Africa", card: "I", connected: ["Congo", "Egypt", "Madagascar", "North-Africa", "South-Africa", "Middle-East"]
 	}, "Egypt": {
-		continent: "Africa", connected: ["East-Africa", "North-Africa", "Middle-East", "Southern-Europe"]
+		continent: "Africa", card: "C", connected: ["East-Africa", "North-Africa", "Middle-East", "Southern-Europe"]
 	}, "Madagascar": {
-		continent: "Africa", connected: ["East-Africa", "South-Africa"]
+		continent: "Africa", card: "C", connected: ["East-Africa", "South-Africa"]
 	}, "North-Africa": {
-		continent: "Africa", connected: ["Congo", "Egypt", "East-Africa", "Southern-Europe", "Western-Europe", "Brazil"]
+		continent: "Africa", card: "I", connected: ["Congo", "Egypt", "East-Africa", "Southern-Europe", "Western-Europe", "Brazil"]
 	}, "South-Africa": {
-		continent: "Africa", connected: ["Congo", "East-Africa", "Madagascar"]
+		continent: "Africa", card: "A", connected: ["Congo", "East-Africa", "Madagascar"]
 	}, "Afghanistan": {
-		continent: "Asia", connected: ["China", "India", "Middle-East", "Ural", "Ukraine"]
+		continent: "Asia", card: "I", connected: ["China", "India", "Middle-East", "Ural", "Ukraine"]
 	}, "China": {
-		continent: "Asia", connected: ["Afghanistan", "India", "Manchuria", "Siam", "Siberia", "Ural"]
+		continent: "Asia", card: "A", connected: ["Afghanistan", "India", "Manchuria", "Siam", "Siberia", "Ural"]
 	}, "India": {
-		continent: "Asia", connected: ["Afghanistan", "China", "Middle-East", "Siam"]
+		continent: "Asia", card: "C", connected: ["Afghanistan", "China", "Middle-East", "Siam"]
 	}, "Irkutsk": {
-		continent: "Asia", connected: ["Kamchatka", "Manchuria", "Siberia", "Yakutsk"]
+		continent: "Asia", card: "A", connected: ["Kamchatka", "Manchuria", "Siberia", "Yakutsk"]
 	}, "Japan": {
-		continent: "Asia", connected: ["Kamchatka", "Manchuria"]
+		continent: "Asia", card: "C", connected: ["Kamchatka", "Manchuria"]
 	}, "Kamchatka": {
-		continent: "Asia", connected: ["Irkutsk", "Japan", "Manchuria", "Yakutsk", "Alaska"]
+		continent: "Asia", card: "A", connected: ["Irkutsk", "Japan", "Manchuria", "Yakutsk", "Alaska"]
 	}, "Manchuria": {
-		continent: "Asia", connected: ["China", "Irkutsk", "Japan", "Kamchatka", "Siberia"]
+		continent: "Asia", card: "C", connected: ["China", "Irkutsk", "Japan", "Kamchatka", "Siberia"]
 	}, "Middle-East": {
-		continent: "Asia", connected: ["Afghanistan", "India", "Egypt", "East-Africa", "Southern-Europe", "Ukraine"]
+		continent: "Asia", card: "A", connected: ["Afghanistan", "India", "Egypt", "East-Africa", "Southern-Europe", "Ukraine"]
 	}, "Siam": {
-		continent: "Asia", connected: ["China", "India", "Indonesia"]
+		continent: "Asia", card: "C", connected: ["China", "India", "Indonesia"]
 	}, "Siberia": {
-		continent: "Asia", connected: ["China", "Irkutsk", "Manchuria", "Ural", "Yakutsk"]
+		continent: "Asia", card: "I", connected: ["China", "Irkutsk", "Manchuria", "Ural", "Yakutsk"]
 	}, "Ural": {
-		continent: "Asia", connected: ["Afghanistan", "China", "Siberia", "Ukraine"]
+		continent: "Asia", card: "I", connected: ["Afghanistan", "China", "Siberia", "Ukraine"]
 	}, "Yakutsk": {
-		continent: "Asia", connected: ["Irkutsk", "Kamchatka", "Siberia"]
+		continent: "Asia", card: "A", connected: ["Irkutsk", "Kamchatka", "Siberia"]
 	}, "Eastern-Australia": {
-		continent: "Australia", connected: ["New-Guinea", "Western-Australia"]
+		continent: "Australia", card: "C", connected: ["New-Guinea", "Western-Australia"]
 	}, "Indonesia": {
-		continent: "Australia", connected: ["New-Guinea", "Western-Australia", "Siam"]
+		continent: "Australia", card: "I", connected: ["New-Guinea", "Western-Australia", "Siam"]
 	}, "New-Guinea": {
-		continent: "Australia", connected: ["Eastern-Australia", "Indonesia", "Western-Australia"]
+		continent: "Australia", card: "C", connected: ["Eastern-Australia", "Indonesia", "Western-Australia"]
 	}, "Western-Australia": {
-		continent: "Australia", connected: ["Eastern-Australia", "Indonesia", "New-Guinea"]
+		continent: "Australia", card: "A", connected: ["Eastern-Australia", "Indonesia", "New-Guinea"]
 	}, "Great-Britain": {
-		continent: "Europe", connected: ["Iceland", "Northern-Europe", "Scandinavia", "Western-Europe"]
+		continent: "Europe", card: "I", connected: ["Iceland", "Northern-Europe", "Scandinavia", "Western-Europe"]
 	}, "Iceland": {
-		continent: "Europe", connected: ["Great-Britain", "Scandinavia", "Greenland"]
+		continent: "Europe", card: "C", connected: ["Great-Britain", "Scandinavia", "Greenland"]
 	}, "Northern-Europe": {
-		continent: "Europe", connected: ["Great-Britain", "Scandinavia", "Southern-Europe", "Ukraine", "Western-Europe"]
+		continent: "Europe", card: "C", connected: ["Great-Britain", "Scandinavia", "Southern-Europe", "Ukraine", "Western-Europe"]
 	}, "Scandinavia": {
-		continent: "Europe", connected: ["Great-Britain", "Iceland", "Northern-Europe", "Ukraine"]
+		continent: "Europe", card: "I", connected: ["Great-Britain", "Iceland", "Northern-Europe", "Ukraine"]
 	}, "Southern-Europe": {
-		continent: "Europe", connected: ["Northern-Europe", "Ukraine", "Western-Europe", "Egypt", "North-Africa", "Middle-East"]
+		continent: "Europe", card: "I", connected: ["Northern-Europe", "Ukraine", "Western-Europe", "Egypt", "North-Africa", "Middle-East"]
 	}, "Ukraine": {
-		continent: "Europe", connected: ["Northern-Europe", "Scandinavia", "Southern-Europe", "Afghanistan", "Middle-East", "Ural"]
+		continent: "Europe", card: "I", connected: ["Northern-Europe", "Scandinavia", "Southern-Europe", "Afghanistan", "Middle-East", "Ural"]
 	}, "Western-Europe": {
-		continent: "Europe", connected: ["Great-Britain", "Northern-Europe", "Southern-Europe", "North-Africa"]
+		continent: "Europe", card: "I", connected: ["Great-Britain", "Northern-Europe", "Southern-Europe", "North-Africa"]
 	}, "Alaska": {
-		continent: "North-America", connected: ["Alberta", "Northwest-Territory", "Kamchatka"]
+		continent: "North-America", card: "A", connected: ["Alberta", "Northwest-Territory", "Kamchatka"]
 	}, "Alberta": {
-		continent: "North-America", connected: ["Alaska", "Northwest-Territory", "Ontario", "Western-United-States"]
+		continent: "North-America", card: "A", connected: ["Alaska", "Northwest-Territory", "Ontario", "Western-United-States"]
 	}, "Eastern-United-States": {
-		continent: "North-America", connected: ["Mexico", "Ontario", "Quebec", "Western-United-States"]
+		continent: "North-America", card: "A", connected: ["Mexico", "Ontario", "Quebec", "Western-United-States"]
 	}, "Greenland": {
-		continent: "North-America", connected: ["Northwest-Territory", "Ontario", "Quebec", "Iceland"]
+		continent: "North-America", card: "C", connected: ["Northwest-Territory", "Ontario", "Quebec", "Iceland"]
 	}, "Mexico": {
-		continent: "North-America", connected: ["Eastern-United-States", "Western-United-States", "Venezuela"]
+		continent: "North-America", card: "I", connected: ["Eastern-United-States", "Western-United-States", "Venezuela"]
 	}, "Northwest-Territory": {
-		continent: "North-America", connected: ["Alaska", "Alberta", "Greenland", "Ontario"]
+		continent: "North-America", card: "C", connected: ["Alaska", "Alberta", "Greenland", "Ontario"]
 	}, "Ontario": {
-		continent: "North-America", connected: ["Alberta", "Eastern-United-States", "Greenland", "Northwest-Territory", "Quebec", "Western-United-States"]
+		continent: "North-America", card: "A", connected: ["Alberta", "Eastern-United-States", "Greenland", "Northwest-Territory", "Quebec", "Western-United-States"]
 	}, "Quebec": {
-		continent: "North-America", connected: ["Eastern-United-States", "Greenland", "Ontario"]
+		continent: "North-America", card: "A", connected: ["Eastern-United-States", "Greenland", "Ontario"]
 	}, "Western-United-States": {
-		continent: "North-America", connected: ["Alberta", "Eastern-United-States", "Mexico", "Ontario"]
+		continent: "North-America", card: "A", connected: ["Alberta", "Eastern-United-States", "Mexico", "Ontario"]
 	}, "Argentina": {
-		continent: "South-America", connected: ["Brazil", "Peru"]
+		continent: "South-America", card: "I", connected: ["Brazil", "Peru"]
 	}, "Brazil": {
-		continent: "South-America", connected: ["Argentina", "Peru", "Venezuela", "North-Africa"]
+		continent: "South-America", card: "I", connected: ["Argentina", "Peru", "Venezuela", "North-Africa"]
 	}, "Peru": {
-		continent: "South-America", connected: ["Argentina", "Brazil", "Venezuela"]
+		continent: "South-America", card: "C", connected: ["Argentina", "Brazil", "Venezuela"]
 	}, "Venezuela": {
-		continent: "South-America", connected: ["Brazil", "Peru", "Mexico"]
+		continent: "South-America", card: "C", connected: ["Brazil", "Peru", "Mexico"]
 	}
 };
 
@@ -130,10 +130,16 @@ module.exports.initialTroops = (players) => {
 	}
 };
 
-module.exports.continentReinforcement = (continent) => {
-	const cont = CONTINENTS[continent];
-	if (cont) return cont.reinforcement;
-	return -1;
+module.exports.basicReinforcement = (holdings) => {
+	const ret = Math.floor(holdings.length / 3);
+	return (ret < 3) ? 3 : ret;
+};
+
+module.exports.continentReinforcement = (holdings) => {
+	return Object.keys(CONTINENTS).reduce((accm, curr) => {
+		const val = holdings.filter(t => t.continent === curr).length;
+		return accm + ((val === CONTINENTS[curr].territories.length) ? CONTINENTS[curr].reinforcement : 0);
+	}, 0);
 };
 
 module.exports.redeemReinforcement = (last) => {
@@ -158,16 +164,10 @@ module.exports.redeemReinforcement = (last) => {
 	}
 };
 
-module.exports.basicReinforcement = (holdings) => {
-	const ret = Math.floor(holdings.length / 3);
-	return (ret < 3) ? 3 : ret;
-};
-
 module.exports.buildTerritory = () => {
     return Object.keys(TERRITORIES).map(name => {
         let territory = {};
         territory["name"] = name;
-        // territory["game"] = id;
         territory["continent"] = TERRITORIES[name].continent;
         territory["troops"] = 0;
         return territory;
@@ -176,6 +176,10 @@ module.exports.buildTerritory = () => {
 
 module.exports.shuffleCards = (tokens) => {
 	let cards = Object.keys(TERRITORIES);
+	if (!tokens) {
+		cards.push("Wildcard-1");
+		cards.push("Wildcard-2");
+	}
 	let size = cards.length;
 
 	while (size > 0) {
@@ -187,11 +191,20 @@ module.exports.shuffleCards = (tokens) => {
 		cards[idx] = tmp;
 	}
 
-	let ret = {};
-	let index = 0;
-	for (let v of cards) {
-		ret[v] = tokens[index % tokens.length];
-		index ++;
+	if (!tokens) {
+		return cards.map(c => {
+			let card = {};
+			card["name"] = c;
+			card["type"] = TERRITORIES[c] ? TERRITORIES[c].card : "";
+			return card;
+		});
+	} else {
+		let ret = {};
+		let index = 0;
+		for (let v of cards) {
+			ret[v] = tokens[index % tokens.length];
+			index ++;
+		}
+		return ret;
 	}
-	return ret;
 };
