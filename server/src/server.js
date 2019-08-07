@@ -2,6 +2,7 @@ const { ApolloServer } = require('apollo-server');
 
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
+const gameRules = require('./rules');
 const EventDS = require('./data/event-ds')
 const EventStore = require('./data/event-store');
 
@@ -18,7 +19,7 @@ const server = new ApolloServer({
 	typeDefs,
 	resolvers,
 	dataSources: () => ({
-		eventDS: new EventDS({ store: eventStore })
+		eventDS: new EventDS({ store: eventStore, rules: gameRules })
 	})
 });
 

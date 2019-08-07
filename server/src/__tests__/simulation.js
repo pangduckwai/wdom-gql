@@ -1,14 +1,13 @@
 const { ApolloServer } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
-
-const { REGISTER, QUIT, OPEN, CLOSE, JOIN, LEAVE, START, ACTION, TURN } = require('./mutations');
-const { MYSELF, MY_GAME, FELLOW, PLAYERS, GAMES, MY_HOLDING } = require('./queries');
-const typeDefs = require('./schema');
-const resolvers = require('./resolvers');
-const EventDS = require('./data/event-ds');
-const EventStore = require('./data/event-store');
-
-const { buildTerritory, continentReinforcement } = require('./rules');
+const typeDefs = require('../schema');
+const resolvers = require('../resolvers');
+const EventDS = require('../data/event-ds');
+const EventStore = require('../data/event-store');
+const gameRules = require('../rules');
+const { REGISTER, QUIT, OPEN, CLOSE, JOIN, LEAVE, START, ACTION, TURN } = require('../mutations');
+const { MYSELF, MY_GAME, FELLOW, PLAYERS, GAMES, MY_HOLDING } = require('../queries');
+const { mockRules } = require('../_mock/mock-rules');
 
 let eventStore;
 let eventDS;
@@ -22,8 +21,9 @@ let jtokens = [];
 
 beforeAll(() => {
 	console.log("Test setup...");
+	gameRules.shuffleCards = mockRules;
 	eventStore = new EventStore();
-	eventDS = new EventDS({ store: eventStore });
+	eventDS = new EventDS({ store: eventStore, rules: gameRules });
 });
 
 afterAll(() => {
@@ -50,44 +50,44 @@ let createServer = (token) => {
 
 describe('Test rules', () => {
 	it('Continent Reinforcement - All', () => {
-		const territories = buildTerritory();
-		const reinforcement = continentReinforcement(territories);
+		const territories = gameRules.buildTerritory();
+		const reinforcement = gameRules.continentReinforcement(territories);
 		expect(reinforcement).toEqual(24);
 	});
 
 	it('Continent Reinforcement - Africa', () => {
-		const territories = buildTerritory().filter(t => t.continent === 'Africa');
-		const reinforcement = continentReinforcement(territories);
+		const territories = gameRules.buildTerritory().filter(t => t.continent === 'Africa');
+		const reinforcement = gameRules.continentReinforcement(territories);
 		expect(reinforcement).toEqual(3);
 	});
 
 	it('Continent Reinforcement - Asia', () => {
-		const territories = buildTerritory().filter(t => t.continent === 'Asia');
-		const reinforcement = continentReinforcement(territories);
+		const territories = gameRules.buildTerritory().filter(t => t.continent === 'Asia');
+		const reinforcement = gameRules.continentReinforcement(territories);
 		expect(reinforcement).toEqual(7);
 	});
 
 	it('Continent Reinforcement - Australia', () => {
-		const territories = buildTerritory().filter(t => t.continent === 'Australia');
-		const reinforcement = continentReinforcement(territories);
+		const territories = gameRules.buildTerritory().filter(t => t.continent === 'Australia');
+		const reinforcement = gameRules.continentReinforcement(territories);
 		expect(reinforcement).toEqual(2);
 	});
 
 	it('Continent Reinforcement - Europe', () => {
-		const territories = buildTerritory().filter(t => t.continent === 'Europe');
-		const reinforcement = continentReinforcement(territories);
+		const territories = gameRules.buildTerritory().filter(t => t.continent === 'Europe');
+		const reinforcement = gameRules.continentReinforcement(territories);
 		expect(reinforcement).toEqual(5);
 	});
 
 	it('Continent Reinforcement - North-America', () => {
-		const territories = buildTerritory().filter(t => t.continent === 'North-America');
-		const reinforcement = continentReinforcement(territories);
+		const territories = gameRules.buildTerritory().filter(t => t.continent === 'North-America');
+		const reinforcement = gameRules.continentReinforcement(territories);
 		expect(reinforcement).toEqual(5);
 	});
 
 	it('Continent Reinforcement - South-America', () => {
-		const territories = buildTerritory().filter(t => t.continent === 'South-America');
-		const reinforcement = continentReinforcement(territories);
+		const territories = gameRules.buildTerritory().filter(t => t.continent === 'South-America');
+		const reinforcement = gameRules.continentReinforcement(territories);
 		expect(reinforcement).toEqual(2);
 	});
 
@@ -280,10 +280,7 @@ describe('Preparation', () => {
 			await mutate({
 				mutation: ACTION,
 				variables: { name: plys[players[idx].name].holdings[plys[players[idx].name].index].name },
-			});//.then(response => {
-			// 	console.log(JSON.stringify(response));
-			// });
-			// }).catch(error => console.log(JSON.stringify(error)));
+			});
 
 			const myg = await eventDS.findGameByToken({ token: gtokens[1] }); //query({ query: MY_GAME });
 			if (myg.rounds > 0) break;
@@ -307,9 +304,25 @@ describe('Play game', () => {
 		const { mutate, query } = createTestClient(server);
 		await mutate({ mutation: TURN });
 		await query({ query: MYSELF }).then(v => {
-			expect(v.data.me.reinforcement).toEqual(3);
+			expect(v.data.me.reinforcement).toEqual(5);
 		});
 	});
+
+	it('Deploy reinforcement', async () => {
+		const server = new ApolloServer(createServer(ptokens['Paul']));
+		const { mutate, query } = createTestClient(server);
+		const res1 = await query({ query: MY_GAME });
+		const game = res1.data.myGame;
+		const res2 = await query({ query: MYSELF });
+		const self = res2.data.me;
+		const count = self.reinforcement;
+		for (let i = 0; i < count; i ++) {
+			await mutate({
+				mutation: ACTION,
+				variables: { name: 'Venezuela' },
+			});
+		}
+	})
 });
 
 describe('Wrap up', () => {
@@ -331,12 +344,12 @@ describe('Wrap up', () => {
 	// 	});
 	// });
 
-	it('Active game', async () => {
-		const server = new ApolloServer(createServer(ptokens['Paul']));
-		const { query } = createTestClient(server);
-		await query({ query: MY_GAME }).then(v => {
-			console.log("My game", JSON.stringify(v.data.myGame, null, 3));
-			expect(v.data.myGame.rounds).toEqual(1);
-		});
-	});
+	// it('Active game', async () => {
+	// 	const server = new ApolloServer(createServer(ptokens['Paul']));
+	// 	const { query } = createTestClient(server);
+	// 	await query({ query: MY_GAME }).then(v => {
+	// 		console.log("My game", JSON.stringify(v.data.myGame, null, 3));
+	// 		expect(v.data.myGame.rounds).toEqual(1);
+	// 	});
+	// });
 });

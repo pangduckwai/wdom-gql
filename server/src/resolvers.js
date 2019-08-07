@@ -1,6 +1,5 @@
-const evn = require('./events');
 const { UserInputError } = require('apollo-server');
-const { MIN_PLAYER_PER_GAME, MAX_PLAYER_PER_GAME, initialTroops, basicReinforcement, continentReinforcement, shuffleCards } = require('./rules');
+const evn = require('./events');
 
 module.exports = {
 	Query: {
@@ -97,7 +96,7 @@ module.exports = {
 			if (g.rounds >= 0) throw new UserInputError(`[JOIN] Game '${g.name}' already started`);
 
 			const players = dataSources.eventDS.listPlayersByGame({ token: token });
-			if (players.length >= MAX_PLAYER_PER_GAME)
+			if (players.length >= dataSources.eventDS.gameRules.MAX_PLAYER_PER_GAME)
 				throw new UserInputError(`[JOIN] Game '${g.name}' is full already`);
 
 			const k = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, token] }});
@@ -131,13 +130,13 @@ module.exports = {
 			if (g.host !== p.token) throw new UserInputError("[START] Can only start your own game");
 
 			const players = dataSources.eventDS.listPlayersByGame({ token: p.joined });
-			if (players.length < MIN_PLAYER_PER_GAME)
-				throw new UserInputError(`[START] Minimum number of players is ${MIN_PLAYER_PER_GAME}`);
+			if (players.length < dataSources.eventDS.gameRules.MIN_PLAYER_PER_GAME)
+				throw new UserInputError(`[START] Minimum number of players is ${dataSources.eventDS.gameRules.MIN_PLAYER_PER_GAME}`);
 
 			const k = await dataSources.eventDS.add({ event: evn.GAME_STARTED, payload: { tokens: [p.token, g.token] }});
 			if (!k.successful) throw new UserInputError(k);
 
-			const deck = shuffleCards(players.map(q => q.token));
+			const deck = dataSources.eventDS.gameRules.shuffleCards(players.map(q => q.token));
 			const hold = {};
 			for (const c of Object.keys(deck)) {
 				if (!hold[deck[c]]) {
@@ -153,7 +152,7 @@ module.exports = {
 				if (!m.successful) throw new UserInputError(m.message);
 			}
 
-			const troops = initialTroops(players.length);
+			const troops = dataSources.eventDS.gameRules.initialTroops(players.length);
 			for (const player of players) {
 				const n = await dataSources.eventDS.add({
 					event: evn.TROOP_ASSIGNED,
@@ -162,7 +161,7 @@ module.exports = {
 				if (!n.successful) throw new UserInputError(n.message);
 			}
 
-			const cards = shuffleCards(); // Need to do it here because need to record each card in a event, otherwise cannot replay
+			const cards = dataSources.eventDS.gameRules.shuffleCards(); // Need to do it here because need to record each card in a event, otherwise cannot replay
 			for (const card of cards) {
 				const d = await dataSources.eventDS.add({
 					event: evn.CARD_RETURNED,
@@ -271,8 +270,8 @@ module.exports = {
 
 			const holdings = dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
 			const reinforcement =
-				basicReinforcement(holdings) +
-				continentReinforcement(holdings); //TODO - Plus troops from trading in cards
+				dataSources.eventDS.gameRules.basicReinforcement(holdings) +
+				dataSources.eventDS.gameRules.continentReinforcement(holdings); //TODO - Plus troops from trading in cards
 			const s = await dataSources.eventDS.add({
 				event: evn.TROOP_ASSIGNED,
 				payload: { amount: reinforcement, tokens: [p.token, g.token] }
