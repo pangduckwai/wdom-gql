@@ -1,6 +1,13 @@
+/*
+- Setup Phase
+- Playing Phase
+- Reinforce Stage
+- Combat Stage
+- Fortify Stage
+*/
 
 let CONTINENTS = {
-	   "Africa": {
+	"Africa": {
 		reinforcement: 3,
 		territories: ["Congo", "East-Africa", "Egypt", "Madagascar", "North-Africa", "South-Africa"]
 	}, "Asia": {
@@ -22,7 +29,7 @@ let CONTINENTS = {
 };
 
 let TERRITORIES = {
-	   "Congo": {
+	"Congo": {
 		continent: "Africa", card: "A", connected: ["East-Africa", "North-Africa", "South-Africa"]
 	}, "East-Africa": {
 		continent: "Africa", card: "I", connected: ["Congo", "Egypt", "Madagascar", "North-Africa", "South-Africa", "Middle-East"]
@@ -109,14 +116,6 @@ let TERRITORIES = {
 	}
 };
 
-module.exports.minPlayersPerGame = () => {
-	return 3;
-};
-
-module.exports.maxPlayersPerGame = () => {
-	return 6;
-};
-
 module.exports.initialTroops = (players) => {
 	switch(players) {
 		case 3:
@@ -165,13 +164,33 @@ module.exports.redeemReinforcement = (last) => {
 };
 
 module.exports.buildTerritory = () => {
-    return Object.keys(TERRITORIES).map(name => {
-        let territory = {};
-        territory["name"] = name;
-        territory["continent"] = TERRITORIES[name].continent;
-        territory["troops"] = 0;
-        return territory;
-    });
+	let tindex = {};
+	let territories = Object.keys(TERRITORIES).map((name, idx) => {
+		let territory = {};
+		territory["name"] = name;
+		territory["continent"] = TERRITORIES[name].continent;
+		territory["troops"] = 0;
+		tindex[name] = idx;
+		return territory;
+	});
+	for (let territory of territories) {
+		territory["connected"] = TERRITORIES[territory.name].connected.map(name => territories[tindex[name]]);
+	}
+	return territories;
+};
+
+module.exports.getCard = (name) => {
+	const rec = TERRITORIES[name];
+	let card = {};
+	card['name'] = name;
+	if (rec) {
+		card["type"] = rec.card;
+	} else if ((name === "Wildcard-1") || (name === "Wildcard-2")) {
+		card["type"] = "";
+	} else {
+		return null;
+	}
+	return card;
 };
 
 module.exports.shuffleCards = (tokens) => {
@@ -208,3 +227,6 @@ module.exports.shuffleCards = (tokens) => {
 		return ret;
 	}
 };
+
+module.exports.MIN_PLAYER_PER_GAME = 3;
+module.exports.MAX_PLAYER_PER_GAME = 6;

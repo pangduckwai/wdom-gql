@@ -1,8 +1,8 @@
 const { ApolloServer } = require('apollo-server');
 const { createTestClient } = require('apollo-server-testing');
 
-const { REGISTER, QUIT, OPEN, CLOSE, JOIN, LEAVE, START, ACTION } = require('./mutations');
-const { MY_GAME, FELLOW, PLAYERS, GAMES, MY_HOLDING } = require('./queries');
+const { REGISTER, QUIT, OPEN, CLOSE, JOIN, LEAVE, START, ACTION, TURN } = require('./mutations');
+const { MYSELF, MY_GAME, FELLOW, PLAYERS, GAMES, MY_HOLDING } = require('./queries');
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
 const EventDS = require('./data/event-ds');
@@ -93,9 +93,9 @@ describe('Test rules', () => {
 
 });
 
-const PLAYER_NAMES = ['Rick', 'John', 'Josh', 'Nick', 'Rick', 'Paul', 'Bill', 'Fred'];
+const PLAYER_NAMES = ['Rick', 'John', 'Josh', 'Nick', 'Rick', 'Paul', 'Bill', 'Fred', 'Jack'];
 const GAME_NAMES = [{ name: "John's Game", index: 'John' }, { name: "Paul's Game", index: 'Paul' }, { name: "John's Game", index: 'Rick' }, { name: "Some game", index: 'John'}];
-const JOINING = ['Rick', 'John', 'Josh', 'Nick', 'Fred'];
+const JOINING = ['Rick', 'John', 'Josh', 'Nick', 'Bill', 'Fred', 'Jack'];
 describe('Preparation', () => {
 	it('Create players', async () => {
 		let okay = 0, fail = 0;
@@ -106,19 +106,15 @@ describe('Preparation', () => {
 				mutation: REGISTER,
 				variables: { name: name },
 			}).then(response => {
-				ptokens[name] = response.data.registerPlayer.event.token;
-				okay ++;
-			}).catch(_ => fail ++);
+				if (response.data.registerPlayer) {
+					ptokens[name] = response.data.registerPlayer.event.token;
+					okay ++;
+				} else {
+					if (response.errors[0].message === "[REGISTER] Player 'Rick' already exists") fail ++;
+				}
+			});
 		}
-		expect((okay === 7) && (fail === 1)).toBeTruthy();
-	});
-
-	it('Player quit', async () => {
-		const server = new ApolloServer(createServer(ptokens['Bill']));
-		const { mutate, query } = createTestClient(server);
-		await mutate({ mutation: QUIT }); //.then(v => console.log(JSON.stringify(v))).catch(e => console.log(JSON.stringify(e)));
-		const res = await query({ query: PLAYERS });
-		expect(res.data.listPlayers.length).toEqual(6);
+		expect((okay === 8) && (fail === 1)).toBeTruthy();
 	});
 
 	it('Open new game', async () => {
@@ -130,9 +126,15 @@ describe('Preparation', () => {
 				mutation: OPEN,
 				variables: { name: game.name },
 			}).then(response => {
-				gtokens.push(response.data.openGame.event.token);
-				okay ++;
-			}).catch(_ => fail ++);
+				if (response.data.openGame) {
+					gtokens.push(response.data.openGame.event.token);
+					okay ++;
+				} else {
+					if ((response.errors[0].message === "[OPEN] Game 'John's Game' already exists") ||
+						(response.errors[0].message === "[OPEN] You are already in the game 'John's Game'"))
+						fail ++;
+				}
+			});
 		}
 		expect((okay === 2) && (fail === 2)).toBeTruthy();
 	});
@@ -146,11 +148,33 @@ describe('Preparation', () => {
 				mutation: JOIN,
 				variables: { token: gtokens[1] },
 			}).then(response => {
-				jtokens.push(response.data.joinGame.event.token);
-				okay ++;
-			}).catch(_ => fail ++);
+				if (response.data.joinGame) {
+					jtokens.push(response.data.joinGame.event.token);
+					okay ++;
+				} else {
+					if ((response.errors[0].message === "[JOIN] Game 'Paul's Game' is full already") ||
+						(response.errors[0].message === "[JOIN] You are already in the game 'John's Game'"))
+						fail ++;
+				}
+			});
 		}
-		expect((okay === 4) && (fail === 1)).toBeTruthy();
+		expect((okay === 5) && (fail === 2)).toBeTruthy();
+	});
+
+	it('Player quit', async () => {
+		const server = new ApolloServer(createServer(ptokens['Bill']));
+		const { mutate, query } = createTestClient(server);
+		await mutate({ mutation: QUIT }); //.then(v => console.log(JSON.stringify(v))).catch(e => console.log(JSON.stringify(e)));
+		const res = await query({ query: PLAYERS });
+		expect(res.data.listPlayers.length).toEqual(7);
+	});
+
+	it('Player quit', async () => {
+		const server = new ApolloServer(createServer(ptokens['Jack']));
+		const { mutate, query } = createTestClient(server);
+		await mutate({ mutation: QUIT });
+		const res = await query({ query: PLAYERS });
+		expect(res.data.listPlayers.length).toEqual(6);
 	});
 
 	it('Leave game', async () => {
@@ -162,6 +186,12 @@ describe('Preparation', () => {
 		const { query } = createTestClient(server2);
 		const res = await query({ query: FELLOW });
 		expect(res.data.myFellowPlayers.length).toEqual(4);
+	});
+
+	it('Start game', async () => {
+		const server = new ApolloServer(createServer(ptokens['John']));
+		const { mutate, query } = createTestClient(server);
+		await mutate({ mutation: START }).then(response => expect(response.errors[0].message).toEqual("[START] Minimum number of players is 3"));
 	});
 
 	it("Leave one's own game", async () => {
@@ -271,15 +301,26 @@ describe('Preparation', () => {
 	});
 });
 
+describe('Play game', () => {
+	it('Start turn', async () => {
+		const server = new ApolloServer(createServer(ptokens['Paul']));
+		const { mutate, query } = createTestClient(server);
+		await mutate({ mutation: TURN });
+		await query({ query: MYSELF }).then(v => {
+			expect(v.data.me.reinforcement).toEqual(3);
+		});
+	});
+});
+
 describe('Wrap up', () => {
-	// it('Players', async () => {
-	// 	const server = new ApolloServer(createServer());
-	// 	const { query } = createTestClient(server);
-	// 	await query({ query: PLAYERS }).then(v => {
-	// 		console.log("Players", v.data.listPlayers.length, JSON.stringify(v.data.listPlayers, null, 3));
-	// 		expect(v.data.listPlayers.length).toEqual(6);
-	// 	});
-	// });
+	it('Players', async () => {
+		const server = new ApolloServer(createServer());
+		const { query } = createTestClient(server);
+		await query({ query: PLAYERS }).then(v => {
+			console.log("Players", v.data.listPlayers.length, JSON.stringify(v.data.listPlayers, null, 3));
+			expect(v.data.listPlayers.length).toEqual(6);
+		});
+	});
 
 	// it('Games', async () => {
 	// 	const server = new ApolloServer(createServer());

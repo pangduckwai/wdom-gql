@@ -29,5 +29,9 @@ module.exports = Object.freeze({
 		id: 14, type: "G"
 	}, SETUP_FINISHED: {
 		id: 15, type: "G"
+	}, CARD_RETURNED: {
+		id: 16, type: "G"
+	}, TERRITORY_ATTACKED: {
+		id: 17, type: "G"
 	}
 });

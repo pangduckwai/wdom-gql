@@ -112,5 +112,19 @@ module.exports = Object.freeze({
                 token
             }
 		}
-	}`
+    }`,
+    TURN: gql`
+    mutation Turn {
+        startTurn {
+			successful
+            message
+            event {
+                timestamp
+                event
+                type
+                name
+                token
+            }
+		}
+    }`
 });

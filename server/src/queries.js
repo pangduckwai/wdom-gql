@@ -1,6 +1,21 @@
 const { gql } = require('apollo-server');
 
 module.exports = Object.freeze({
+	MYSELF: gql`
+	query Myself {
+		me {
+			token
+			name
+			reinforcement
+			cards {
+				name
+				type
+			}
+			joined {
+				name
+			}
+		}
+	}`,
 	MY_GAME: gql`
 	query MyGame {
 		myGame {
@@ -27,6 +42,9 @@ module.exports = Object.freeze({
 					name
 				}
 				troops
+				connected {
+					name
+				}
 			}
 		}
 	}`,

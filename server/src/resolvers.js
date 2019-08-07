@@ -1,6 +1,6 @@
 const evn = require('./events');
 const { UserInputError } = require('apollo-server');
-const { minPlayersPerGame, maxPlayersPerGame, shuffleCards, initialTroops, basicReinforcement, continentReinforcement } = require('./rules');
+const { MIN_PLAYER_PER_GAME, MAX_PLAYER_PER_GAME, initialTroops, basicReinforcement, continentReinforcement, shuffleCards } = require('./rules');
 
 module.exports = {
 	Query: {
@@ -97,7 +97,7 @@ module.exports = {
 			if (g.rounds >= 0) throw new UserInputError(`[JOIN] Game '${g.name}' already started`);
 
 			const players = dataSources.eventDS.listPlayersByGame({ token: token });
-			if (players.length >= maxPlayersPerGame())
+			if (players.length >= MAX_PLAYER_PER_GAME)
 				throw new UserInputError(`[JOIN] Game '${g.name}' is full already`);
 
 			const k = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, token] }});
@@ -131,8 +131,8 @@ module.exports = {
 			if (g.host !== p.token) throw new UserInputError("[START] Can only start your own game");
 
 			const players = dataSources.eventDS.listPlayersByGame({ token: p.joined });
-			if (players.length < minPlayersPerGame())
-				throw new UserInputError(`[START] Minimum number of players is ${minPlayersPerGame()}`);
+			if (players.length < MIN_PLAYER_PER_GAME)
+				throw new UserInputError(`[START] Minimum number of players is ${MIN_PLAYER_PER_GAME}`);
 
 			const k = await dataSources.eventDS.add({ event: evn.GAME_STARTED, payload: { tokens: [p.token, g.token] }});
 			if (!k.successful) throw new UserInputError(k);
@@ -160,6 +160,15 @@ module.exports = {
 					payload: { amount: (troops - hold[player.token]), tokens: [player.token, g.token] }
 				});
 				if (!n.successful) throw new UserInputError(n.message);
+			}
+
+			const cards = shuffleCards(); // Need to do it here because need to record each card in a event, otherwise cannot replay
+			for (const card of cards) {
+				const d = await dataSources.eventDS.add({
+					event: evn.CARD_RETURNED,
+					payload: { name: card.name, tokens: [p.token, g.token] }
+				});
+				if (!d.successful) throw new UserInputError(d.message);
 			}
 
 			await dataSources.eventDS.updateSnapshot();
@@ -218,22 +227,60 @@ module.exports = {
 					return a;
 				}
 			} else { // rounds > 0, playing phase
-				//TODO HERE!!!
+				if (p.reinforcement > 0) {
+					// Reinforcement stage
+					if (owned) {
+						const a = await dataSources.eventDS.add({
+							event: evn.TROOP_ADDED,
+							payload: { name: name, amount: 1, tokens: [p.token, g.token] }
+						});
+						if (!a.successful) throw new UserInputError(a.message);
+	
+						const d = await dataSources.eventDS.add({
+							event: evn.TROOP_DEPLOYED,
+							payload: { amount: 1, tokens: [p.token, g.token] }
+						});
+						if (!d.successful) throw new UserInputError(d.message);
+						await dataSources.eventDS.updateSnapshot();
+					}
+				} else {
+					// Combat stage (moved to this stage automatically)
+					if (!owned) {
+						if (g.territories[g.t_index[name]].connected.filter(conn => conn.name === g.current.name).length > 0) {
+							//Connected, can attack
+							const k = await dataSources.eventDS.add({
+								event: evn.TERRITORY_ATTACKED,
+								payload: { tokens: [p.token, g.token, g.current.name, name] }
+							});
+							if (!k.successful) throw new UserInputError(k.message);
+							await dataSources.eventDS.updateSnapshot();
+						}
+					}
+				}
 			}
-		// },
-		// startTurn: async (_, __, { dataSources }) => {
-		// 	const p = dataSources.eventDS.me();
-		// 	if (!p) throw new UserInputError("[TURN] You are not a registered player yet");
-		// 	if (!p.joined) throw new UserInputError("[TURN] You are not in any game");
+		},
+		startTurn: async (_, __, { dataSources }) => {
+			const p = dataSources.eventDS.me();
+			if (!p) throw new UserInputError("[TURN] You are not a registered player yet");
+			if (!p.joined) throw new UserInputError("[TURN] You are not in any game");
 
-		// 	const g = dataSources.eventDS.findGameByToken({ token: p.joined });
-		// 	if (!g) throw new UserInputError(`[TURN] Game '${p.joined}' not found`);
-		// 	if (g.rounds < 0) throw new UserInputError("[TURN] The game is not started yet");
-		// 	if (g.turn !== p.token) throw new UserInputError("[TURN] Now is not your turn yet");
+			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+			if (!g) throw new UserInputError(`[TURN] Game '${p.joined}' not found`);
+			if (g.rounds <= 0) throw new UserInputError("[TURN] The game is not ready yet");
+			if (g.turn !== p.token) throw new UserInputError("[TURN] Now is not your turn yet");
 
-		// 	const deck = shuffleCards(); // Need to do it here because need to record each card in a event, otherwise cannot replay
-		// 	const holdings = dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
-		// 	const reinforcement = basicReinforcement(holdings) + continentReinforcement(holdings); //TODO - Plus troops from trading in cards
+			const holdings = dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
+			const reinforcement =
+				basicReinforcement(holdings) +
+				continentReinforcement(holdings); //TODO - Plus troops from trading in cards
+			const s = await dataSources.eventDS.add({
+				event: evn.TROOP_ASSIGNED,
+				payload: { amount: reinforcement, tokens: [p.token, g.token] }
+			});
+			if (!s.successful) throw new UserInputError(s.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return s;
 		}
 	},
 	Player: {

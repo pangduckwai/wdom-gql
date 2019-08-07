@@ -1,3 +1,4 @@
+const { UserInputError } = require('apollo-server');
 const crypto = require('crypto');
 const evn = require('../events');
 
@@ -130,6 +131,7 @@ class EventStore {
 					break;
 				case evn.TERRITORY_ASSIGNED.id:
 				case evn.TERRITORY_SELECTED.id:
+				case evn.CARD_RETURNED.id:
 					if (payload.tokens.length < 2) {
 						rspn.message = "Missing player and/or game IDs";
 					} else if (payload.name === null) {
@@ -168,6 +170,13 @@ class EventStore {
 						rspn.successful = populate(obj, payload.tokens[0]);
 					}
 					break;
+				case evn.TERRITORY_ATTACKED.id:
+					if (payload.tokens.length < 4) {
+						rspn.message = "[ATTACK] Missing player ID, game ID, and from/to territory IDs";
+					} else {
+						rspn.successful = populate(obj, payload.tokens[1]); //token of the game in question
+					}
+					break;
 			}
 			if (rspn.successful) {
 				const len = this.events.push(obj);
@@ -175,12 +184,10 @@ class EventStore {
 					rspn.event = copy(obj);
 					resolve(rspn);
 				} else {
-					rspn.successful = false;
-					rspn.message = `Adding event ${JSON.stringify(obj)} failed`;
-					reject(rspn);
+					throw new UserInputError(`Adding event ${JSON.stringify(obj)} failed`);
 				}
 			} else {
-				reject(rspn);
+				throw new UserInputError(rspn.message);
 			}
 		});
 	}

@@ -1,6 +1,6 @@
 const { DataSource } = require('apollo-datasource');
 const evn = require('../events');
-const { buildTerritory, shuffleCards } = require('../rules');
+const { buildTerritory, getCard } = require('../rules');
 
 /*
 type Player {
@@ -8,6 +8,7 @@ type Player {
 	token: String!
 	name: String!
 	reinforcement: Int!
+	cards: [Card]!
 	joined: Game
 }
 
@@ -20,6 +21,7 @@ type Game {
 	rounds: Int!
 	redeemed: Int!
 	current: Territory
+	cards: [Card]!
 	territories: [Territory]!
 }
 
@@ -248,6 +250,15 @@ class EventDS extends DataSource {
 				if (obj && (obj.rounds === 0)) {
 					obj.turn = obj.host;
 					obj.rounds = 1;
+				}
+				break;
+			case evn.CARD_RETURNED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.rounds === 0)) {
+					const card = getCard(v.name);
+					if (card && (obj.cards.filter(c => c.name === v.name).length <= 0)) {
+						obj.cards.push(card);
+					}
 				}
 				break;
 		}
