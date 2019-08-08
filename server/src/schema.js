@@ -20,6 +20,7 @@ type Mutation {
 	startGame: Response
 	takeAction(name: String!): Response
 	startTurn: Response
+	endTurn(from: String, to: String, amount: Int): Response
 }
 
 type Player {
@@ -28,6 +29,7 @@ type Player {
 	reinforcement: Int!
 	cards: [Card]!
 	joined: Game
+	conquer: Boolean
 }
 
 type Game {

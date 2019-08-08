@@ -367,14 +367,14 @@ describe('Play game', () => {
 });
 
 describe('Wrap up', () => {
-	// it('Players', async () => {
-	// 	const server = new ApolloServer(createServer());
-	// 	const { query } = createTestClient(server);
-	// 	await query({ query: ALL_PLAYERS }).then(v => {
-	// 		console.log("Players", v.data.listPlayers.length, JSON.stringify(v.data.listPlayers, null, 3));
-	// 		expect(v.data.listPlayers.length).toEqual(6);
-	// 	});
-	// });
+	it('Players', async () => {
+		const server = new ApolloServer(createServer());
+		const { query } = createTestClient(server);
+		await query({ query: ALL_PLAYERS }).then(v => {
+			console.log("Players", v.data.listPlayers.length, JSON.stringify(v.data.listPlayers, null, 3));
+			expect(v.data.listPlayers.length).toEqual(6);
+		});
+	});
 
 	// it('Games', async () => {
 	// 	const server = new ApolloServer(createServer());

@@ -217,7 +217,7 @@ module.exports = {
 
 					if (!setupFinished) {
 						const n = await dataSources.eventDS.add({
-							event: evn.TURN_TAKEN,
+							event: evn.NEXT_PLAYER,
 							payload: { data: [p.token, g.token] }
 						});
 						if (!n.successful) throw new UserInputError(n.message);
@@ -285,6 +285,12 @@ module.exports = {
 			if (g.rounds <= 0) throw new UserInputError("[TURN] The game is not ready yet");
 			if (g.turn !== p.token) throw new UserInputError("[TURN] Now is not your turn yet");
 
+			const t = await dataSources.eventDS.add({
+				event: evn.TURN_STARTED,
+				payload: { data: [p.token, g.token] }
+			});
+			if (!t.successful) throw new UserInputError(t.message);
+
 			const holdings = dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
 			const reinforcement =
 				dataSources.eventDS.gameRules.basicReinforcement(holdings) +
@@ -297,6 +303,45 @@ module.exports = {
 
 			await dataSources.eventDS.updateSnapshot();
 			return s;
+		},
+		endTurn: async (_, { from, to, amount }, { dataSources }) => {
+			const p = dataSources.eventDS.me();
+			if (!p) throw new UserInputError("[TURN] You are not a registered player yet");
+			if (!p.joined) throw new UserInputError("[TURN] You are not in any game");
+
+			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+			if (!g) throw new UserInputError(`[TURN] Game '${p.joined}' not found`);
+			if (g.rounds <= 0) throw new UserInputError("[TURN] The game is not ready yet");
+			if (g.turn !== p.token) throw new UserInputError("[TURN] Now is not your turn yet");
+
+			// Note: in the case of fortifying, when 'endTurn' is called it already pass user confirmation to fortify
+			if (from && to && (amount > 0)) {
+				if ((g.territories[g.t_index[from]].owner === p.token) &&
+					(g.territories[g.t_index[to]].owner === p.token)) {
+					let value = amount;
+					if (amount >= g.territories[g.t_index[from]].troops) value = g.territories[g.t_index[from]].troops - 1;
+
+					const f = await dataSources.eventDS.add({
+						event: evn.FORTIFIED,
+						payload: { amount: value, data: [p.token, g.token, from, to] }
+					});
+					if (!f.successful) throw new UserInputError(f.message);
+				}
+			}
+
+			const e = await dataSources.eventDS.add({
+				event: evn.TURN_ENDED,
+				payload: { data: [p.token, g.token] }
+			});
+			if (!e.successful) throw new UserInputError(e.message);
+			const n = await dataSources.eventDS.add({
+				event: evn.NEXT_PLAYER,
+				payload: { data: [p.token, g.token] }
+			});
+			if (!n.successful) throw new UserInputError(n.message);
+
+			await dataSources.eventDS.updateSnapshot();
+			return e;
 		}
 	},
 	Player: {

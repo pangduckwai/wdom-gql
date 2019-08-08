@@ -103,7 +103,7 @@ class EventDS extends DataSource {
 	}
 
 	process(v) {
-		let obj, plys, len;
+		let obj, len;
 
 		switch (v.event) {
 			//Player events
@@ -205,20 +205,16 @@ class EventDS extends DataSource {
 					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
 				}
 				break;
-			// case evn.ACTION_TAKEN.id:
-			// 	//TODO HERE - 
-			// 	//NOTE!!! Event 'ACTION_TAKEN' not needed during setup phase, leave it just in case needed in playing phase
-			// 	break;
 			case evn.TERRITORY_SELECTED.id:
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
 					obj.current = v.name;
 				}
 				break;
-			case evn.TURN_TAKEN.id:
+			case evn.NEXT_PLAYER.id:
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
-					plys = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === v.token));
+					const plys = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === v.token));
 					let idx = 0;
 					for (const ply of plys) {
 						idx ++;
@@ -250,6 +246,13 @@ class EventDS extends DataSource {
 				if (obj && (obj.rounds === 0)) {
 					obj.turn = obj.host;
 					obj.rounds = 1;
+				}
+				break;
+			case evn.TURN_STARTED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.turn === v.data[0])) {
+					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					if (ply) ply.conquer = false;
 				}
 				break;
 			case evn.CARD_RETURNED.id:
@@ -284,7 +287,23 @@ class EventDS extends DataSource {
 					to.owner = v.data[0];
 					to.troops = fm.troops - 1;
 					fm.troops = 1;
+					obj.current = v.data[3];
+
+					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					if (ply) ply.conquer = true;
 				}
+				break;
+			case evn.FORTIFIED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.turn === v.data[0])) {
+					const fm = obj.territories[obj.t_index[v.data[2]]];
+					const to = obj.territories[obj.t_index[v.data[3]]];
+					let value = (v.amount >= fm.troops) ? fm.troops - 1 : v.amount;
+					to.troops += value;
+					fm.troops -= value;
+				}
+				break;
+			case evn.TURN_ENDED.id:
 				break;
 		}
 	}

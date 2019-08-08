@@ -80,6 +80,7 @@ module.exports = Object.freeze({
                     name
                 }
 			}
+			conquer
 		}
 	}`,
 	ALL_GAMES: gql`

@@ -120,9 +120,10 @@ class EventStore {
 					break;
 				case evn.GAME_CLOSED.id:
 				case evn.GAME_STARTED.id:
-				// case evn.ACTION_TAKEN.id:
-				case evn.TURN_TAKEN.id:
+				case evn.NEXT_PLAYER.id:
 				case evn.SETUP_FINISHED.id:
+				case evn.TURN_STARTED.id:
+				case evn.TURN_ENDED.id:
 					if (payload.data.length < 2) {
 						rspn.message = "Missing player and/or game IDs";
 					} else {
@@ -172,14 +173,23 @@ class EventStore {
 					break;
 				case evn.TERRITORY_ATTACKED.id:
 					if (payload.data.length < 6) {
-						rspn.message = "[ATTACK] Missing player ID, game ID, and from/to territory IDs";
+						rspn.message = "[ATTACK] Missing player ID, game ID, from/to territory IDs, and casualties";
 					} else {
 						rspn.successful = populate(obj, payload.data[1]); //token of the game in question
 					}
 					break;
 				case evn.TERRITORY_CONQUERED.id:
 					if (payload.data.length < 4) {
-						rspn.message = "[CONQUER] Missing player ID, game ID, and conquered territory ID";
+						rspn.message = "[CONQUER] Missing player ID, game ID, and from/to territory IDs";
+					} else {
+						rspn.successful = populate(obj, payload.data[1]);
+					}
+					break;
+				case evn.FORTIFIED.id:
+					if (payload.data.length < 4) {
+						rspn.message = "[FORTIFY] Missing player ID, game ID, and from/to territory IDs";
+					} else if (payload.amount < 0) {
+						rspn.message = "[FORTIFY] Missing number of troops";
 					} else {
 						rspn.successful = populate(obj, payload.data[1]);
 					}
