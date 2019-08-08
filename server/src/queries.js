@@ -58,7 +58,7 @@ module.exports = Object.freeze({
 			troops
 		}
 	}`,
-	FELLOW: gql`
+	FELLOW_PLAYERS: gql`
 	query Fellow {
 		myFellowPlayers {
 			name
@@ -67,7 +67,7 @@ module.exports = Object.freeze({
 			}
 		}
 	}`,
-	PLAYERS: gql`
+	ALL_PLAYERS: gql`
 	query Players {
 		listPlayers {
 			token
@@ -82,7 +82,7 @@ module.exports = Object.freeze({
 			}
 		}
 	}`,
-	GAMES: gql`
+	ALL_GAMES: gql`
 	query Games {
 		listGames {
 			token

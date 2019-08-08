@@ -1,6 +1,6 @@
 const gameRules = require('../rules');
 
-module.exports.mockRules = (tokens) => {
+module.exports.mockShuffleCards = (tokens) => {
 	const cards1 = [
 		"Northern-Europe","Congo","Irkutsk","Siberia","Japan","Venezuela","Brazil","Egypt","Peru","Western-Europe","Ural","Ukraine",
 		"Eastern-Australia","Alaska","Manchuria","Eastern-United-States","India","Wildcard-2","China","Scandinavia","Great-Britain",
@@ -31,4 +31,8 @@ module.exports.mockRules = (tokens) => {
 		}
 		return ret;
 	}
+};
+
+module.exports.mockDoBattle = ({ attacker, defender }) => {
+	return { attacker: 1, defender: 1 };
 };

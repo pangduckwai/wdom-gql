@@ -230,7 +230,38 @@ let gameRules = new function() {
 			}
 			return ret;
 		}
-	}
+	};
+
+	this.doBattle = ({ attacker, defender }) => {
+		let rdice = [], wdice = [];
+
+		let roll = (start, end, troops, dices) => {
+			let r;
+			for (let i = start; i < Math.min(troops, end+start); i ++) {
+				r = Math.floor(Math.random() * 6) + 1;
+				for (let j = 0; j < dices.length; j ++) {
+					if (r > dices[j]) {
+						dices.splice(j, 0, r);
+						break;
+					}
+				}
+				if (dices.length === (i-start)) dices.push(r);
+			}
+		};
+
+		roll(1, 3, attacker, rdice);
+		roll(0, 2, defender, wdice);
+
+		let casualties = { attacker: 0, defender: 0 };
+		for (let k = 0; k < Math.min(rdice.length, wdice.length); k ++) {
+			if (rdice[k] > wdice[k]) {
+				casualties.defender ++; //Defender lose
+			} else {
+				casualties.attacker ++; //Attacker lose
+			}
+		}
+		return casualties;
+	};
 };
 
 module.exports = gameRules;

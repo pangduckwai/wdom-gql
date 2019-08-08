@@ -11,7 +11,7 @@ const evn = require('../events');
 		type: String! (Player|Game|Card|...)
 		name: String
 		amount: Int
-		tokens: [String]
+		data: [String]
 	}
 */
 let copy = (orig) => {
@@ -23,10 +23,10 @@ let copy = (orig) => {
 	copy.type = orig.type;
 	if (typeof(orig.name) !== "undefined") copy.name = orig.name;
 	if (typeof(orig.amount) !== "undefined") copy.amount = orig.amount;
-	if (orig.tokens) {
-		copy.tokens = [];
-		for (let t of orig.tokens)
-			copy.tokens.push(t);
+	if (orig.data) {
+		copy.data = [];
+		for (let t of orig.data)
+			copy.data.push(t);
 	}
 	return copy;
 };
@@ -65,7 +65,7 @@ class EventStore {
 	add({ event, payload = {
 		name: null,
 		amount: -1,
-		tokens: []
+		data: []
 	}}) {
 		return new Promise((resolve, reject) => {
 			let dtm = Date.now();
@@ -80,10 +80,10 @@ class EventStore {
 
 			if (payload.name !== null) obj.name = payload.name;
 			if (payload.amount >= 0) obj.amount = payload.amount;
-			if (payload.tokens && (payload.tokens.length > 0)) {
-				obj.tokens = [];
-				for (let t of payload.tokens)
-					obj.tokens.push(t);
+			if (payload.data && (payload.data.length > 0)) {
+				obj.data = [];
+				for (let t of payload.data)
+					obj.data.push(t);
 			}
 
 			switch (event.id) {
@@ -95,22 +95,22 @@ class EventStore {
 					}
 					break;
 				case evn.PLAYER_QUITTED.id:
-					if (payload.tokens.length < 1) {
+					if (payload.data.length < 1) {
 						rspn.message = "[QUIT] Missing player ID";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[0]); //token of the player quitting
+						rspn.successful = populate(obj, payload.data[0]); //token of the player quitting
 					}
 					break;
 				case evn.GAME_JOINED.id:
 				case evn.GAME_LEFT.id:
-					if (payload.tokens.length < 2) {
+					if (payload.data.length < 2) {
 						rspn.message = "Missing player and/or game IDs";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[0]);
+						rspn.successful = populate(obj, payload.data[0]);
 					}
 					break;
 				case evn.GAME_OPENED.id:
-					if (payload.tokens.length < 1) {
+					if (payload.data.length < 1) {
 						rspn.message = "[OPEN] Missing player ID";
 					} else if (payload.name === null) {
 						rspn.message = "[OPEN] Missing game name";
@@ -120,24 +120,24 @@ class EventStore {
 					break;
 				case evn.GAME_CLOSED.id:
 				case evn.GAME_STARTED.id:
-				case evn.ACTION_TAKEN.id:
+				// case evn.ACTION_TAKEN.id:
 				case evn.TURN_TAKEN.id:
 				case evn.SETUP_FINISHED.id:
-					if (payload.tokens.length < 2) {
+					if (payload.data.length < 2) {
 						rspn.message = "Missing player and/or game IDs";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]);
+						rspn.successful = populate(obj, payload.data[1]);
 					}
 					break;
 				case evn.TERRITORY_ASSIGNED.id:
 				case evn.TERRITORY_SELECTED.id:
 				case evn.CARD_RETURNED.id:
-					if (payload.tokens.length < 2) {
+					if (payload.data.length < 2) {
 						rspn.message = "Missing player and/or game IDs";
 					} else if (payload.name === null) {
 						rspn.message = "Missing territory name";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]);
+						rspn.successful = populate(obj, payload.data[1]);
 					}
 					break;
 				case evn.TROOP_ADDED.id:
@@ -145,14 +145,14 @@ class EventStore {
 					//      - usually correspond to a click to a territory, meaning to add 1 troop.
 					//      - exception: when redeeming cards, if any of the territory on the cards are owned by the same player,
 					//        add 2 troops directly to that territory
-					if (payload.tokens.length < 2) {
+					if (payload.data.length < 2) {
 						rspn.message = "[ADD] Missing player and/or game IDs";
 					} else if (payload.name === null) {
 						rspn.message = "[ADD] Missing territory name";
 					} else if (payload.amount < 0) {
 						rspn.message = "[ADD] Missing number of troops";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game in question
+						rspn.successful = populate(obj, payload.data[1]); //token of the game in question
 					}
 					break;
 				case evn.TROOP_ASSIGNED.id:
@@ -162,19 +162,26 @@ class EventStore {
 					//  3. after redeem cards for additional reinforcement
 				case evn.TROOP_DEPLOYED.id:
 					// TROOP_DEPLOYED: NOTE - subtract currently available reinforcement of a player after troops added to a territory
-					if (payload.tokens.length < 2) {
+					if (payload.data.length < 2) {
 						rspn.message = "Missing player and/or game IDs";
 					} else if (payload.amount < 0) {
 						rspn.message = "Missing number of troops";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[0]);
+						rspn.successful = populate(obj, payload.data[0]);
 					}
 					break;
 				case evn.TERRITORY_ATTACKED.id:
-					if (payload.tokens.length < 4) {
+					if (payload.data.length < 6) {
 						rspn.message = "[ATTACK] Missing player ID, game ID, and from/to territory IDs";
 					} else {
-						rspn.successful = populate(obj, payload.tokens[1]); //token of the game in question
+						rspn.successful = populate(obj, payload.data[1]); //token of the game in question
+					}
+					break;
+				case evn.TERRITORY_CONQUERED.id:
+					if (payload.data.length < 4) {
+						rspn.message = "[CONQUER] Missing player ID, game ID, and conquered territory ID";
+					} else {
+						rspn.successful = populate(obj, payload.data[1]);
 					}
 					break;
 			}

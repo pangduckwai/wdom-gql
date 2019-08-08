@@ -39,7 +39,7 @@ module.exports = {
 			const p = dataSources.eventDS.me();
 			if (!p) throw new UserInputError("[QUIT] You are not a registered player yet");
 
-			const q = await dataSources.eventDS.add({ event: evn.PLAYER_QUITTED, payload: { tokens: [p.token] }});
+			const q = await dataSources.eventDS.add({ event: evn.PLAYER_QUITTED, payload: { data: [p.token] }});
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -56,10 +56,10 @@ module.exports = {
 			const g = dataSources.eventDS.findGameByName({ name });
 			if (g) throw new UserInputError(`[OPEN] Game '${name}' already exists`);
 
-			const h = await dataSources.eventDS.add({ event: evn.GAME_OPENED, payload: { name: name, tokens: [ p.token ] }});
+			const h = await dataSources.eventDS.add({ event: evn.GAME_OPENED, payload: { name: name, data: [ p.token ] }});
 			if (!h.successful) throw new UserInputError(h.message);
 
-			const q = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, h.event.token] }});
+			const q = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { data: [p.token, h.event.token] }});
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -74,10 +74,10 @@ module.exports = {
 			if (!g) throw new UserInputError(`[CLOSE] Game '${p.joined}' not found`);
 			if (g.host !== p.token) throw new UserInputError("[CLOSE] Can only close your own game");
 
-			const k = await dataSources.eventDS.add({ event: evn.GAME_CLOSED, payload: { tokens: [p.token, g.token] }});
+			const k = await dataSources.eventDS.add({ event: evn.GAME_CLOSED, payload: { data: [p.token, g.token] }});
 			if (!k.successful) throw new UserInputError(k.message);
 
-			const q = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { tokens: [p.token, g.token] }});
+			const q = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { data: [p.token, g.token] }});
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -99,7 +99,7 @@ module.exports = {
 			if (players.length >= dataSources.eventDS.gameRules.MAX_PLAYER_PER_GAME)
 				throw new UserInputError(`[JOIN] Game '${g.name}' is full already`);
 
-			const k = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { tokens: [p.token, token] }});
+			const k = await dataSources.eventDS.add({ event: evn.GAME_JOINED, payload: { data: [p.token, token] }});
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -114,7 +114,7 @@ module.exports = {
 			if (!g) throw new UserInputError(`[LEAVE] Game '${p.joined}' not found`);
 			if (g.host === p.token) throw new UserInputError("[LEAVE] Cannot leave your own game");
 
-			const k = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { tokens: [p.token, g.token] }});
+			const k = await dataSources.eventDS.add({ event: evn.GAME_LEFT, payload: { data: [p.token, g.token] }});
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -133,7 +133,7 @@ module.exports = {
 			if (players.length < dataSources.eventDS.gameRules.MIN_PLAYER_PER_GAME)
 				throw new UserInputError(`[START] Minimum number of players is ${dataSources.eventDS.gameRules.MIN_PLAYER_PER_GAME}`);
 
-			const k = await dataSources.eventDS.add({ event: evn.GAME_STARTED, payload: { tokens: [p.token, g.token] }});
+			const k = await dataSources.eventDS.add({ event: evn.GAME_STARTED, payload: { data: [p.token, g.token] }});
 			if (!k.successful) throw new UserInputError(k);
 
 			const deck = dataSources.eventDS.gameRules.shuffleCards(players.map(q => q.token));
@@ -147,7 +147,7 @@ module.exports = {
 
 				const m = await dataSources.eventDS.add({
 					event: evn.TERRITORY_ASSIGNED,
-					payload: { name: c, tokens: [deck[c], g.token] }
+					payload: { name: c, data: [deck[c], g.token] }
 				});
 				if (!m.successful) throw new UserInputError(m.message);
 			}
@@ -156,7 +156,7 @@ module.exports = {
 			for (const player of players) {
 				const n = await dataSources.eventDS.add({
 					event: evn.TROOP_ASSIGNED,
-					payload: { amount: (troops - hold[player.token]), tokens: [player.token, g.token] }
+					payload: { amount: (troops - hold[player.token]), data: [player.token, g.token] }
 				});
 				if (!n.successful) throw new UserInputError(n.message);
 			}
@@ -165,7 +165,7 @@ module.exports = {
 			for (const card of cards) {
 				const d = await dataSources.eventDS.add({
 					event: evn.CARD_RETURNED,
-					payload: { name: card.name, tokens: [p.token, g.token] }
+					payload: { name: card.name, data: [p.token, g.token] }
 				});
 				if (!d.successful) throw new UserInputError(d.message);
 			}
@@ -187,37 +187,44 @@ module.exports = {
 			if (owned) {
 				const c = await dataSources.eventDS.add({
 					event: evn.TERRITORY_SELECTED,
-					payload: { name: name, tokens: [p.token, g.token] }
+					payload: { name: name, data: [p.token, g.token] }
 				});
 				if (!c.successful) throw new UserInputError(c.message);
 			}
 
 			if (g.rounds === 0) { // Setup phase
+				let setupFinished = false;
 				if (owned && (p.reinforcement > 0)) {
+					if (p.reinforcement === 1) {
+						// If this player's reinforcement > 1, then there is no way setup will finish by this action
+						// Check this to avoid calling snapshot in the middle of this action
+						const plys = dataSources.eventDS.listPlayersByGame({ token: g.token })
+							.filter(ply => (ply.token !== p.token) && (ply.reinforcement > 0));
+						if (plys.length <= 0) setupFinished = true;
+					}
+
 					const a = await dataSources.eventDS.add({
 						event: evn.TROOP_ADDED,
-						payload: { name: name, amount: 1, tokens: [p.token, g.token] }
+						payload: { name: name, amount: 1, data: [p.token, g.token] }
 					});
 					if (!a.successful) throw new UserInputError(a.message);
 
 					const d = await dataSources.eventDS.add({
 						event: evn.TROOP_DEPLOYED,
-						payload: { amount: 1, tokens: [p.token, g.token] }
+						payload: { amount: 1, data: [p.token, g.token] }
 					});
 					if (!d.successful) throw new UserInputError(d.message);
-					await dataSources.eventDS.updateSnapshot();
 
-					const plys = dataSources.eventDS.listPlayersByGame({ token: g.token }).filter(p => p.reinforcement > 0);
-					if (plys.length > 0) {
+					if (!setupFinished) {
 						const n = await dataSources.eventDS.add({
 							event: evn.TURN_TAKEN,
-							payload: { tokens: [p.token, g.token] }
+							payload: { data: [p.token, g.token] }
 						});
 						if (!n.successful) throw new UserInputError(n.message);
 					} else {
 						const s = await dataSources.eventDS.add({
 							event: evn.SETUP_FINISHED,
-							payload: { tokens: [p.token, g.token] }
+							payload: { data: [p.token, g.token] }
 						});
 						if (!s.successful) throw new UserInputError(s.message);
 					}
@@ -225,35 +232,45 @@ module.exports = {
 					await dataSources.eventDS.updateSnapshot();
 					return a;
 				}
-			} else { // rounds > 0, playing phase
-				if (p.reinforcement > 0) {
-					// Reinforcement stage
-					if (owned) {
-						const a = await dataSources.eventDS.add({
-							event: evn.TROOP_ADDED,
-							payload: { name: name, amount: 1, tokens: [p.token, g.token] }
+			} else if (p.reinforcement > 0) { // rounds > 0, playing phase
+				// Reinforcement stage
+				if (owned) {
+					const a = await dataSources.eventDS.add({
+						event: evn.TROOP_ADDED,
+						payload: { name: name, amount: 1, data: [p.token, g.token] }
+					});
+					if (!a.successful) throw new UserInputError(a.message);
+
+					const d = await dataSources.eventDS.add({
+						event: evn.TROOP_DEPLOYED,
+						payload: { amount: 1, data: [p.token, g.token] }
+					});
+					if (!d.successful) throw new UserInputError(d.message);
+					await dataSources.eventDS.updateSnapshot();
+				}
+			} else {
+				// Combat stage (moved to this stage automatically)
+				if (!owned) { // If click on owned territory at this stage, only means changing the attack-from territory to the newly clicked one
+					if (g.territories[g.t_index[name]].connected.filter(conn => conn.name === g.current).length > 0) {
+						//Connected, can attack
+						const fm = g.territories[g.t_index[g.current]];
+						const to = g.territories[g.t_index[name]];
+						const casualties = dataSources.eventDS.gameRules.doBattle({ attacker: fm.troops, defender: to.troops });
+
+						const k = await dataSources.eventDS.add({
+							event: evn.TERRITORY_ATTACKED,
+							payload: { data: [p.token, g.token, g.current, name, casualties.attacker, casualties.defender] }
 						});
-						if (!a.successful) throw new UserInputError(a.message);
-	
-						const d = await dataSources.eventDS.add({
-							event: evn.TROOP_DEPLOYED,
-							payload: { amount: 1, tokens: [p.token, g.token] }
-						});
-						if (!d.successful) throw new UserInputError(d.message);
-						await dataSources.eventDS.updateSnapshot();
-					}
-				} else {
-					// Combat stage (moved to this stage automatically)
-					if (!owned) {
-						if (g.territories[g.t_index[name]].connected.filter(conn => conn.name === g.current.name).length > 0) {
-							//Connected, can attack
-							const k = await dataSources.eventDS.add({
-								event: evn.TERRITORY_ATTACKED,
-								payload: { tokens: [p.token, g.token, g.current.name, name] }
+						if (!k.successful) throw new UserInputError(k.message);
+
+						if (casualties.defender >= to.troops) {
+							const q = await dataSources.eventDS.add({
+								event: evn.TERRITORY_CONQUERED,
+								payload: { data: [p.token, g.token, g.current, name] }
 							});
-							if (!k.successful) throw new UserInputError(k.message);
-							await dataSources.eventDS.updateSnapshot();
+							if (!q.successful) throw new UserInputError(q.message);
 						}
+						await dataSources.eventDS.updateSnapshot();
 					}
 				}
 			}
@@ -274,7 +291,7 @@ module.exports = {
 				dataSources.eventDS.gameRules.continentReinforcement(holdings); //TODO - Plus troops from trading in cards
 			const s = await dataSources.eventDS.add({
 				event: evn.TROOP_ASSIGNED,
-				payload: { amount: reinforcement, tokens: [p.token, g.token] }
+				payload: { amount: reinforcement, data: [p.token, g.token] }
 			});
 			if (!s.successful) throw new UserInputError(s.message);
 

@@ -128,7 +128,7 @@ class EventDS extends DataSource {
 			case evn.GAME_JOINED.id:
 				obj = this.players[this.idxPlayerToken[v.token]];
 				if (obj) {
-					obj.joined = v.tokens[1];
+					obj.joined = v.data[1];
 				}
 				break;
 			case evn.GAME_LEFT.id:
@@ -164,7 +164,7 @@ class EventDS extends DataSource {
 					ready: true,
 					token: v.token,
 					name: v.name,
-					host: v.tokens[0],
+					host: v.data[0],
 					rounds: -1,
 					redeemed: 0,
 					cards: [],
@@ -180,14 +180,14 @@ class EventDS extends DataSource {
 				break;
 			case evn.GAME_CLOSED.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj && (obj.host === v.tokens[0])) { //Only the host can close a game
+				if (obj && (obj.host === v.data[0])) { //Only the host can close a game
 					this.games.splice(this.idxGameToken[v.token], 1);
 					this.rebuildGameIndex();
 				}
 				break;
 			case evn.GAME_STARTED.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj && (obj.host === v.tokens[0])) { //Only the host can start a game
+				if (obj && (obj.host === v.data[0])) { //Only the host can start a game
 					obj.turn = obj.host;
 					obj.rounds = 0;
 				}
@@ -195,34 +195,34 @@ class EventDS extends DataSource {
 			case evn.TERRITORY_ASSIGNED.id:
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj) {
-					obj.territories[obj.t_index[v.name]].owner = v.tokens[0];
+					obj.territories[obj.t_index[v.name]].owner = v.data[0];
 					obj.territories[obj.t_index[v.name]].troops = 1;
 				}
 				break;
 			case evn.TROOP_ADDED.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.tokens[0])) {
+				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
 					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
 				}
 				break;
-			case evn.ACTION_TAKEN.id:
-				//TODO HERE - 
-				//NOTE!!! Event 'ACTION_TAKEN' not needed during setup phase, leave it just in case needed in playing phase
-				break;
+			// case evn.ACTION_TAKEN.id:
+			// 	//TODO HERE - 
+			// 	//NOTE!!! Event 'ACTION_TAKEN' not needed during setup phase, leave it just in case needed in playing phase
+			// 	break;
 			case evn.TERRITORY_SELECTED.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.tokens[0])) {
+				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
 					obj.current = v.name;
 				}
 				break;
 			case evn.TURN_TAKEN.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.tokens[0])) {
+				if (obj && (obj.turn === v.data[0])) {
 					plys = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === v.token));
 					let idx = 0;
 					for (const ply of plys) {
 						idx ++;
-						if (ply.token === v.tokens[0]) break;
+						if (ply.token === v.data[0]) break;
 					}
 					if (idx >= plys.length) idx = 0;
 
@@ -259,6 +259,31 @@ class EventDS extends DataSource {
 					if (card && (obj.cards.filter(c => c.name === v.name).length <= 0)) {
 						obj.cards.push(card);
 					}
+				}
+				break;
+			case evn.TERRITORY_ATTACKED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.turn === v.data[0])) {
+					const fm = obj.territories[obj.t_index[v.data[2]]];
+					const to = obj.territories[obj.t_index[v.data[3]]];
+					if (fm.troops > v.data[4])
+						fm.troops -= v.data[4];
+					else
+						fm.troops = 1;
+					if (to.troops >= v.data[5])
+						to.troops -= v.data[5];
+					else
+						to.troops = 0;
+				}
+				break;
+			case evn.TERRITORY_CONQUERED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.turn === v.data[0])) {
+					const fm = obj.territories[obj.t_index[v.data[2]]];
+					const to = obj.territories[obj.t_index[v.data[3]]];
+					to.owner = v.data[0];
+					to.troops = fm.troops - 1;
+					fm.troops = 1;
 				}
 				break;
 		}

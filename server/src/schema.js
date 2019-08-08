@@ -62,7 +62,7 @@ type Event {
 	type: String!
 	name: String
 	amount: Int
-	tokens: [String]
+	data: [String]
 	token: String!
 }
 

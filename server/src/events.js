@@ -21,17 +21,19 @@ module.exports = Object.freeze({
 		id: 10, type: "P"
 	}, TROOP_DEPLOYED: {
 		id: 11, type: "P"
-	}, ACTION_TAKEN: {
-		id: 12, type: "G"
+	// }, ACTION_TAKEN: {
+	// 	id: 12, type: "G"
 	}, TERRITORY_SELECTED: {
-		id: 13, type: "G"
+		id: 12, type: "G"
 	}, TURN_TAKEN: {
-		id: 14, type: "G"
+		id: 13, type: "G"
 	}, SETUP_FINISHED: {
-		id: 15, type: "G"
+		id: 14, type: "G"
 	}, CARD_RETURNED: {
-		id: 16, type: "G"
+		id: 15, type: "G"
 	}, TERRITORY_ATTACKED: {
+		id: 16, type: "G"
+	}, TERRITORY_CONQUERED: {
 		id: 17, type: "G"
 	}
 });
