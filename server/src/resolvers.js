@@ -22,7 +22,8 @@ module.exports = {
 			return [];
 		},
 		listPlayers: (_, __, { dataSources }) => dataSources.eventDS.listPlayers(),
-		listGames: (_, __, { dataSources }) => dataSources.eventDS.listGames()
+		listGames: (_, __, { dataSources }) => dataSources.eventDS.listGames(),
+		listTerritories: (_, { token }, { dataSources }) => dataSources.eventDS.listTerritoriesByPlayer({ token })
 	},
 	Mutation: {
 		registerPlayer: async (_, { name }, { dataSources }) => {

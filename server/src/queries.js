@@ -53,13 +53,10 @@ module.exports = Object.freeze({
 			}
 		}
 	}`,
-	MY_HOLDING: gql`
-	query MyHolding {
+	MY_TERRITORIES: gql`
+	query MyTerritories {
 		myTerritories {
 			name
-			owner {
-				name
-			}
 			troops
 		}
 	}`,
@@ -103,16 +100,16 @@ module.exports = Object.freeze({
 			current {
 				name
 			}
-			territories {
-				name
-				owner {
-					name
-				}
-				troops
-			}
 			winner {
 				name
 			}
+		}
+	}`,
+	PLAYER_TERRITORIES: gql`
+	query ListTerritories($token: String!) {
+		listTerritories(token: $token) {
+			name
+			troops
 		}
 	}`
 });

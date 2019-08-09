@@ -8,6 +8,7 @@ type Query {
 	myFellowPlayers: [Player]!
 	listPlayers: [Player]!
 	listGames: [Game]!
+	listTerritories(token: String!): [Territory]!
 }
 
 type Mutation {

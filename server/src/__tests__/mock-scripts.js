@@ -25,13 +25,13 @@ module.exports = Object.freeze({
 		{p:'John', r:{xpt:3, name:'Ural', amt:9}, a:{xpt:11, lst:[{from:'Ural', to:'Ukraine'}]}, x:7},
 		{p:'Josh', r:{xpt:6, name:'North-Africa', amt:7}, a:{xpt:10, lst:[{from:'East-Africa', to:'Middle-East'}]}, x:6},
 		{p:'Nick', r:{xpt:3, name:'Scandinavia', amt:8}, a:{xpt:9, lst:[{from:'Scandinavia', to:'Ukraine'}, {to:'Ukraine', repeat:6},{from:'Iceland', to:'Greenland'}]}, f:{from:'Greenland', to:'Iceland', amt:2}, x:3},
-		{
-			p:'Paul',
-			r:{xpt:5, name:'Eastern-United-States', amt:7},
-			a:{xpt:8, lst:[
-				{from:'Eastern-United-States', to:'Quebec'}
-			]}, f:{from:'Mexico', to:'Western-United-States', amt:7},
-			x:8
-		},
+		{p:'Paul', r:{xpt:5, name:'Eastern-United-States', amt:7}, a:{xpt:8, lst:[{from:'Eastern-United-States', to:'Quebec'}]}, f:{from:'Mexico', to:'Western-United-States', amt:7}, x:8},
+		{p:'Rick', r:{xpt:5, name:'Siam', amt:14}, a:{xpt:7, lst:[{from:'Siam', to:'China'}, { to: 'India' }]}, f:{from:'India', to:'Siam', amt:10}, x:10},
+		{p:'John', r:{xpt:3, name:'Siberia', amt:10}, a:{xpt:10, lst:[{from:'Siberia', to:'Irkutsk'}]}, f:{from:'Irkutsk', to:'Siberia', amt:9}, x:8},
+		{p:'Josh', r:{xpt:6, name:'Egypt', amt:12}, a:{xpt:9, lst:[{from:'Egypt', to:'Southern-Europe'}, {to: 'Southern-Europe', repeat: 4}]}, f:{from:'North-Africa', to:'Southern-Europe', amt:2}, x:8},
+		{p:'Nick', r:{xpt:3, name:'Northern-Europe', amt:4}, a:{xpt:9, lst:[{from:'Northern-Europe', to:'Ukraine'}]}, x:2},
+		{p:'Paul', r:{xpt:5, name:'Quebec', amt:10}, a:{xpt:10, lst:[
+			{from:'Western-United-States', to:'Alberta'}, {from:'Quebec', to:'Ontario'}
+		]}, x: 8},
 	]
 });
