@@ -39,5 +39,10 @@ module.exports.mockShuffleCards = (tokens) => {
 };
 
 module.exports.mockDoBattle = ({ attacker, defender }) => {
-	return { attacker: 1, defender: 1 };
+	const rd = Math.min(attacker, 4) - 1;
+	const wd = Math.min(defender, 2);
+	if ((rd === 1) && (wd === 1))
+		return { attacker: 1, defender: 0 };
+	else
+		return { attacker: 1, defender: 1 };
 };

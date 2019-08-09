@@ -243,6 +243,7 @@ class EventDS extends DataSource {
 						let off = idx;
 						let won = false;
 						while (this.listTerritoriesByPlayer({ token: plys[off].token }).length <= 0) {
+							console.log("NOTE!!!", plys[off].name, "is defeated");
 							off ++;
 							if (off >= plys.length) off = 0;
 							if (off === idx) {

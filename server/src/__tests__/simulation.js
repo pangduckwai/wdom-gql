@@ -260,9 +260,10 @@ describe("Test Gameplay", () => {
 			for (let i = 0; i < res1.data.me.reinforcement; i ++) {
 				await mutate({ mutation: TAKE_ACTION, variables: { name: script.r.name }});
 			}
-			const res2 = await query({ query: MY_HOLDING });
-			const res3 = await query({ query: MYSELF });
-			expect((res2.data.myTerritories.filter(t => t.name === script.r.name)[0].troops === script.r.amt) && (res3.data.me.reinforcement === 0)).toBeTruthy();
+			const res2 = await query({ query: MYSELF });
+			const res3 = await query({ query: MY_HOLDING });
+			expect(res2.data.me.reinforcement).toEqual(0);
+			expect(res3.data.myTerritories.filter(t => t.name === script.r.name)[0].troops).toEqual(script.r.amt);
 
 			for (const attack of script.a.lst) {
 				for (let count = 0; count < ((attack.repeat) ? attack.repeat : 1); count ++) {
@@ -277,9 +278,10 @@ describe("Test Gameplay", () => {
 			if (script.f) {
 				await mutate({
 					mutation: END_TURN,
-					variables: { from: script.f.from, to: script.f.to, amount: script.f.amount },
+					variables: { from: script.f.from, to: script.f.to, amount: script.f.amt },
 				});
 			} else {
+				if (current === 'Paul') console.log("No fortification");
 				await mutate({ mutation: END_TURN });
 			}
 			await query({ query: MY_GAME }).then(v => {
@@ -294,14 +296,14 @@ describe("Test Gameplay", () => {
 });
 
 describe('Wrap up', () => {
-	it('Players', async () => {
-		const server = new ApolloServer(createServer());
-		const { query } = createTestClient(server);
-		await query({ query: ALL_PLAYERS }).then(v => {
-			console.log("Players", v.data.listPlayers.length, JSON.stringify(v.data.listPlayers, null, 3));
-			expect(v.data.listPlayers.length).toEqual(6);
-		});
-	});
+	// it('Players', async () => {
+	// 	const server = new ApolloServer(createServer());
+	// 	const { query } = createTestClient(server);
+	// 	await query({ query: ALL_PLAYERS }).then(v => {
+	// 		console.log("Players", v.data.listPlayers.length, JSON.stringify(v.data.listPlayers, null, 3));
+	// 		expect(v.data.listPlayers.length).toEqual(6);
+	// 	});
+	// });
 
 	// it('Games', async () => {
 	// 	const server = new ApolloServer(createServer());
@@ -315,6 +317,11 @@ describe('Wrap up', () => {
 	it('Active game', async () => {
 		const server = new ApolloServer(createServer(ptokens['Paul']));
 		const { query } = createTestClient(server);
+
+		const res = await query({ query: FELLOW_PLAYERS });
+		const count = res.data.myFellowPlayers.length;
+		console.log("Players", JSON.stringify(res.data.myFellowPlayers, null, 3));
+
 		await query({ query: ALL_GAMES }).then(v => {
 			const round = Math.floor((v.data.listGames[0].rounds - 1) / 5) + 1; //TODO get 'real' player numbers instead
 			console.log("Round", round, JSON.stringify(v.data.listGames[0], null, 3));

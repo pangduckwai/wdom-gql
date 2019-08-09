@@ -67,9 +67,12 @@ module.exports = Object.freeze({
 	query Fellow {
 		myFellowPlayers {
 			name
-			joined {
+			reinforcement
+			cards {
 				name
+				type
 			}
+			conquer
 		}
 	}`,
 	ALL_PLAYERS: gql`
