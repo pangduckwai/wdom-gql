@@ -8,11 +8,16 @@ module.exports.mockShuffleCards = (tokens) => {
 		"New-Guinea","Wildcard-1","Madagascar","Ontario","Middle-East","Yakutsk","Mexico","Greenland","Siam","East-Africa","Southern-Europe",
 		"Northwest-Territory","Iceland","Argentina","Kamchatka"
 	];
-	const cards2 = ["Western-Europe","Ontario","Irkutsk","Great-Britain","Brazil","Mexico","Eastern-Australia","Northwest-Territory",
-		"Kamchatka","Venezuela","New-Guinea","Alberta","Ukraine","India","Peru","Eastern-United-States","Ural","Congo",
-		"Indonesia","Middle-East","Alaska","Greenland","South-Africa","Northern-Europe","Egypt","Iceland","China",
-		"Western-Australia","Yakutsk","Argentina","Southern-Europe","Manchuria","Western-United-States","Afghanistan","Siam","Quebec",
-		"Japan","Scandinavia","North-Africa","East-Africa","Madagascar","Siberia"
+	const cards2 = [
+		"Western-Europe",       "Ontario",          "Irkutsk",              "Great-Britain",        "Brazil",
+		"Mexico",               "Eastern-Australia","Northwest-Territory",  "Kamchatka",            "Venezuela",
+		"New-Guinea",           "Alberta",          "India",                "Ukraine",              "Peru",
+		"Eastern-United-States","Ural",             "Congo",                "Indonesia",            "Middle-East",
+		"Alaska",               "Greenland",        "South-Africa",         "Northern-Europe",      "Egypt",
+		"Iceland",              "China",            "Western-Australia",    "Yakutsk",              "Argentina",
+		"Southern-Europe",      "Manchuria",        "Western-United-States","Afghanistan",          "Siam",
+		"Quebec",               "Japan",            "Scandinavia",          "North-Africa",         "East-Africa",
+		"Madagascar",           "Siberia"
 	];
 
 	if (!tokens) {

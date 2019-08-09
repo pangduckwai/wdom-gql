@@ -184,8 +184,9 @@ module.exports = {
 			if (g.turn !== p.token) throw new UserInputError("[ACTION] Now is not your turn yet");
 
 			const owned = (g.territories[g.t_index[name]].owner === p.token);
+			let c;
 			if (owned) {
-				const c = await dataSources.eventDS.add({
+				c = await dataSources.eventDS.add({
 					event: evn.TERRITORY_SELECTED,
 					payload: { name: name, data: [p.token, g.token] }
 				});
@@ -247,6 +248,7 @@ module.exports = {
 					});
 					if (!d.successful) throw new UserInputError(d.message);
 					await dataSources.eventDS.updateSnapshot();
+					return a;
 				}
 			} else {
 				// Combat stage (moved to this stage automatically)
@@ -271,7 +273,11 @@ module.exports = {
 							if (!q.successful) throw new UserInputError(q.message);
 						}
 						await dataSources.eventDS.updateSnapshot();
+						return k;
 					}
+				} else {
+					await dataSources.eventDS.updateSnapshot();
+					return c;
 				}
 			}
 		},
@@ -365,6 +371,12 @@ module.exports = {
 		current: (game, _, __) => {
 			if ((typeof(game.current) !== "undefined") && (game.current !== null)) {
 				return game.territories[game.t_index[game.current]];
+			}
+			return null;
+		},
+		winner: (game, _, { dataSources }) => {
+			if ((typeof(game.winner) !== "undefined") && (game.winner !== null)) {
+				return dataSources.eventDS.findPlayerByToken({ token: game.winner });
 			}
 			return null;
 		}

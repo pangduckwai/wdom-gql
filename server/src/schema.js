@@ -42,6 +42,8 @@ type Game {
 	current: Territory
 	cards: [Card]!
 	territories: [Territory]!
+	fortified: Boolean
+	winner: Player
 }
 
 type Territory {

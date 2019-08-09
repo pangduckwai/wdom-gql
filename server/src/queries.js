@@ -14,6 +14,7 @@ module.exports = Object.freeze({
 			joined {
 				name
 			}
+			conquer
 		}
 	}`,
 	MY_GAME: gql`
@@ -29,6 +30,7 @@ module.exports = Object.freeze({
 			}
 			rounds
 			redeemed
+			fortified
 			current {
 				name
 			}
@@ -45,6 +47,9 @@ module.exports = Object.freeze({
 				connected {
 					name
 				}
+			}
+			winner {
+				name
 			}
 		}
 	}`,
@@ -70,15 +75,11 @@ module.exports = Object.freeze({
 	ALL_PLAYERS: gql`
 	query Players {
 		listPlayers {
-			token
 			name
 			reinforcement
-			joined {
-				token
-                name
-                host {
-                    name
-                }
+			cards {
+				name
+				type
 			}
 			conquer
 		}
@@ -86,7 +87,6 @@ module.exports = Object.freeze({
 	ALL_GAMES: gql`
 	query Games {
 		listGames {
-			token
 			name
 			host {
 				name
@@ -96,6 +96,20 @@ module.exports = Object.freeze({
 			}
 			rounds
 			redeemed
+			fortified
+			current {
+				name
+			}
+			territories {
+				name
+				owner {
+					name
+				}
+				troops
+			}
+			winner {
+				name
+			}
 		}
 	}`
 });

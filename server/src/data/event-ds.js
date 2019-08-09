@@ -205,6 +205,10 @@ class EventDS extends DataSource {
 					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
 				}
 				break;
+			// case evn.ACTION_TAKEN.id:
+			// 	//TODO HERE - 
+			// 	//NOTE!!! Event 'ACTION_TAKEN' not needed during setup phase, leave it just in case needed in playing phase
+			// 	break;
 			case evn.TERRITORY_SELECTED.id:
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
@@ -236,8 +240,21 @@ class EventDS extends DataSource {
 						}
 						if (!finished) obj.turn = plys[off].token;
 					} else if (obj.rounds > 0) {
-						//TODO skip if already defeated
-						obj.turn = plys[idx].token;
+						let off = idx;
+						let won = false;
+						while (this.listTerritoriesByPlayer({ token: plys[off].token }).length <= 0) {
+							off ++;
+							if (off >= plys.length) off = 0;
+							if (off === idx) {
+								won = ture;
+								break; //No one else has any territory left
+							}
+						}
+						if (!won)
+							obj.turn = plys[off].token;
+						else {
+							if (!obj.winner) obj.winner = v.data[0];
+						}
 					}
 				}
 				break;
@@ -251,13 +268,14 @@ class EventDS extends DataSource {
 			case evn.TURN_STARTED.id:
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
+					obj.fortified = false;
 					const ply = this.players[this.idxPlayerToken[v.data[0]]];
 					if (ply) ply.conquer = false;
 				}
 				break;
 			case evn.CARD_RETURNED.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj && (obj.rounds === 0)) {
+				if (obj && (obj.rounds === 0)) { //TODO NOTE here, should redeem card use this same event to put card back to end of deck?
 					const card = this.gameRules.getCard(v.name);
 					if (card && (obj.cards.filter(c => c.name === v.name).length <= 0)) {
 						obj.cards.push(card);
@@ -301,9 +319,21 @@ class EventDS extends DataSource {
 					let value = (v.amount >= fm.troops) ? fm.troops - 1 : v.amount;
 					to.troops += value;
 					fm.troops -= value;
+					obj.fortified = true;
+					obj.current = v.data[3];
 				}
 				break;
 			case evn.TURN_ENDED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.turn === v.data[0])) {
+					obj.rounds ++;
+
+					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					if (ply && ply.conquer) {
+						const card = obj.cards.splice(0, 1)[0];
+						ply.cards.push(card);
+					}
+				}
 				break;
 		}
 	}

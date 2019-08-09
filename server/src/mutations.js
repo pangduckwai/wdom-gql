@@ -114,8 +114,22 @@ module.exports = Object.freeze({
 		}
 	}`,
 	START_TURN: gql`
-	mutation Turn {
+	mutation StartTurn {
 		startTurn {
+			successful
+			message
+			event {
+				timestamp
+				event
+				type
+				name
+				token
+			}
+		}
+	}`,
+	END_TURN: gql`
+	mutation EndTurn($from: String, $to: String, $amount: Int) {
+		endTurn(from: $from, to: $to, amount: $amount) {
 			successful
 			message
 			event {

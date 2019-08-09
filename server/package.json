@@ -20,7 +20,7 @@
 	},
 	"jest": {
 		"testPathIgnorePatterns": [
-			"/node_modules/"
+			"/node_modules/", "mock-.*[.]js"
 		]
 	}
 }
