@@ -105,10 +105,6 @@ module.exports = Object.freeze({
 			winner {
 				name
 			}
-			cards {
-				name
-				type
-			}
 		}
 	}`,
 	PLAYER_TERRITORIES: gql`

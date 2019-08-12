@@ -205,10 +205,6 @@ class EventDS extends DataSource {
 					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
 				}
 				break;
-			// case evn.ACTION_TAKEN.id:
-			// 	//TODO HERE - 
-			// 	//NOTE!!! Event 'ACTION_TAKEN' not needed during setup phase, leave it just in case needed in playing phase
-			// 	break;
 			case evn.TERRITORY_SELECTED.id:
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
@@ -218,17 +214,16 @@ class EventDS extends DataSource {
 			case evn.NEXT_PLAYER.id:
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
-					const plys = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === v.token));
+					const plys = this.listPlayersByGame({ token: v.token });
 					let idx = 0;
 					for (const ply of plys) {
-						idx ++;
 						if (ply.token === v.data[0]) break;
+						idx ++;
 					}
-					if (idx >= plys.length) idx = 0;
+					let off = ((idx + 1) >= plys.length) ? 0 : idx + 1;
 
 					if (obj.rounds === 0) {
 						// Setup phase
-						let off = idx;
 						let finished = false;
 						while (plys[off].reinforcement <= 0) {
 							off ++;
@@ -240,21 +235,14 @@ class EventDS extends DataSource {
 						}
 						if (!finished) obj.turn = plys[off].token;
 					} else if (obj.rounds > 0) {
-						let off = idx;
-						let won = false;
 						while (this.listTerritoriesByPlayer({ token: plys[off].token }).length <= 0) {
 							off ++;
 							if (off >= plys.length) off = 0;
-							if (off === idx) {
-								console.log("NOTE!!! No one else has any territory left except", plys[off].name);
-								won = ture;
-								break;
-							}
 						}
-						if (!won)
+						if (off !== idx)
 							obj.turn = plys[off].token;
 						else {
-							if (!obj.winner) obj.winner = v.data[0];
+							obj.winner = v.data[0];
 						}
 					}
 				}
@@ -283,7 +271,7 @@ class EventDS extends DataSource {
 					}
 				}
 				break;
-			case evn.CARDS_REDEEMED.id:
+			case evn.CARDS_REDEEMED.id: //TODO test a player redeem 2 sets of cards in 1 round
 				obj = this.games[this.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const reinforcement = this.gameRules.redeemReinforcement(obj.redeemed);

@@ -40,13 +40,25 @@ module.exports = Object.freeze({
 		{p:'Josh', c:[["Western-Europe","Manchuria","China"]], r:{lst:[{name:'North-Africa', amt:6}, {name:'Egypt', amt:5}]}, a:{xpt:13, lst:[{from:'Egypt', to:'Middle-East'}]}, x:9},
 		{p:'Paul', c:[["Venezuela","Eastern-United-States","Ural"]], r:{lst:[{name:'Iceland', amt:3}, {name:'Alaska', amt:3}, {name:'Brazil', amt:11}]}, a:{xpt:15, lst:[{from:'Brazil', to:'North-Africa'}, {to:'North-Africa', repeat:6}]}, f:{from:'Venezuela', to:'Brazil', amt:2}, x:3},
 		{p:'Rick', c:[["India","Great-Britain","Congo"]], r:{lst:[{name:'Manchuria', amt:13}]}, a:{xpt:9, lst:[{from:'Manchuria', to:'Siberia'}, {to:'Siberia', repeat:8}]}, f:{from:'India', to:'Afghanistan', amt:2}, x:9},
-		{p:'John', c:[["Irkutsk","Egypt","Indonesia"]], r:{lst:[{name:'Kamchatka', amt:13}]}, a:{xpt:8, lst:[{from:'Irkutsk', to:'Siberia'}, {to:'Siberia', repeat:3}, {from:'Kamchatka', to:'Manchuria'}, {to:'Siberia', repeat:8}]}, f:{from:'Siberia', to:'Manchuria', amt:6}, x:7},
-		{p:'Josh', c:[["South-Africa","Peru","Siberia"]], r:{lst:[{name:'Western-Europe', amt:19}]}, a:{xpt:14, lst:[{from:'Western-Europe', to:'North-Africa'}, {to:'North-Africa', repeat:9}, {to:'Brazil', repeat:3}]}, f:{from:'South-Africa', to:'East-Africa', amt:2}, x:3},
-		{
-			p:'Paul', c:[["Northern-Europe","Scandinavia","Western-Australia"]], r:{lst:[{name:'Venezuela', amt:29}]}, a:{xpt:15, lst:[
-				{from:'Venezuela', to:'Brazil'}, {to:'Brazil', repeat:6}, {to:'North-Africa'}
-			]}, x:20
-		},
+		{p:'John', c:[["Irkutsk","Egypt","Indonesia"]], r:{lst:[{name:'Kamchatka', amt:13}]}, a:{xpt:8, lst:[{from:'Irkutsk', to:'Siberia'}, {to:'Siberia', repeat:3}, {from:'Kamchatka', to:'Manchuria'}, {to:'Siberia', repeat:8}]}, f:{from:'Siberia', to:'Ural', amt:6}, x:7},
+		{p:'Josh', c:[["South-Africa","Peru","Siberia"]], r:{lst:[{name:'Western-Europe', amt:19}]}, a:{xpt:14, lst:[{from:'Western-Europe', to:'North-Africa'}, {to:'North-Africa', repeat:9}, {to:'Brazil', repeat:3}]}, f:{from:'Middle-East', to:'East-Africa', amt:8}, x:9},
+		{p:'Paul', c:[["Northern-Europe","Scandinavia","Western-Australia"]], r:{lst:[{name:'Venezuela', amt:29}]}, a:{xpt:15, lst:[{from:'Venezuela', to:'Brazil'}, {to:'Brazil', repeat:6}, {to:'North-Africa'}]}, x:20},
 		{p:'Rick', r:{lst:[{name:'Afghanistan', amt:5}]}, a:{xpt:8, lst:[{from:'Afghanistan', to:'China'}]}, f:{from:'China', to:'Siam', amt:12}, x:12},
+		{p:'John', c:[["Eastern-Australia","Alaska","North-Africa"]], r:{lst:[{name:'Ural', amt:28}]}, a:{xpt:15, lst:[{from:'Ural', to:'Afghanistan'}, {to:'India'}, {to:'China'}, {to:'Siam', repeat:12},{to:'Indonesia'}, {to:'New-Guinea'}, {to:'Eastern-Australia'}, {to:'Western-Australia'}]}, f:{from:'Western-Australia', to:'Indonesia', amt:7}, x:8},
+		{p:'Josh', c:[["Wildcard-2","Japan","Quebec"]], r:{lst:[{name:'East-Africa', amt:34}]}, a:{xpt:22, lst:[{from:'East-Africa', to:'North-Africa'}, {to:'North-Africa', repeat:19}, {to:'Brazil'}, {to:'Argentina'}, {to:'Peru'}, {to:'Venezuela'}, {to:'Mexico'}, {to:'Eastern-United-States', repeat:3}, {to:'Western-United-States'}, {to:'Alberta'}, {to:'Northwest-Territory'}]}, x:2},
+		{p:'Paul', r:{lst:[{name:'Iceland', amt:3}]}, a:{xpt:6, lst:[{from:'Iceland', to:'Great-Britain'}]}, x:9},
+		{p:'John', c:[["New-Guinea","Afghanistan","Alberta"]], r:{lst:[{name:'Afghanistan', amt:42}]}, a:{xpt:27, lst:[{from:'Afghanistan', to:'Middle-East'}, {to:'East-Africa'}, {to:'Madagascar'}, {to:'South-Africa', repeat:3}, {to:'Congo'}, {to:'North-Africa'}, {to:'Egypt'}, {to:'Southern-Europe'}, {to:'Ukraine'}, {to:'Scandinavia'}, {to:'Northern-Europe'}, {to:'Western-Europe'}]}, f:{from:'Western-Europe', to:'North-Africa', amt:18}, x:19},
+		{p:'Josh', r:{lst:[{name:'Northwest-Territory', amt:5}]}, a:{xpt:10, lst:[{from:'Northwest-Territory', to:'Ontario'}]}, x:5},
+		{p:'Paul', r:{lst:[{name:'Greenland', amt:3}]}, a:{xpt:6, lst:[{from:'Greenland', to:'Northwest-Territory'}]}, f:{from:'Great-Britain', to:'Iceland', amt:4}, x:5},
+		{p:'John', r:{lst:[{name:'North-Africa', amt:21}]}, a:{xpt:37, lst:[{from:'North-Africa', to:'Brazil'}, {to:'Argentina'}, {to:'Peru'}, {to:'Venezuela'}, {to:'Mexico'}, {to:'Western-United-States'}, {to:'Eastern-United-States'}, {to:'Quebec'}, {to:'Ontario', repeat:5}, {to:'Alberta'}]}, x:16},
+		{p:'Paul', r:{lst:[{name:'Great-Britain', amt:3}]}, a:{xpt:7, lst:[{from:'Great-Britain', to:'Northern-Europe'}, {from:'Alaska', to:'Kamchatka'}]}, x:6},
+		{
+			p:'John', c:[["Mexico","Ontario","Wildcard-1"]], r:{lst:[
+				{name:'Alberta', amt:20}, {name:'Ontario', amt:38}
+			]}, a:{xpt:42, lst:[
+				{from:'Alberta', to:'Northwest-Territory'}, {to:'Northwest-Territory'}, {to:'Alaska'}, {to:'Kamchatka', repeat:6},
+				{from:'Ontario', to:'Greenland'}, {to:'Iceland', repeat:5}, {to:'Great-Britain'}, {to:'Northern-Europe', repeat:6}
+			]}, x:24
+		},
 	]
 });
