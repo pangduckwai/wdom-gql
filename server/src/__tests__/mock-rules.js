@@ -3,7 +3,7 @@ const gameRules = require('../rules');
 module.exports.mockShuffleCards = (tokens) => {
 	const cards1 = [
 		"Northern-Europe","Congo","Irkutsk","Siberia","Japan","Venezuela","Brazil","Egypt","Peru","Western-Europe","Ural","Ukraine",
-		"Eastern-Australia","Alaska","Manchuria","Eastern-United-States","India","Wildcard-2","China","Scandinavia","Great-Britain",
+		"Eastern-Australia","Wildcard-2","Manchuria","Eastern-United-States","India","Alaska","China","Scandinavia","Great-Britain",
 		"Indonesia","South-Africa","Western-Australia","Alberta","North-Africa","Quebec","Western-United-States","Afghanistan",
 		"New-Guinea","Wildcard-1","Madagascar","Ontario","Middle-East","Yakutsk","Mexico","Greenland","Siam","East-Africa","Southern-Europe",
 		"Northwest-Territory","Iceland","Argentina","Kamchatka"

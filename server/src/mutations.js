@@ -140,5 +140,19 @@ module.exports = Object.freeze({
 				token
 			}
 		}
+	}`,
+	REDEEM_CARD: gql`
+	mutation RedeemCards($cards: [String]!) {
+		redeemCards(cards: $cards) {
+			successful
+			message
+			event {
+				timestamp
+				event
+				type
+				name
+				token
+			}
+		}
 	}`
 });

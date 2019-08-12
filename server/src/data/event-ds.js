@@ -243,12 +243,12 @@ class EventDS extends DataSource {
 						let off = idx;
 						let won = false;
 						while (this.listTerritoriesByPlayer({ token: plys[off].token }).length <= 0) {
-							console.log("NOTE!!!", plys[off].name, "is defeated");
 							off ++;
 							if (off >= plys.length) off = 0;
 							if (off === idx) {
+								console.log("NOTE!!! No one else has any territory left except", plys[off].name);
 								won = ture;
-								break; //No one else has any territory left
+								break;
 							}
 						}
 						if (!won)
@@ -276,10 +276,28 @@ class EventDS extends DataSource {
 				break;
 			case evn.CARD_RETURNED.id:
 				obj = this.games[this.idxGameToken[v.token]];
-				if (obj && (obj.rounds === 0)) { //TODO NOTE here, should redeem card use this same event to put card back to end of deck?
+				if (obj && ((obj.rounds === 0) || (obj.turn === v.data[0]))) {
 					const card = this.gameRules.getCard(v.name);
 					if (card && (obj.cards.filter(c => c.name === v.name).length <= 0)) {
 						obj.cards.push(card);
+					}
+				}
+				break;
+			case evn.CARDS_REDEEMED.id:
+				obj = this.games[this.idxGameToken[v.token]];
+				if (obj && (obj.turn === v.data[0])) {
+					const reinforcement = this.gameRules.redeemReinforcement(obj.redeemed);
+					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					if (ply) {
+						obj.redeemed = reinforcement;
+						ply.reinforcement += reinforcement;
+						ply.cards = ply.cards.filter(c => (c.name !== v.data[2]) && (c.name !== v.data[3]) && (c.name !== v.data[4]));
+
+						const territories = this.listTerritoriesByPlayer({token: v.data[0]})
+						for (let i = 2; i < v.data.length; i ++) {
+							const territory = territories.filter(t => t.name === v.data[i]);
+							if (territory.length > 0) territory[0].troops += 2;
+						}
 					}
 				}
 				break;
@@ -310,6 +328,18 @@ class EventDS extends DataSource {
 
 					const ply = this.players[this.idxPlayerToken[v.data[0]]];
 					if (ply) ply.conquer = true;
+				}
+				break;
+			case evn.PLAYER_ATTACKED.id:
+				obj = this.players[this.idxPlayerToken[v.token]];
+				if (obj) {
+					const ply = this.players[this.idxPlayerToken[v.data[2]]];
+					const left = this.listTerritoriesByPlayer({ token: v.data[2] });
+					if (left.length <= 0) {
+						//Player defeated
+						obj.cards.push(...ply.cards);
+						ply.cards = [];
+					}
 				}
 				break;
 			case evn.FORTIFIED.id:

@@ -185,11 +185,25 @@ class EventStore {
 						rspn.successful = populate(obj, payload.data[1]);
 					}
 					break;
+				case evn.PLAYER_ATTACKED.id:
+					if (payload.data.length < 3) {
+						rspn.message = "[ATTACK] Missing player ID, game ID, and ID of the player under attack";
+					} else {
+						rspn.successful = populate(obj, payload.data[0]);
+					}
+					break;
 				case evn.FORTIFIED.id:
 					if (payload.data.length < 4) {
 						rspn.message = "[FORTIFY] Missing player ID, game ID, and from/to territory IDs";
 					} else if (payload.amount < 0) {
 						rspn.message = "[FORTIFY] Missing number of troops";
+					} else {
+						rspn.successful = populate(obj, payload.data[1]);
+					}
+					break;
+				case evn.CARDS_REDEEMED.id:
+					if (payload.data.length < 5) {
+						rspn.message = "[REDEEM] Missing player ID, game ID, and IDs of the cards being redeemed";
 					} else {
 						rspn.successful = populate(obj, payload.data[1]);
 					}

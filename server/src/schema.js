@@ -22,6 +22,7 @@ type Mutation {
 	takeAction(name: String!): Response
 	startTurn: Response
 	endTurn(from: String, to: String, amount: Int): Response
+	redeemCards(cards: [String]!): Response
 }
 
 type Player {
@@ -29,6 +30,7 @@ type Player {
 	name: String!
 	reinforcement: Int!
 	cards: [Card]!
+	redeemable: Boolean
 	joined: Game
 	conquer: Boolean
 }

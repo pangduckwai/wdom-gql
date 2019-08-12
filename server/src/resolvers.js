@@ -234,51 +234,66 @@ module.exports = {
 					await dataSources.eventDS.updateSnapshot();
 					return a;
 				}
-			} else if (p.reinforcement > 0) { // rounds > 0, playing phase
-				// Reinforcement stage
-				if (owned) {
-					const a = await dataSources.eventDS.add({
-						event: evn.TROOP_ADDED,
-						payload: { name: name, amount: 1, data: [p.token, g.token] }
-					});
-					if (!a.successful) throw new UserInputError(a.message);
-
-					const d = await dataSources.eventDS.add({
-						event: evn.TROOP_DEPLOYED,
-						payload: { amount: 1, data: [p.token, g.token] }
-					});
-					if (!d.successful) throw new UserInputError(d.message);
-					await dataSources.eventDS.updateSnapshot();
-					return a;
-				}
 			} else {
-				// Combat stage (moved to this stage automatically)
-				if (!owned) { // If click on owned territory at this stage, only means changing the attack-from territory to the newly clicked one
-					if (g.territories[g.t_index[name]].connected.filter(conn => conn.name === g.current).length > 0) {
-						//Connected, can attack
-						const fm = g.territories[g.t_index[g.current]];
-						const to = g.territories[g.t_index[name]];
-						const casualties = dataSources.eventDS.gameRules.doBattle({ attacker: fm.troops, defender: to.troops });
-
-						const k = await dataSources.eventDS.add({
-							event: evn.TERRITORY_ATTACKED,
-							payload: { data: [p.token, g.token, g.current, name, casualties.attacker, casualties.defender] }
+				if (p.reinforcement > 0) {
+					// Reinforcement stage
+					if (owned && (p.cards.length < 5)) {
+						const a = await dataSources.eventDS.add({
+							event: evn.TROOP_ADDED,
+							payload: { name: name, amount: 1, data: [p.token, g.token] }
 						});
-						if (!k.successful) throw new UserInputError(k.message);
+						if (!a.successful) throw new UserInputError(a.message);
 
-						if (casualties.defender >= to.troops) {
-							const q = await dataSources.eventDS.add({
-								event: evn.TERRITORY_CONQUERED,
-								payload: { data: [p.token, g.token, g.current, name] }
-							});
-							if (!q.successful) throw new UserInputError(q.message);
-						}
+						const d = await dataSources.eventDS.add({
+							event: evn.TROOP_DEPLOYED,
+							payload: { amount: 1, data: [p.token, g.token] }
+						});
+						if (!d.successful) throw new UserInputError(d.message);
+
 						await dataSources.eventDS.updateSnapshot();
-						return k;
+						return a;
 					}
 				} else {
-					await dataSources.eventDS.updateSnapshot();
-					return c;
+					// Combat stage (moved to this stage automatically)
+					if (!owned && (p.cards.length < 5)) { // If click on owned territory at this stage, only means changing the attack-from territory to the newly clicked one
+						if (g.territories[g.t_index[name]].connected.filter(conn => conn.name === g.current).length > 0) {
+							//Connected, can attack
+							const fm = g.territories[g.t_index[g.current]];
+							const to = g.territories[g.t_index[name]];
+							if ((fm.troops >= 2) && (to.troops >= 1)) {
+								const casualties = dataSources.eventDS.gameRules.doBattle({ attacker: fm.troops, defender: to.troops });
+
+								const k = await dataSources.eventDS.add({
+									event: evn.TERRITORY_ATTACKED,
+									payload: { data: [p.token, g.token, g.current, name, casualties.attacker, casualties.defender] }
+								});
+								if (!k.successful) throw new UserInputError(k.message);
+
+								if (casualties.defender >= to.troops) {
+									const u = await dataSources.eventDS.add({
+										event: evn.TERRITORY_CONQUERED,
+										payload: { data: [p.token, g.token, g.current, name] }
+									});
+									if (!u.successful) throw new UserInputError(u.message);
+
+									//Only trigger this when a territory changed hand
+									const q = dataSources.eventDS.findPlayerByToken({ token: to.owner });
+									if (!q) throw new UserInputError(`[ACTION] Player '${to.owner}' not found`);
+
+									const t = await dataSources.eventDS.add({
+										event: evn.PLAYER_ATTACKED,
+										payload: { data: [p.token, g.token, q.token]}
+									});
+									if (!t.successful) throw new UserInputError(t.message);
+								}
+								await dataSources.eventDS.updateSnapshot();
+								return k;
+							} //otherwise not enough troop to attack, ignore the action
+						}
+					} else {
+						await dataSources.eventDS.updateSnapshot();
+						return c;
+					}
 				}
 			}
 		},
@@ -349,6 +364,41 @@ module.exports = {
 
 			await dataSources.eventDS.updateSnapshot();
 			return e;
+		},
+		redeemCards: async (_, { cards }, { dataSources }) => {
+			const p = dataSources.eventDS.me();
+			if (!p) throw new UserInputError("[REDEEM] You are not a registered player yet");
+			if (!p.joined) throw new UserInputError("[REDEEM] You are not in any game");
+
+			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
+			if (!g) throw new UserInputError(`[REDEEM] Game '${p.joined}' not found`);
+			if (g.rounds <= 0) throw new UserInputError("[REDEEM] The game is not ready yet");
+			if (g.turn !== p.token) throw new UserInputError("[REDEEM] Now is not your turn yet");
+
+			if (cards.length !== 3) throw new UserInputError("[REDEEM] Need to redeem 3 cards");
+			let redeeming = [];
+			for (const card of cards) {
+				const r = p.cards.filter(c => c.name === card);
+				if (r.length <= 0) throw new UserInputError(`[REDEEM] You don't own the card '${card}'`);
+				redeeming.push(r[0]);
+			}
+			if (!dataSources.eventDS.gameRules.isRedeemable(redeeming)) throw new UserInputError("[REDEEM] The set of cards is not redeemable");
+
+			const d = await dataSources.eventDS.add({
+				event: evn.CARDS_REDEEMED,
+				payload: { data: [p.token, g.token, ...cards] }
+			});
+			if (!d.successful) throw new UserInputError(d.message);
+
+			for (const card of cards) {
+				const t = await dataSources.eventDS.add({
+					event: evn.CARD_RETURNED,
+					payload: { name: card, data: [p.token, g.token] }
+				});
+				if (!t.successful) throw new UserInputError(t.message);
+			}
+			await dataSources.eventDS.updateSnapshot();
+			return d;
 		}
 	},
 	Player: {
@@ -357,6 +407,9 @@ module.exports = {
 				return dataSources.eventDS.findGameByToken({ token: player.joined });
 			}
 			return null;
+		},
+		redeemable: (player, _, { dataSources }) => {
+			return dataSources.eventDS.gameRules.isRedeemable(player.cards);
 		}
 	},
 	Game: {

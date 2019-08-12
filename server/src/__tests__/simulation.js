@@ -7,7 +7,7 @@ const EventStore = require('../data/event-store');
 const gameRules = require('../rules');
 
 const {
-	REGISTER, QUIT_PLAYER, OPEN_GAME, CLOSE_GAME, JOIN_GAME, LEAVE_GAME, START_GAME, TAKE_ACTION, START_TURN, END_TURN
+	REGISTER, QUIT_PLAYER, OPEN_GAME, CLOSE_GAME, JOIN_GAME, LEAVE_GAME, START_GAME, TAKE_ACTION, START_TURN, END_TURN, REDEEM_CARD
 } = require('../mutations');
 const { MYSELF, MY_GAME, FELLOW_PLAYERS, ALL_PLAYERS, ALL_GAMES, MY_TERRITORIES, PLAYER_TERRITORIES } = require('../queries');
 const { mockShuffleCards, mockDoBattle } = require('./mock-rules');
@@ -254,16 +254,29 @@ describe("Test Gameplay", () => {
 
 			await mutate({ mutation: START_TURN });
 
-			const res1 = await query({ query: MYSELF });
-			expect(res1.data.me.reinforcement).toEqual(script.r.xpt);
+			if (script.c) {
+				for (const set of script.c) {
+					await mutate({
+						mutation: REDEEM_CARD,
+						variables: { cards: set },
+					});
+				}
+			}
 
-			for (let i = 0; i < res1.data.me.reinforcement; i ++) {
-				await mutate({ mutation: TAKE_ACTION, variables: { name: script.r.name }});
+			const res1 = await query({ query: MYSELF });
+			const received = res1.data.me.reinforcement;
+			// expect(res1.data.me.reinforcement).toEqual(script.r.xpt);
+
+			let total = 0;
+			for (const reinforce of script.r.lst) {
+				for (let count = 0; count < reinforce.amt; count ++) {
+					await mutate({ mutation: TAKE_ACTION, variables: { name: reinforce.name }});
+					total ++;
+				}
 			}
 			const res2 = await query({ query: MYSELF });
-			const res3 = await query({ query: MY_TERRITORIES });
 			expect(res2.data.me.reinforcement).toEqual(0);
-			expect(res3.data.myTerritories.filter(t => t.name === script.r.name)[0].troops).toEqual(script.r.amt);
+			expect(received).toEqual(total);
 
 			for (const attack of script.a.lst) {
 				for (let count = 0; count < ((attack.repeat) ? attack.repeat : 1); count ++) {
@@ -281,7 +294,6 @@ describe("Test Gameplay", () => {
 					variables: { from: script.f.from, to: script.f.to, amount: script.f.amt },
 				});
 			} else {
-				if (current === 'Paul') console.log("No fortification");
 				await mutate({ mutation: END_TURN });
 			}
 			await query({ query: MY_GAME }).then(v => {

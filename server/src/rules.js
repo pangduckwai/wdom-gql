@@ -167,6 +167,15 @@ let gameRules = new function() {
 		}
 	};
 
+	this.isRedeemable = (cards) => {
+		if (cards.length < 3) return false;
+		let a = cards.filter(c => (c.type === "A") || (c.type === ""));
+		let c = cards.filter(c => (c.type === "C") || (c.type === ""));
+		let i = cards.filter(c => (c.type === "I") || (c.type === ""));
+
+		return ((a.length >= 3) || (c.length >= 3) || (i.length >= 3) || ((a.length >= 1) && (c.length >= 1) && (i.length >= 1)));
+	};
+
 	this.buildTerritory = () => {
 		let tindex = {};
 		let territories = Object.keys(this.TERRITORIES).map((name, idx) => {

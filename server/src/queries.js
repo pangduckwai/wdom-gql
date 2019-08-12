@@ -69,6 +69,7 @@ module.exports = Object.freeze({
 				name
 				type
 			}
+			redeemable
 			conquer
 		}
 	}`,
@@ -81,6 +82,7 @@ module.exports = Object.freeze({
 				name
 				type
 			}
+			redeemable
 			conquer
 		}
 	}`,
@@ -102,6 +104,10 @@ module.exports = Object.freeze({
 			}
 			winner {
 				name
+			}
+			cards {
+				name
+				type
 			}
 		}
 	}`,

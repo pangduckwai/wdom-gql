@@ -31,13 +31,17 @@ module.exports = Object.freeze({
 		id: 15, type: "G"
 	}, CARD_RETURNED: {
 		id: 16, type: "G"
-	}, TERRITORY_ATTACKED: {
+	}, CARDS_REDEEMED: {
 		id: 17, type: "G"
-	}, TERRITORY_CONQUERED: {
+	}, TERRITORY_ATTACKED: {
 		id: 18, type: "G"
-	}, FORTIFIED: {
+	}, TERRITORY_CONQUERED: {
 		id: 19, type: "G"
+	}, PLAYER_ATTACKED: {
+		id: 20, type: "P"
+	}, FORTIFIED: {
+		id: 21, type: "G"
 	}, TURN_ENDED: {
-		id: 20, type: "G"
+		id: 22, type: "G"
 	}
 });
