@@ -1,7 +1,6 @@
 import React from 'react';
 import Territory from './territory';
 import { MAP, LINK, LINE } from './constants';
-import 'whatwg-fetch';
 
 export default class Game extends React.Component {
 	constructor(props) {
@@ -16,25 +15,25 @@ export default class Game extends React.Component {
 	}
 
 	// TODO TEMP: should called after game start, not in this lifecycle method.
-	componentDidMount() {
-		fetch("http://localhost:54321/game/starting/12345678")
-			.then(res => res.json())
-			.then(
-				(result) => {
-					console.log(result);
-					this.setState({
-						players: result.players,
-						owners: result.owners
-					});
-				},
-				(error) => {
-					this.setState({
-						players: [],
-						owners: {}
-					});
-				}
-			);
-	}
+	// componentDidMount() {
+	// 	fetch("http://localhost:54321/game/starting/12345678")
+	// 		.then(res => res.json())
+	// 		.then(
+	// 			(result) => {
+	// 				console.log(result);
+	// 				this.setState({
+	// 					players: result.players,
+	// 					owners: result.owners
+	// 				});
+	// 			},
+	// 			(error) => {
+	// 				this.setState({
+	// 					players: [],
+	// 					owners: {}
+	// 				});
+	// 			}
+	// 		);
+	// }
 
 	handleHover(value, e) {
 		e.stopPropagation();

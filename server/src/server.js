@@ -6,6 +6,8 @@ const gameRules = require('./rules');
 const EventDS = require('./data/event-ds')
 const EventStore = require('./data/event-store');
 
+const { mockSetup } = require('./__tests__/mock-setup'); //TEMP!!!
+
 const eventStore = new EventStore();
 
 const server = new ApolloServer({
@@ -22,6 +24,8 @@ const server = new ApolloServer({
 		eventDS: new EventDS({ store: eventStore, rules: gameRules })
 	})
 });
+
+mockSetup({ eventDS: new EventDS({ store: eventStore, rules: gameRules })}); //TEMP!!!
 
 server.listen().then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);

@@ -1,5 +1,5 @@
 {
-  "name": "wdom",
+  "name": "wdom-gql-client",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,10 +11,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/react-hooks": "^3.0.0",
+    "apollo-cache-inmemory": "^1.5.1",
+    "apollo-client": "^2.5.1",
+    "apollo-link-http": "^1.5.5",
+    "graphql": "^14.0.2",
+    "graphql-tag": "^2.10.0",
     "html-webpack-plugin": "^3.2.0",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "whatwg-fetch": "^3.0.0"
+    "react-apollo": "^2.5.1",
+    "react-dom": "^16.8.6"
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",
@@ -32,6 +38,7 @@
     "style-loader": "^0.23.1",
     "webpack": "^4.35.3",
     "webpack-cli": "^3.3.5",
-    "webpack-dev-server": "^3.7.2"
+    "webpack-dev-server": "^3.7.2",
+    "apollo": "^2.5.3"
   }
 }

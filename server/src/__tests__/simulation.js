@@ -8,8 +8,8 @@ const gameRules = require('../rules');
 
 const {
 	REGISTER, QUIT_PLAYER, OPEN_GAME, CLOSE_GAME, JOIN_GAME, LEAVE_GAME, START_GAME, TAKE_ACTION, START_TURN, END_TURN, REDEEM_CARD
-} = require('../mutations');
-const { MYSELF, MY_GAME, FELLOW_PLAYERS, ALL_PLAYERS, ALL_GAMES, MY_TERRITORIES, PLAYER_TERRITORIES } = require('../queries');
+} = require('./mock-mutations');
+const { MYSELF, MY_GAME, FELLOW_PLAYERS, ALL_PLAYERS, ALL_GAMES, MY_TERRITORIES, PLAYER_TERRITORIES } = require('./mock-queries');
 const { mockShuffleCards, mockDoBattle } = require('./mock-rules');
 const testScripts = require('./mock-scripts');
 
