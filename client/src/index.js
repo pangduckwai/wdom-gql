@@ -4,8 +4,8 @@ import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { HttpLink } from 'apollo-link-http';
 import { ApolloProvider } from '@apollo/react-hooks';
-// import Game from './components/game';
-import PlayerList from './components/temp-plist';
+import Game from './components/game';
+// import PlayerList from './components/temp-plist';
 
 const cache = new InMemoryCache();
 const link = new HttpLink({
@@ -19,7 +19,7 @@ const client = new ApolloClient({
 
 ReactDOM.render(
 	<ApolloProvider client={client}>
-		<PlayerList />
+		<Game />
 	</ApolloProvider>,
 	document.getElementById('root')
 );

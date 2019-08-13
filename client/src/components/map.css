@@ -1,4 +1,7 @@
 /* Classes for the map */
+body {
+	margin: 0;
+}
 path {
 	stroke:darkolivegreen;
 	stroke-width: 2px;
@@ -9,6 +12,33 @@ line {
 }
 svg {
 	background-color:lightskyblue;
+}
+.map {
+	position: relative;
+	top: 0;
+	left: 0;
+}
+.control {
+	position: absolute;
+	bottom: 10px;
+	left: 5px;
+	width: 15%;
+	height: 40%;
+	padding: 5px;
+	border: 2px solid black;
+	font-family: Arial, Helvetica, sans-serif;
+	background:rgba(210,210,210,0.5);
+}
+label {
+	font-variant-caps: small-caps;
+	font-weight: bold;
+}
+input {
+	margin: 2px;
+}
+#root {
+	width: 95%;
+	margin: 1% auto;
 }
 .tname {
 	fill: #101010;
