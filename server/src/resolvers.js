@@ -3,6 +3,10 @@ const evn = require('./events');
 
 module.exports = {
 	Query: {
+		events: async (_, __, { dataSources }) => {
+			const { ___, eventList } = await dataSources.eventDS.events();
+			return eventList;
+		},
 		me: (_, __, { dataSources }) => dataSources.eventDS.me(),
 		myGame: (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();

@@ -1,47 +1,10 @@
 const { DataSource } = require('apollo-datasource');
 const evn = require('../events');
 
-/*
-type Player {
-	ready: Boolean!
-	token: String!
-	name: String!
-	reinforcement: Int!
-	cards: [Card]!
-	joined: Game
-}
-
-type Game {
-	ready: Boolean!
-	token: String!
-	name: String!
-	host: Player!
-	turn: Player
-	rounds: Int!
-	redeemed: Int!
-	current: Territory
-	cards: [Card]!
-	territories: [Territory]!
-}
-
-type Territory {
-	name: String!
-	continent: String!
-	owner: Player
-	troops: Int!
-}
-*/
 class EventDS extends DataSource {
 	constructor({ store, rules }) {
 		super();
 		this.store = store;
-		this.players = [];
-		this.games = [];
-		this.idxPlayerToken = {};
-		this.idxPlayerName = {};
-		this.idxGameToken = {};
-		this.idxGameName = {};
-		this.snapshot = -1;
 		this.gameRules = rules;
 	}
 
@@ -49,24 +12,9 @@ class EventDS extends DataSource {
 		this.context = config.context;
 	}
 
-	rebuildPlayerIndex() {
-		this.idxPlayerToken = {};
-		this.idxPlayerName = {};
-		for (let i = 0; i < this.players.length; i ++) {
-			this.idxPlayerToken[this.players[i].token] = i;
-			this.idxPlayerName[this.players[i].name] = i;
-		}
-	};
-
-	rebuildGameIndex() {
-		this.idxGameToken = {};
-		this.idxGameName = {};
-		for (let j = 0; j < this.games.length; j ++) {
-			this.idxGameToken[this.games[j].token] = j;
-			this.idxGameName[this.games[j].name] = j;
-		}
-	};
-
+	async events() {
+		return this.store.list({ index: 0 });
+	}
 	me() {
 		if (this.context && this.context.token)
 			return this.findPlayerByToken({ token: this.context.token });
@@ -74,30 +22,30 @@ class EventDS extends DataSource {
 			return null;
 	}
 	listPlayers() {
-		return this.players;
+		return this.store.players;
 	};
 	findPlayerByToken({ token }) {
-		return this.players[this.idxPlayerToken[token]];
+		return this.store.players[this.store.idxPlayerToken[token]];
 	}
 	findPlayerByName({ name }) {
-		return this.players[this.idxPlayerName[name]];
+		return this.store.players[this.store.idxPlayerName[name]];
 	}
 	listPlayersByGame({ token }) {
-		return this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === token));
+		return this.store.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === token));
 	}
 
 	listGames() {
-		return this.games;
+		return this.store.games;
 	}
 	findGameByToken({ token }) {
-		return this.games[this.idxGameToken[token]];
+		return this.store.games[this.store.idxGameToken[token]];
 	}
 	findGameByName({ name }) {
-		return this.games[this.idxGameName[name]];
+		return this.store.games[this.store.idxGameName[name]];
 	}
 
 	listTerritoriesByPlayer({ token }) {
-		return this.games[this.idxGameToken[this.players[this.idxPlayerToken[token]].joined]].territories.filter(t => 
+		return this.store.games[this.store.idxGameToken[this.store.players[this.store.idxPlayerToken[token]].joined]].territories.filter(t => 
 			(typeof(t.owner) !== "undefined") && (t.owner === token)
 		);
 	}
@@ -115,30 +63,30 @@ class EventDS extends DataSource {
 					reinforcement: 0,
 					cards: [],
 				};
-				len = this.players.push(obj);
-				if (len > 0) this.rebuildPlayerIndex();
+				len = this.store.players.push(obj);
+				if (len > 0) this.store.rebuildPlayerIndex();
 				break;
 			case evn.PLAYER_QUITTED.id:
-				obj = this.players[this.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
-					this.players.splice(this.idxPlayerToken[v.token], 1);
-					this.rebuildPlayerIndex();
+					this.store.players.splice(this.store.idxPlayerToken[v.token], 1);
+					this.store.rebuildPlayerIndex();
 				}
 				break;
 			case evn.GAME_JOINED.id:
-				obj = this.players[this.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					obj.joined = v.data[1];
 				}
 				break;
 			case evn.GAME_LEFT.id:
-				obj = this.players[this.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					delete obj.joined;
 				}
 				break;
 			case evn.TROOP_ASSIGNED.id:
-				obj = this.players[this.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					if (v.amount >= 0) {
 						obj.reinforcement = obj.reinforcement + v.amount;
@@ -148,7 +96,7 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.TROOP_DEPLOYED.id:
-				obj = this.players[this.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					if ((v.amount >= 0) && (obj.reinforcement >= v.amount)) {
 						obj.reinforcement = obj.reinforcement - v.amount;
@@ -175,44 +123,44 @@ class EventDS extends DataSource {
 					obj.t_index[obj.territories[i].name] = i;
 				}
 
-				len = this.games.push(obj);
-				if (len > 0) this.rebuildGameIndex();
+				len = this.store.games.push(obj);
+				if (len > 0) this.store.rebuildGameIndex();
 				break;
 			case evn.GAME_CLOSED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.host === v.data[0])) { //Only the host can close a game
-					this.games.splice(this.idxGameToken[v.token], 1);
-					this.rebuildGameIndex();
+					this.store.games.splice(this.store.idxGameToken[v.token], 1);
+					this.store.rebuildGameIndex();
 				}
 				break;
 			case evn.GAME_STARTED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.host === v.data[0])) { //Only the host can start a game
 					obj.turn = obj.host;
 					obj.rounds = 0;
 				}
 				break;
 			case evn.TERRITORY_ASSIGNED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj) {
 					obj.territories[obj.t_index[v.name]].owner = v.data[0];
 					obj.territories[obj.t_index[v.name]].troops = 1;
 				}
 				break;
 			case evn.TROOP_ADDED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
 					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
 				}
 				break;
 			case evn.TERRITORY_SELECTED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
 					obj.current = v.name;
 				}
 				break;
 			case evn.NEXT_PLAYER.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const plys = this.listPlayersByGame({ token: v.token });
 					let idx = 0;
@@ -248,22 +196,22 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.SETUP_FINISHED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.rounds === 0)) {
 					obj.turn = obj.host;
 					obj.rounds = 1;
 				}
 				break;
 			case evn.TURN_STARTED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					obj.fortified = false;
-					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 					if (ply) ply.conquer = false;
 				}
 				break;
 			case evn.CARD_RETURNED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && ((obj.rounds === 0) || (obj.turn === v.data[0]))) {
 					const card = this.gameRules.getCard(v.name);
 					if (card && (obj.cards.filter(c => c.name === v.name).length <= 0)) {
@@ -272,10 +220,10 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.CARDS_REDEEMED.id: //TODO test a player redeem 2 sets of cards in 1 round
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const reinforcement = this.gameRules.redeemReinforcement(obj.redeemed);
-					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 					if (ply) {
 						obj.redeemed = reinforcement;
 						ply.reinforcement += reinforcement;
@@ -290,7 +238,7 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.TERRITORY_ATTACKED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const fm = obj.territories[obj.t_index[v.data[2]]];
 					const to = obj.territories[obj.t_index[v.data[3]]];
@@ -305,7 +253,7 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.TERRITORY_CONQUERED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const fm = obj.territories[obj.t_index[v.data[2]]];
 					const to = obj.territories[obj.t_index[v.data[3]]];
@@ -314,14 +262,14 @@ class EventDS extends DataSource {
 					fm.troops = 1;
 					obj.current = v.data[3];
 
-					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 					if (ply) ply.conquer = true;
 				}
 				break;
 			case evn.PLAYER_ATTACKED.id:
-				obj = this.players[this.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
-					const ply = this.players[this.idxPlayerToken[v.data[2]]];
+					const ply = this.store.players[this.store.idxPlayerToken[v.data[2]]];
 					const left = this.listTerritoriesByPlayer({ token: v.data[2] });
 					if (left.length <= 0) {
 						//Player defeated
@@ -331,7 +279,7 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.FORTIFIED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const fm = obj.territories[obj.t_index[v.data[2]]];
 					const to = obj.territories[obj.t_index[v.data[3]]];
@@ -343,11 +291,11 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.TURN_ENDED.id:
-				obj = this.games[this.idxGameToken[v.token]];
+				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					obj.rounds ++;
 
-					const ply = this.players[this.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 					if (ply && ply.conquer) {
 						const card = obj.cards.splice(0, 1)[0];
 						ply.cards.push(card);
@@ -357,46 +305,10 @@ class EventDS extends DataSource {
 		}
 	}
 
-	async takeSnapshot() {
-		return new Promise(async (resolve, _) => {
-			const { lastIndex, eventList } = await this.store.list({ index: 0 }); // get all
-			this.snapshot = lastIndex;
-
-			this.players = [];
-			this.idxPlayerToken = {};
-			this.idxPlayerName = {};
-
-			this.games = [];
-			this.idxGameToken = {};
-			this.idxGameName = {};
-
-			if (lastIndex >= 0) {
-				//Players
-				const registered = eventList.filter(e => (e.type === "P") && (e.event === evn.PLAYER_REGISTERED.id)); //await this.store.find({ type: "P", event: evn.PLAYER_REGISTERED.id }); // to: this.snapshot,
-				for (const player of registered) {
-					const events = eventList.filter(e => (e.token === player.eventid)); //await this.store.find({ token: player.eventid });
-					for (const v of events) {
-						this.process(v);
-					}
-				}
-
-				//Games
-				const opened = eventList.filter(e => (e.type === "G") && (e.event === evn.GAME_OPENED.id)); //await this.store.find({ type: "G", event: evn.GAME_OPENED.id });
-				for (const game of opened) {
-					const events = eventList.filter(e => (e.token === game.eventid)); //await this.store.find({ token: game.eventid });
-					for (const v of events) {
-						this.process(v);
-					}
-				}
-			}
-			resolve(true);
-		});
-	}
-
 	async updateSnapshot() {
 		return new Promise(async (resolve, _) => {
-			const { lastIndex, eventList } = await this.store.list({ index: this.snapshot + 1 });
-			this.snapshot = lastIndex;
+			const { lastIndex, eventList } = await this.store.list({ index: this.store.snapshot + 1 });
+			this.store.snapshot = lastIndex;
 
 			if (lastIndex >= 0) {
 				for (const event of eventList) {

@@ -2,18 +2,6 @@ const { UserInputError } = require('apollo-server');
 const crypto = require('crypto');
 const evn = require('../events');
 
-/*
-	type Event {
-		eventid: String!
-		timestamp: Int!
-		event: String! (Register(P)|Quit(P)|Join(G)|Leave(G)|Next(G)|Open(H)|Close(H)|Start(H)|Assign(T)|Add(T)|Attack(T)|Fortify(T)|Collect(C)|Redeem(C))
-		token: String! (token of related entities (Player/Game/etc.))
-		type: String! (Player|Game|Card|...)
-		name: String
-		amount: Int
-		data: [String]
-	}
-*/
 let copy = (orig) => {
 	let copy = {};
 	copy.eventid = orig.eventid;
@@ -39,8 +27,35 @@ let populate = (event, token) => {
 class EventStore {
 	constructor() {
 		this.events = [];
+		this.players = [];
+		this.games = [];
+		this.idxPlayerToken = {};
+		this.idxPlayerName = {};
+		this.idxGameToken = {};
+		this.idxGameName = {};
+		this.snapshot = -1;
 	}
 
+	////////////////////////////////////////////////
+	rebuildPlayerIndex() {
+		this.idxPlayerToken = {};
+		this.idxPlayerName = {};
+		for (let i = 0; i < this.players.length; i ++) {
+			this.idxPlayerToken[this.players[i].token] = i;
+			this.idxPlayerName[this.players[i].name] = i;
+		}
+	};
+
+	rebuildGameIndex() {
+		this.idxGameToken = {};
+		this.idxGameName = {};
+		for (let j = 0; j < this.games.length; j ++) {
+			this.idxGameToken[this.games[j].token] = j;
+			this.idxGameName[this.games[j].name] = j;
+		}
+	};
+
+	////////////////////////////////////////////////
 	list({ index }) {
 		return new Promise((resolve, _) => {
 			const len = this.events.length;

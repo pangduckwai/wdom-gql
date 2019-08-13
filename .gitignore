@@ -63,3 +63,4 @@ typings/
 
 note.txt
 *.old/
+*.try/

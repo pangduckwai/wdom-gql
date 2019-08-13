@@ -2,6 +2,7 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
 type Query {
+	events: [Event]!
 	me: Player
 	myGame: Game
 	myTerritories: [Territory]!
