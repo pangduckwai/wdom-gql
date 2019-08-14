@@ -1,10 +1,10 @@
 import React from 'react';
-import { MAP } from './constants';
+import { MAP } from '../constants';
 import './map.css';
 
 export default function Territory(props) {
 	const local = MAP[props.tid];
-	let clazz = 'c';
+	let clazz = 'c'; //'hide c';
 	if (props.sel) clazz = 'c s';
 	if (props.lnk) clazz = 'c l';
 
@@ -14,6 +14,7 @@ export default function Territory(props) {
 			onMouseOver={props.onMouseOver}>
 
 			<path
+				data-tid={props.tid.toLowerCase()}
 				className={`${local.continent} ${local.cindex}`}
 				d={local.svgPath}/>
 			<text className={"tarmy"} x={local.loc[0]} y={local.loc[1]}>

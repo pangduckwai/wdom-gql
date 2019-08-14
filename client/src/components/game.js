@@ -1,17 +1,29 @@
 import React from 'react';
-import Territory from './territory';
-import Control from './control';
-import { MAP, LINK, LINE } from './constants';
+import Map from './map';
+import Register from './register';
+
+let convert = (tid) => {
+	const buff = tid.split("");
+	let found = true;
+	for (let i = 0; i < buff.length; i ++) {
+		if (found) {
+			found = false;
+			buff[i] = buff[i].toUpperCase();
+		} else if (buff[i] === '-') {
+			found = true;
+		}
+	}
+	return buff.join("");
+};
 
 export default class Game extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			playerName: "",
-			player: {},
-			game: {},
 			selected: "",
 			focused: "",
+			player: {},
+			game: {},
 			owners: []
 		};
 	}
@@ -49,71 +61,68 @@ export default class Game extends React.Component {
 
 	/////////////////////////////
 	// Component <Territory /> //
-	handleHover(value, e) {
+	handleHover(e) {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
 
-		this.setState({
-			focused: value
-		});
+		if (typeof(e.target.dataset.tid) !== "undefined") {
+			this.setState({
+				focused: convert(e.target.dataset.tid)
+			});
+		}
 	}
 
-	handleClick(value, e) {
+	handleClick(e) {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
 
-		this.setState({
-			selected: value,
-			focused: value
-		});
+		if (typeof(e.target.dataset.tid) !== "undefined") {
+			const value = convert(e.target.dataset.tid);
+			this.setState({
+				selected: value,
+				focused: value
+			});
+		}
 	}
-
-	///////////////////////////
-	// Component <Control /> //
-	handleRegisterName(e) {
-		this.setState({ playerName: e.target.value });
-	}
-
-	handleRegister(e) {
-		e.stopPropagation();
-		e.nativeEvent.stopImmediatePropagation();
-		e.nativeEvent.preventDefault();
-		console.log("Register", this.state.playerName);
-	}
+	/////////////////////////////
 
 	render() {
-		const curr = (this.state.selected !== "") ? LINK[this.state.selected].connected : [];
-
-		return (
-			<div className="map">
-				<svg viewBox="0 0 1225 628" preserveAspectRatio="xMidYMid meet"
-					onClick={this.handleClear.bind(this)}
-					onMouseOver={this.handleUnhover.bind(this)}>
-
-					{LINE.map((points, i) =>
-						<line key={i} x1={points[0]} y1={points[1]} x2={points[2]} y2={points[3]} />)}
-
-					{Object.keys(MAP).map((key) =>
-						(<Territory
-							key={key} tid={key}
-							player={(this.state.owners[key] != null) ? this.state.owners[key] : 0}
-							army={(this.state.owners[key] != null) ? 1 : 0}
-							sel={key === this.state.selected}
-							lnk={curr.includes(key)}
-							onClick={this.handleClick.bind(this, key)}
-							onMouseOver={this.handleHover.bind(this, key)} />))}
-
-					<text className="tname" x="560" y="590">
-						{(this.state.selected === "") ? this.state.focused : this.state.selected}
-					</text>
-				</svg>
-				<Control
-					player={this.state.player}
-					game={this.state.game}
-					playerName={this.state.playerName}
-					onChange={this.handleRegisterName.bind(this)}
-					onSubmit={this.handleRegister.bind(this)} />
-			</div>
+		const map = (
+			<Map
+				selected={this.state.selected}
+				focused={this.state.focused}
+				owners={this.state.owners}
+				handleClear={this.handleClear.bind(this)}
+				handleUnhover={this.handleUnhover.bind(this)}
+				handleClick={this.handleClick.bind(this)}
+				handleHover={this.handleHover.bind(this)} />
 		);
+
+		if (!this.state.player.token) {
+			return (
+				<div className="game">
+					{map}
+					<Register />
+				</div>
+			);
+		} else if (!this.state.game.token) {
+			return (
+				<div className="game">
+					{map}
+					<div className="control">
+						Join a game / Create a new game
+					</div>
+				</div>
+			);
+		} else {
+			return (
+				<div className="game">
+					{map}
+					<div className="control">
+						Play game
+					</div>
+				</div>
+			);
+		}
 	}
 }

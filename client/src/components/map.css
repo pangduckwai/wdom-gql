@@ -13,11 +13,17 @@ line {
 svg {
 	background-color:lightskyblue;
 }
-.map {
+
+.game {
 	position: relative;
 	top: 0;
 	left: 0;
 }
+#root {
+	width: 95%;
+	margin: 1% auto;
+}
+
 .control {
 	position: absolute;
 	bottom: 10px;
@@ -25,7 +31,8 @@ svg {
 	width: 15%;
 	height: 40%;
 	padding: 5px;
-	border: 2px solid black;
+	border: 2px solid #454545;
+	border-radius: 4px;
 	font-family: Arial, Helvetica, sans-serif;
 	background:rgba(210,210,210,0.5);
 }
@@ -33,13 +40,35 @@ label {
 	font-variant-caps: small-caps;
 	font-weight: bold;
 }
-input {
+input[type="submit"]:focus {
+	box-shadow: none;
+	border: 1px solid #4d90fe;
+	outline: none;
+}
+input[type="submit"]:hover {
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	border: 1px solid #c5c5c5;
+	color: #212121;
+}
+input[type="submit"] {
+	margin: 7px 2px 2px 7px;
+	padding: 5px 8px 5px 8px;
+	border: 1px solid #f2f2f2;
+	border-radius: 4px;
+	cursor: pointer;
+	color: #5f6368;
+}
+input[type="text"]:focus {
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	border: 1px solid #c5c5c5;
+}
+input[type="text"] {
 	margin: 2px;
+	padding: 3px 3px 3px 7px;
+	border: 1px solid #f2f2f2;
+	border-radius: 10px;
 }
-#root {
-	width: 95%;
-	margin: 1% auto;
-}
+
 .tname {
 	fill: #101010;
 	font-family: Arial, Helvetica, sans-serif;
@@ -59,7 +88,6 @@ input {
 	display: block;
 }
 .c:hover path { opacity: 0.5; }
-/* .c:hover .tname { display: block; } */
 .s path { opacity: 0.5; }
 .s .tarmy { display: block; font-weight: bold; font-size: 1.2em; }
 .l path { opacity: 0.5; }
