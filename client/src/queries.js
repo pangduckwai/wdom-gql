@@ -22,6 +22,7 @@ query Myself {
 export const ALL_GAMES = gql`
 query Games {
 	listGames {
+		token
 		name
 		host {
 			name

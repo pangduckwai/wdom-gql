@@ -14,3 +14,18 @@ mutation register($name: String!) {
 		}
 	}
 }`;
+
+export const OPEN_GAME = gql`
+mutation Open($name: String!) {
+	openGame(name: $name) {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			name
+			token
+		}
+	}
+}`;

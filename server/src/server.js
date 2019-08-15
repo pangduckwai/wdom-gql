@@ -12,7 +12,7 @@ const eventStore = new EventStore();
 
 const server = new ApolloServer({
 	context: async ({ req }) => {
-		const token = (req.headers && req.headers.token) ? req.headers.token : null;
+		const token = (req.headers && req.headers.authorization) ? req.headers.authorization : null;
 		if (token) {
 			return { token: token };
 		}

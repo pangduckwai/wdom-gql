@@ -1,6 +1,9 @@
 import React from 'react';
 import Map from './map';
 import Register from './register';
+import OpenGame from './open-game';
+import './map.css';
+import ListGames from './list-games';
 
 let convert = (tid) => {
 	const buff = tid.split("");
@@ -22,10 +25,14 @@ export default class Game extends React.Component {
 		this.state = {
 			selected: "",
 			focused: "",
-			player: {},
 			game: {},
 			owners: []
 		};
+
+		this.handleClear = this.handleClear.bind(this);
+		this.handleUnhover = this.handleUnhover.bind(this);
+		this.handleClick = this.handleClick.bind(this);
+		this.handleHover = this.handleHover.bind(this);
 	}
 
 	// TODO TEMP: should called after game start, not in this lifecycle method.
@@ -84,6 +91,14 @@ export default class Game extends React.Component {
 			});
 		}
 	}
+
+	/////////////////////////////
+	// Component <Territory /> //
+	// handleRegister() {
+	// 	console.log("Hello");
+	// 	this.props.refetch();
+	// 	console.log("there");
+	// }
 	/////////////////////////////
 
 	render() {
@@ -92,17 +107,21 @@ export default class Game extends React.Component {
 				selected={this.state.selected}
 				focused={this.state.focused}
 				owners={this.state.owners}
-				handleClear={this.handleClear.bind(this)}
-				handleUnhover={this.handleUnhover.bind(this)}
-				handleClick={this.handleClick.bind(this)}
-				handleHover={this.handleHover.bind(this)} />
+				handleClear={this.handleClear}
+				handleUnhover={this.handleUnhover}
+				handleClick={this.handleClick}
+				handleHover={this.handleHover} />
 		);
 
-		if (!this.state.player.token) {
+		if (!this.props.player || !this.props.player.token) {
 			return (
 				<div className="game">
 					{map}
-					<Register />
+					<div className="control">
+						<div className="title">Register as a player</div>
+						<Register
+							refetch={this.props.refetch} />
+					</div>
 				</div>
 			);
 		} else if (!this.state.game.token) {
@@ -110,7 +129,11 @@ export default class Game extends React.Component {
 				<div className="game">
 					{map}
 					<div className="control">
-						Join a game / Create a new game
+						<div className="title">Welcome <span className="label">{this.props.player.name}</span></div>
+						<OpenGame
+							refetch={this.props.refetch} />
+						<ListGames
+							refetch={this.props.refetch} />
 					</div>
 				</div>
 			);

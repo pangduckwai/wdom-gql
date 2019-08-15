@@ -1,7 +1,7 @@
 import React from 'react';
 import './map.css';
 
-export default class RegisterComp extends React.Component {
+export default class OpenGameComp extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -21,7 +21,7 @@ export default class RegisterComp extends React.Component {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
 		e.nativeEvent.preventDefault();
-		this.props.register({ variables: { name: this.state.name }}).then(r => {
+		this.props.openGame({ variables: { name: this.state.name }}).then(r => {
 			this.props.refetch();
 		});
 	}
@@ -29,8 +29,8 @@ export default class RegisterComp extends React.Component {
 	render() {
 		return (
 			<form onSubmit={this.handleSubmit}>
-				<input type="text" placeholder="Your name" value={this.state.name} onChange={this.handleChange} />
-				<input type="submit" value="Register player" />
+				<input type="text" placeholder="Name of new game" value={this.state.name} onChange={this.handleChange} />
+				<input type="submit" value="Create" />
 			</form>
 		);
 	}

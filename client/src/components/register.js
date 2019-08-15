@@ -3,16 +3,20 @@ import { useMutation } from '@apollo/react-hooks';
 import { REGISTER } from '../mutations';
 import RegisterComp from './register-comp';
 
-export default function Register() {
+export default function Register(props) {
 	const [register, { loading, error }] = useMutation(REGISTER, {
-		onCompleted({ response }) {
-			if (response.successful) {
-				localStorage.setItem("token", response.event.token);
+		onCompleted(data) {
+			if (data.registerPlayer.successful) {
+				localStorage.setItem("token", data.registerPlayer.event.token);
 			}
 		}
 	});
 
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>ERROR</p>;
-	return <RegisterComp register={register} />;
+	return (
+		<RegisterComp
+			register={register}
+			refetch={props.refetch} />
+	);
 }
