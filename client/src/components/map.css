@@ -41,6 +41,15 @@ svg {
 	font-variant-caps: small-caps;
 	font-weight: bold;
 }
+.list {
+	list-style-type: none;
+	font-size: 0.9em;
+	padding-left: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	height: 35%;
+	overflow-y: auto;
+}
 input[type="submit"]:focus {
 	box-shadow: none;
 	border: 1px solid #4d90fe;
@@ -76,6 +85,13 @@ input[type="text"] {
 	margin: 0 0 5px 0;
 	padding: 0 0 2px 0;
 	border-bottom: 1px solid #323232;
+}
+.bt {
+	border-top: 1px solid #323232;
+	border-bottom: none;
+}
+.mt {
+	margin-top: 14px;
 }
 
 .tname {

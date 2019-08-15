@@ -132,6 +132,7 @@ export default class Game extends React.Component {
 						<div className="title">Welcome <span className="label">{this.props.player.name}</span></div>
 						<OpenGame
 							refetch={this.props.refetch} />
+						<div className="title bt mt">Available Games</div>
 						<ListGames
 							refetch={this.props.refetch} />
 					</div>
