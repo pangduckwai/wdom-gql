@@ -13,9 +13,11 @@ export default function App() {
 		return <p>ERROR</p>;
 	}
 
+	console.log(JSON.stringify(data));
 	return (
 		<Main
 			refetch={refetch}
-			player={data.me} />
+			player={data.me}
+			players={data.myFellowPlayers} />
 	);
 }

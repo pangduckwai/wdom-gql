@@ -21,7 +21,8 @@ export default function Territory(props) {
 				{props.army}
 			</text>
 			<polyline
-				className={`player${props.player}`} points="0,0 0,-20 20,-15 0,-10"
+				className={`player${props.player}`}
+				points="0,0 0,-20 20,-15 0,-10"
 				transform={`translate(${local.loc[2]}, ${local.loc[3]})`} />
 		</g>
 	);

@@ -79,7 +79,8 @@ export default class Main extends React.Component {
 				<Map
 					selected={this.state.selected}
 					focused={this.state.focused}
-					territories={this.props.player.joined.territories}
+					player={this.props.player}
+					players={this.props.players}
 					handleClear={this.handleClear}
 					handleUnhover={this.handleUnhover}
 					handleClick={this.handleClick}

@@ -30,7 +30,10 @@ query Myself {
 				}
 				troops
 			}
-        }
+		}
+	}
+	myFellowPlayers {
+		name
 	}
 }`;
 

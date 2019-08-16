@@ -114,6 +114,7 @@ input[type="text"] {
 .tname {
 	font-size: 1.1em;
 	font-weight: bold;
+	text-anchor: start;
 }
 .tarmy {
 	font-size: 0.8em;
