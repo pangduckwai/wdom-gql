@@ -8,14 +8,30 @@ query Myself {
         redeemable
 		reinforcement
 		conquer
-		joined {
-            token
-			name
-        }
 		cards {
 			name
 			type
 		}
+		joined {
+            token
+			name
+			host {
+				token
+				name
+			}
+			turn {
+				token
+			}
+			rounds
+			territories {
+				name
+				owner {
+					token
+					name
+				}
+				troops
+			}
+        }
 	}
 }`;
 

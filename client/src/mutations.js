@@ -29,3 +29,18 @@ mutation Open($name: String!) {
 		}
 	}
 }`;
+
+export const JOIN_GAME = gql`
+mutation Join($token: String!) {
+	joinGame(token: $token) {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			name
+			token
+		}
+	}
+}`;

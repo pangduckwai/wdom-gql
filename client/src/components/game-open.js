@@ -1,12 +1,12 @@
 import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { OPEN_GAME } from '../mutations';
-import OpenGameComp from './open-game-comp';
+import OpenGameComp from './game-open-comp';
 
 export default function OpenGame(props) {
 	const [openGame, { loading, error }] = useMutation(OPEN_GAME, {
 		onCompleted(data) {
-			if (data.registerPlayer.successful) {
+			if (data.openGame.successful) {
 				localStorage.setItem("gameToken", data.openGame.event.token);
 			}
 		}

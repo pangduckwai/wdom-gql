@@ -1,9 +1,9 @@
 import React from 'react';
 import Map from './map';
 import Register from './register';
-import OpenGame from './open-game';
+import OpenGame from './game-open';
+import ListGames from './game-list';
 import './map.css';
-import ListGames from './list-games';
 
 let convert = (tid) => {
 	const buff = tid.split("");
@@ -25,7 +25,6 @@ export default class Game extends React.Component {
 		this.state = {
 			selected: "",
 			focused: "",
-			game: {},
 			owners: []
 		};
 
@@ -92,15 +91,6 @@ export default class Game extends React.Component {
 		}
 	}
 
-	/////////////////////////////
-	// Component <Territory /> //
-	// handleRegister() {
-	// 	console.log("Hello");
-	// 	this.props.refetch();
-	// 	console.log("there");
-	// }
-	/////////////////////////////
-
 	render() {
 		const map = (
 			<Map
@@ -124,12 +114,12 @@ export default class Game extends React.Component {
 					</div>
 				</div>
 			);
-		} else if (!this.state.game.token) {
+		} else if (!this.props.player.joined) {
 			return (
 				<div className="game">
 					{map}
 					<div className="control">
-						<div className="title">Welcome <span className="label">{this.props.player.name}</span></div>
+						<div className="title">Welcome <span className="name">{this.props.player.name}</span></div>
 						<OpenGame
 							refetch={this.props.refetch} />
 						<div className="title bt mt">Available Games</div>
@@ -138,12 +128,23 @@ export default class Game extends React.Component {
 					</div>
 				</div>
 			);
-		} else {
+		} else if (this.props.player.joined.host.token === this.props.player.token) {
+			console.log("Joined!", JSON.stringify(this.props.player.joined));
 			return (
 				<div className="game">
 					{map}
 					<div className="control">
-						Play game
+						Own game
+					</div>
+				</div>
+			);
+		} else {
+			console.log("Joined!", JSON.stringify(this.props.player.joined));
+			return (
+				<div className="game">
+					{map}
+					<div className="control">
+						Others game
 					</div>
 				</div>
 			);

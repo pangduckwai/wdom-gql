@@ -1,7 +1,7 @@
 import React from 'react';
 import './map.css';
 
-export default class ListGamesComp extends React.Component {
+export default class GamesComp extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -17,10 +17,9 @@ export default class ListGamesComp extends React.Component {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
 		e.nativeEvent.preventDefault();
-		// this.props.openGame({ variables: { name: this.state.name }}).then(r => {
-		// 	this.props.refetch();
-		// });
-		console.log("Selected", this.state.value);
+		this.props.joinGame({ variables: { token: this.state.value }}).then(r => {
+			this.props.refetch();
+		});
 	}
 
 	handleSelect(e) {
@@ -54,6 +53,12 @@ export default class ListGamesComp extends React.Component {
 				name: "Dummy Game 4",
 				host: { name: "Dummy4" }
 			});
+			this.props.games.push({
+				key: "A123456789005",
+				token: "A123456789005",
+				name: "Dummy Game 5",
+				host: { name: "Dummy5" }
+			});
 		}
 
 		return (
@@ -65,7 +70,7 @@ export default class ListGamesComp extends React.Component {
 								type="radio"
 								name="choose"
 								value={game.token} />
-							{game.name} (host: {game.host.name})
+							<label>{game.name} (host: {game.host.name})</label>
 						</li>)
 					)}
 				</ul>
