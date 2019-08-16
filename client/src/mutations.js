@@ -1,8 +1,23 @@
 import gql from 'graphql-tag';
 
 export const REGISTER = gql`
-mutation register($name: String!) {
+mutation Register($name: String!) {
 	registerPlayer(name: $name) {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			name
+			token
+		}
+	}
+}`;
+
+export const QUIT_PLAYER = gql`
+mutation Quit {
+	quitPlayer {
 		successful
 		message
 		event {
@@ -33,6 +48,36 @@ mutation Open($name: String!) {
 export const JOIN_GAME = gql`
 mutation Join($token: String!) {
 	joinGame(token: $token) {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			name
+			token
+		}
+	}
+}`;
+
+export const LEAVE_GAME = gql`
+mutation Leave {
+	leaveGame {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			name
+			token
+		}
+	}
+}`;
+
+export const CLOSE_GAME = gql`
+mutation Close {
+	closeGame {
 		successful
 		message
 		event {

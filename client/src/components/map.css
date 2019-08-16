@@ -23,7 +23,8 @@ body {
 	border: 2px solid #454545;
 	border-radius: 4px;
 	font-family: Arial, Helvetica, sans-serif;
-	background:rgba(210,210,210,0.5);
+	/* background:rgba(210,210,210,0.5); */
+	background: #f0f0f080;
 }
 .name {
 	font-size: 1.0em;
@@ -38,15 +39,15 @@ input[type="submit"]:focus {
 input[type="submit"]:hover {
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 	border: 1px solid #c5c5c5;
-	color: #212121;
+	color: #121212;
 }
 input[type="submit"] {
-	margin: 2px 2px 2px 3px;
-	padding: 2px 8px 2px 8px;
-	border: 1px solid #f2f2f2;
+	margin: 0 0 0 3px;
+	padding: 1px 4px 0 4px;
+	border: 1px solid #e0e0e0;
 	border-radius: 4px;
 	cursor: pointer;
-	color: #5f6368;
+	color: #2e3033;
 }
 input[type="text"]:focus {
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -64,24 +65,26 @@ input[type="text"] {
 	text-anchor: left;
 	margin: 0 0 5px 0;
 	padding: 0 0 2px 0;
+}
+.greeting {
+	padding-bottom: 3px;
 	border-bottom: 1px solid #323232;
 }
 .bt {
 	border-top: 1px solid #323232;
-	border-bottom: none;
 }
 .mt {
-	margin-top: 14px;
+	margin-top: 7px;
 }
 .list {
 	list-style-type: none;
 	font-size: 0.9em;
 	padding-left: 0;
 	margin-top: 0;
-	margin-bottom: 0;
+	margin-bottom: 3px;
 	height: 20vh;
 	overflow-x: hidden;
-	overflow-y: auto;
+	overflow-y: scroll;
 	scrollbar-color: #aaaaaa rgba(210,210,210,0.5);
 	scrollbar-width: thin;
 }
@@ -98,6 +101,7 @@ input[type="text"] {
 	display: inline-block;
 	margin-left: 102px;
 	margin-right: -100px;
+	overflow-wrap: break-word;
 }
 
 .c:hover path { opacity: 0.5; }

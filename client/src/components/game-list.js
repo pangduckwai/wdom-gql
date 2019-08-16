@@ -5,6 +5,7 @@ import JoinGame from './game-join';
 
 export default function ListGames(props) {
 	const { data, loading, error } = useQuery(ALL_GAMES);
+
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>ERROR</p>;
 	return (

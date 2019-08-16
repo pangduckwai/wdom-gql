@@ -1,5 +1,6 @@
 import React from 'react';
 import Map from './map';
+import Greetings from './greetings';
 import Register from './register';
 import OpenGame from './game-open';
 import ListGames from './game-list';
@@ -19,7 +20,7 @@ let convert = (tid) => {
 	return buff.join("");
 };
 
-export default class Game extends React.Component {
+export default class Main extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -92,62 +93,42 @@ export default class Game extends React.Component {
 	}
 
 	render() {
-		const map = (
-			<Map
-				selected={this.state.selected}
-				focused={this.state.focused}
-				owners={this.state.owners}
-				handleClear={this.handleClear}
-				handleUnhover={this.handleUnhover}
-				handleClick={this.handleClick}
-				handleHover={this.handleHover} />
+		const registed = this.props.player && !this.props.player.joined;
+		const joined = this.props.player && this.props.player.joined;
+		return (
+			<div className="game">
+				<Map
+					selected={this.state.selected}
+					focused={this.state.focused}
+					owners={this.state.owners}
+					handleClear={this.handleClear}
+					handleUnhover={this.handleUnhover}
+					handleClick={this.handleClick}
+					handleHover={this.handleHover} />
+				<div className="control">
+					{(!this.props.player || !this.props.player.token) ? (
+						<Register refetch={this.props.refetch} />
+					) : (
+						<Greetings player={this.props.player} refetch={this.props.refetch} />
+					)}
+					{registed &&
+						<>
+							<OpenGame refetch={this.props.refetch} />
+							<div className="title bt mt">Available Games</div>
+							<ListGames refetch={this.props.refetch} />
+						</>
+					}
+					{(joined && (this.props.player.joined.host.token === this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
+						<span>Start Game...</span>
+					}
+					{(joined && (this.props.player.joined.host.token !== this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
+						<span>Wait for game to start...</span>
+					}
+					{(joined && (this.props.player.joined.rounds >= 0)) &&
+						<span>Playing game...</span>
+					}
+				</div>
+			</div>
 		);
-
-		if (!this.props.player || !this.props.player.token) {
-			return (
-				<div className="game">
-					{map}
-					<div className="control">
-						<div className="title">Register as a player</div>
-						<Register
-							refetch={this.props.refetch} />
-					</div>
-				</div>
-			);
-		} else if (!this.props.player.joined) {
-			return (
-				<div className="game">
-					{map}
-					<div className="control">
-						<div className="title">Welcome <span className="name">{this.props.player.name}</span></div>
-						<OpenGame
-							refetch={this.props.refetch} />
-						<div className="title bt mt">Available Games</div>
-						<ListGames
-							refetch={this.props.refetch} />
-					</div>
-				</div>
-			);
-		} else if (this.props.player.joined.host.token === this.props.player.token) {
-			console.log("Joined!", JSON.stringify(this.props.player.joined));
-			return (
-				<div className="game">
-					{map}
-					<div className="control">
-						Own game
-					</div>
-				</div>
-			);
-		} else {
-			console.log("Joined!", JSON.stringify(this.props.player.joined));
-			return (
-				<div className="game">
-					{map}
-					<div className="control">
-						Others game
-					</div>
-				</div>
-			);
-		}
 	}
 }
