@@ -26,7 +26,6 @@ query Myself {
 			territories {
 				name
 				owner {
-					token
 					name
 				}
 				troops

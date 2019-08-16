@@ -13,7 +13,12 @@ export default function OpenGame(props) {
 	});
 
 	if (loading) return <p>Loading...</p>;
-	if (error) return <p>ERROR</p>;
+
+	if (error) {
+		console.log(JSON.stringify(error));
+		return <p>ERROR</p>;
+	}
+
 	return (
 		<OpenGameComp
 			openGame={openGame}

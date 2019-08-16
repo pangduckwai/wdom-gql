@@ -14,7 +14,10 @@ export default function Greetings(props) {
 		});
 
 		if (loading) return <p>Loading...</p>;
-		if (error) return <p>ERROR: {JSON.stringify(error)}</p>;
+		if (error) {
+			console.log(JSON.stringify(error));
+			return <p>ERROR</p>;
+		}
 		return (
 			<GreetingsComp
 				player={props.player}
@@ -32,7 +35,10 @@ export default function Greetings(props) {
 		});
 
 		if (loading) return <p>Loading...</p>;
-		if (error) return <p>ERROR: {JSON.stringify(error)}</p>;
+		if (error) {
+			console.log(JSON.stringify(error));
+			return <p>ERROR</p>;
+		}
 		return (
 			<GreetingsComp
 				player={props.player}
@@ -50,7 +56,10 @@ export default function Greetings(props) {
 		});
 
 		if (loading) return <p>Loading...</p>;
-		if (error) return <p>ERROR: {JSON.stringify(error)}</p>;
+		if (error) {
+			console.log(JSON.stringify(error));
+			return <p>ERROR</p>;
+		}
 		return (
 			<GreetingsComp
 				player={props.player}

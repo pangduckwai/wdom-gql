@@ -7,7 +7,12 @@ export default function ListGames(props) {
 	const { data, loading, error } = useQuery(ALL_GAMES);
 
 	if (loading) return <p>Loading...</p>;
-	if (error) return <p>ERROR</p>;
+
+	if (error) {
+		console.log(JSON.stringify(error));
+		return <p>ERROR</p>;
+	}
+
 	return (
 		<JoinGame
 			games={data.listGames}

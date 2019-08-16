@@ -4,6 +4,7 @@ import Greetings from './greetings';
 import Register from './register';
 import OpenGame from './game-open';
 import ListGames from './game-list';
+import StartGame from './game-start';
 import './map.css';
 
 let convert = (tid) => {
@@ -25,8 +26,7 @@ export default class Main extends React.Component {
 		super(props);
 		this.state = {
 			selected: "",
-			focused: "",
-			owners: []
+			focused: ""
 		};
 
 		this.handleClear = this.handleClear.bind(this);
@@ -34,27 +34,6 @@ export default class Main extends React.Component {
 		this.handleClick = this.handleClick.bind(this);
 		this.handleHover = this.handleHover.bind(this);
 	}
-
-	// TODO TEMP: should called after game start, not in this lifecycle method.
-	// componentDidMount() {
-	// 	fetch("http://localhost:54321/game/starting/12345678")
-	// 		.then(res => res.json())
-	// 		.then(
-	// 			(result) => {
-	// 				console.log(result);
-	// 				this.setState({
-	// 					players: result.players,
-	// 					owners: result.owners
-	// 				});
-	// 			},
-	// 			(error) => {
-	// 				this.setState({
-	// 					players: [],
-	// 					owners: {}
-	// 				});
-	// 			}
-	// 		);
-	// }
 
 	////////////////////////
 	// Component <Game /> //
@@ -100,7 +79,7 @@ export default class Main extends React.Component {
 				<Map
 					selected={this.state.selected}
 					focused={this.state.focused}
-					owners={this.state.owners}
+					territories={this.props.player.joined.territories}
 					handleClear={this.handleClear}
 					handleUnhover={this.handleUnhover}
 					handleClick={this.handleClick}
@@ -119,7 +98,15 @@ export default class Main extends React.Component {
 						</>
 					}
 					{(joined && (this.props.player.joined.host.token === this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
-						<span>Start Game...</span>
+						<>
+							<StartGame refetch={this.props.refetch} />
+							<ul>
+								<li>TODO!!!</li>
+								<li>Add subscription here...</li>
+								<li>... to display latest list of players...</li>
+								<li>... who joined this game.</li>
+							</ul>
+						</>
 					}
 					{(joined && (this.props.player.joined.host.token !== this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
 						<span>Wait for game to start...</span>

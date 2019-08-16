@@ -23,7 +23,6 @@ body {
 	border: 2px solid #454545;
 	border-radius: 4px;
 	font-family: Arial, Helvetica, sans-serif;
-	/* background:rgba(210,210,210,0.5); */
 	background: #f0f0f080;
 }
 .name {
@@ -121,7 +120,7 @@ input[type="text"] {
 	font-weight: normal;
 }
 
-/* path {
+path {
 	stroke:darkolivegreen;
 	stroke-width: 2px;
 }
@@ -142,8 +141,8 @@ text {
 	text-anchor: middle;
 	dominant-baseline: middle;
 	display: block;
-} */
-path {
+}
+/* path {
 	stroke:white;
 	stroke-width: 2px;
 	fill: none;
@@ -166,7 +165,7 @@ text {
 	text-anchor: middle;
 	dominant-baseline: middle;
 	display: block;
-}
+} */
 
 .s polyline {
 	animation-name: flag;
@@ -191,7 +190,7 @@ text {
 	}
 }
 
-/* .player0 { fill:lightgray; }
+.player0 { fill:lightgray; }
 .player1 { fill:red; }
 .player2 { fill:blueviolet; }
 .player3 { fill:burlywood; }
@@ -225,7 +224,7 @@ text {
 .North-America.v4 { fill:#ff6d33; }
 .South-America.v0 { fill:#9370d8; }
 .South-America.v1 { fill:#885fd8; }
-.South-America.v2 { fill:#7c4ed8; } */
+.South-America.v2 { fill:#7c4ed8; }
 
 /* .badge {
 	stroke:black;

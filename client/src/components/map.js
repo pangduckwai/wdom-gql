@@ -1,11 +1,20 @@
 import React from 'react';
-import { MAP, LINK, LINE } from '../constants';
+import { LINK, LINE } from '../constants';
 import Territory from './territory';
 import './map.css';
 
 export default function Map(props) {
 	const curr = (props.selected !== "") ? LINK[props.selected].connected : [];
 
+	const TEMP = {
+		John : 1,
+		Josh : 2,
+		Nick : 3,
+		Paul : 4,
+		Bill : 5
+	};
+
+	console.log(JSON.stringify(props.territories));
 	return (
 		<svg viewBox="0 0 1225 628" preserveAspectRatio="xMidYMid meet"
 			onClick={props.handleClear}
@@ -14,13 +23,13 @@ export default function Map(props) {
 			{LINE.map((points, i) =>
 				<line key={i} x1={points[0]} y1={points[1]} x2={points[2]} y2={points[3]} />)}
 
-			{Object.keys(MAP).map((key) =>
+			{props.territories.map((territory) =>
 				(<Territory
-					key={key} tid={key}
-					player={(props.owners[key] != null) ? props.owners[key] : 0}
-					army={(props.owners[key] != null) ? 1 : 0}
-					sel={key === props.selected}
-					lnk={curr.includes(key)}
+					key={territory.name} tid={territory.name}
+					player={TEMP[territory.owner.name] || 0}
+					army={territory.troops || 0}
+					sel={territory.name === props.selected}
+					lnk={curr.includes(territory.name)}
 					onClick={props.handleClick}
 					onMouseOver={props.handleHover} />))}
 

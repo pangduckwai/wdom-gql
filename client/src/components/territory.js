@@ -4,7 +4,7 @@ import './map.css';
 
 export default function Territory(props) {
 	const local = MAP[props.tid];
-	let clazz = 'c'; //'hide c';
+	let clazz = 'c';
 	if (props.sel) clazz = 'c s';
 	if (props.lnk) clazz = 'c l';
 

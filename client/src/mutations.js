@@ -89,3 +89,18 @@ mutation Close {
 		}
 	}
 }`;
+
+export const START_GAME = gql`
+mutation Start {
+	startGame {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			name
+			token
+		}
+	}
+}`;
