@@ -13,6 +13,10 @@ export default function GameJoiners(props) {
 			if (subscriptionData.data && subscriptionData.data.broadcastJoined) {
 				console.log("SUBSCRIPTION!!!", JSON.stringify(subscriptionData));
 				refetch();
+				if (subscriptionData.data.broadcastJoined.event === 4) {
+					console.log("Leave game! Refetch");
+					props.refetch();
+				}
 			}
 		}
 	});
@@ -24,13 +28,12 @@ export default function GameJoiners(props) {
 		return <p>ERROR</p>;
 	}
 
-	const classname = `list ${props.type}`;
 	return (
 		<>
 			<div className="title">Joined players</div>
-			<ul className={classname}>
+			<ul className="list">
 				{data.myFellowPlayers.map((player, index) =>
-					<li key={index}>{player.name}</li>
+					<li key={index}>- {player.name}</li>
 				)}
 			</ul>
 		</>

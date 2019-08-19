@@ -23,7 +23,7 @@ export default class StartGameComp extends React.Component {
 
 	render() {
 		return (
-			<form onSubmit={this.handleSubmit}>
+			<form className="game-ctrl" onSubmit={this.handleSubmit}>
 				<input type="submit" value="Start Game" />
 			</form>
 		);

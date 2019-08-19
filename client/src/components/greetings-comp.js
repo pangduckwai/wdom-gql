@@ -20,7 +20,7 @@ export default class GreetingsComp extends React.Component {
 		return (
 			<form className="greeting" onSubmit={this.handleSubmit}>
 				<label className="title">Welcome <span className="name">{this.props.player.name}</span></label>
-				<input type="submit" value={this.props.desc} />
+				<input type="submit" value="&times;" />
 			</form>
 		);
 	}

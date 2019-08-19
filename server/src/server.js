@@ -83,5 +83,5 @@ server.listen(PORT, () => {
 		server: server,
 		path: '/subscriptions'
 	});
-	console.log('🚀 WDOM-GQL listening on port', PORT);
+	console.log(`🚀 WDOM-GQL listening on port ${PORT}....`);
 });

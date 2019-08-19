@@ -13,6 +13,10 @@ export default function ListGames(props) {
 			if (subscriptionData.data && subscriptionData.data.broadcastOpened) {
 				console.log("SUBSCRIPTION!!!", JSON.stringify(subscriptionData));
 				refetch();
+				if (subscriptionData.data.broadcastOpened.event === 6) {
+					console.log("Close game! Refetch");
+					props.refetch();
+				}
 			}
 		}
 	});

@@ -102,20 +102,22 @@ export default class Main extends React.Component {
 					{registed &&
 						<>
 							<OpenGame refetch={this.props.refetch} />
-							<div className="title bt mt">Available Games</div>
 							<ListGames refetch={this.props.refetch} />
 						</>
 					}
+					{joined &&
+						<div className="title bb mt mb">Game <span className="name">{this.props.player.joined.name}</span></div>
+					}
 					{(joined && (this.props.player.joined.host.token === this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
 						<>
-							<GameJoiners token={this.props.player.joined.token} type="host" />
+							<GameJoiners refetch={this.props.refetch} token={this.props.player.joined.token} />
 							<StartGame refetch={this.props.refetch} />
 						</>
 					}
 					{(joined && (this.props.player.joined.host.token !== this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
 						<>
-							<div className="title bb mt">Wait for game to start...</div>
-							<GameJoiners token={this.props.player.joined.token} type="guest" />
+							<GameJoiners refetch={this.props.refetch} token={this.props.player.joined.token} />
+							<div className="msg mt mb">Wait for game to start...</div>
 						</>
 					}
 					{(joined && (this.props.player.joined.rounds >= 0)) &&
