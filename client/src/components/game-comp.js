@@ -28,38 +28,38 @@ export default class GamesComp extends React.Component {
 
 	render() {
 		//TODO TEMP!!!!!!!!!!1
-		if (this.props.games.length < 5) {
-			this.props.games.push({
-				key: "A123456789001",
-				token: "A123456789001",
-				name: "Dummy Game 1",
-				host: { name: "Dummy1" }
-			});
-			this.props.games.push({
-				key: "A123456789002",
-				token: "A123456789002",
-				name: "Dummy Game 2",
-				host: { name: "Dummy2" }
-			});
-			this.props.games.push({
-				key: "A123456789003",
-				token: "A123456789003",
-				name: "Dummy Game 3",
-				host: { name: "Dummy3" }
-			});
-			this.props.games.push({
-				key: "A123456789004",
-				token: "A123456789004",
-				name: "Dummy Game 4",
-				host: { name: "Dummy4" }
-			});
-			this.props.games.push({
-				key: "A123456789005",
-				token: "A123456789005",
-				name: "Dummy Game 5",
-				host: { name: "Dummy5" }
-			});
-		}
+		// if (this.props.games.length < 5) {
+		// 	this.props.games.push({
+		// 		key: "A123456789001",
+		// 		token: "A123456789001",
+		// 		name: "Dummy Game 1",
+		// 		host: { name: "Dummy1" }
+		// 	});
+		// 	this.props.games.push({
+		// 		key: "A123456789002",
+		// 		token: "A123456789002",
+		// 		name: "Dummy Game 2",
+		// 		host: { name: "Dummy2" }
+		// 	});
+		// 	this.props.games.push({
+		// 		key: "A123456789003",
+		// 		token: "A123456789003",
+		// 		name: "Dummy Game 3",
+		// 		host: { name: "Dummy3" }
+		// 	});
+		// 	this.props.games.push({
+		// 		key: "A123456789004",
+		// 		token: "A123456789004",
+		// 		name: "Dummy Game 4",
+		// 		host: { name: "Dummy4" }
+		// 	});
+		// 	this.props.games.push({
+		// 		key: "A123456789005",
+		// 		token: "A123456789005",
+		// 		name: "Dummy Game 5",
+		// 		host: { name: "Dummy5" }
+		// 	});
+		// }
 
 		return (
 			<form onSubmit={this.handleSubmit}>

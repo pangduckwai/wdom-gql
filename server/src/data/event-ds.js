@@ -1,5 +1,5 @@
 const { DataSource } = require('apollo-datasource');
-const evn = require('../events');
+const evn = require('../const-events');
 
 class EventDS extends DataSource {
 	constructor({ store, rules }) {
@@ -74,13 +74,13 @@ class EventDS extends DataSource {
 				}
 				break;
 			case evn.GAME_JOINED.id:
-				obj = this.store.players[this.store.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 				if (obj) {
-					obj.joined = v.data[1];
+					obj.joined = v.token;
 				}
 				break;
 			case evn.GAME_LEFT.id:
-				obj = this.store.players[this.store.idxPlayerToken[v.token]];
+				obj = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 				if (obj) {
 					delete obj.joined;
 				}

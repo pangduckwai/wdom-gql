@@ -1,6 +1,6 @@
-const { UserInputError } = require('apollo-server');
+const { UserInputError } = require('apollo-server-express');
 const crypto = require('crypto');
-const evn = require('../events');
+const evn = require('../const-events');
 
 let copy = (orig) => {
 	let copy = {};
@@ -121,7 +121,7 @@ class EventStore {
 					if (payload.data.length < 2) {
 						rspn.message = "Missing player and/or game IDs";
 					} else {
-						rspn.successful = populate(obj, payload.data[0]);
+						rspn.successful = populate(obj, payload.data[1]);
 					}
 					break;
 				case evn.GAME_OPENED.id:

@@ -5,6 +5,7 @@ import Register from './register';
 import OpenGame from './game-open';
 import ListGames from './game-list';
 import StartGame from './game-start';
+import GameJoiners from './game-joiners';
 import './map.css';
 
 let convert = (tid) => {
@@ -34,6 +35,13 @@ export default class Main extends React.Component {
 		this.handleClick = this.handleClick.bind(this);
 		this.handleHover = this.handleHover.bind(this);
 	}
+
+	// componentDidMount() {
+	// 	// const { data: eventBroadcasted, loading } = useSubscription(BROADCAST_EVENT);
+	// 	this.props.subscribe({
+	// 		document: BROADCAST_EVENT
+	// 	});
+	// }
 
 	////////////////////////
 	// Component <Game /> //
@@ -100,17 +108,15 @@ export default class Main extends React.Component {
 					}
 					{(joined && (this.props.player.joined.host.token === this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
 						<>
+							<GameJoiners token={this.props.player.joined.token} type="host" />
 							<StartGame refetch={this.props.refetch} />
-							<ul>
-								<li>TODO!!!</li>
-								<li>Add subscription here...</li>
-								<li>... to display latest list of players...</li>
-								<li>... who joined this game.</li>
-							</ul>
 						</>
 					}
 					{(joined && (this.props.player.joined.host.token !== this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
-						<span>Wait for game to start...</span>
+						<>
+							<div className="title bb mt">Wait for game to start...</div>
+							<GameJoiners token={this.props.player.joined.token} type="guest" />
+						</>
 					}
 					{(joined && (this.props.player.joined.rounds >= 0)) &&
 						<span>Playing game...</span>

@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
 type Query {
@@ -24,6 +24,13 @@ type Mutation {
 	startTurn: Response
 	endTurn(from: String, to: String, amount: Int): Response
 	redeemCards(cards: [String]!): Response
+}
+
+type Subscription {
+	broadcastRegistered: Event
+	broadcastOpened: Event
+	broadcastJoined(token: String!): Event
+#	eventNotified(token: String!): Event
 }
 
 type Player {
@@ -78,6 +85,12 @@ type Response {
 	successful: Boolean!
 	message: String
 	event: Event
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
 }
 `;
 

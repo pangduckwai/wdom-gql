@@ -15,12 +15,14 @@
     "apollo-cache-inmemory": "^1.5.1",
     "apollo-client": "^2.5.1",
     "apollo-link-http": "^1.5.5",
+    "apollo-link-ws": "^1.0.18",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
     "html-webpack-plugin": "^3.2.0",
     "react": "^16.8.6",
     "react-apollo": "^2.5.1",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "subscriptions-transport-ws": "^0.9.16"
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",

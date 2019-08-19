@@ -37,6 +37,13 @@ query Myself {
 	}
 }`;
 
+export const JOINERS = gql`
+query Joiners {
+	myFellowPlayers {
+		name
+	}
+}`;
+
 export const ALL_GAMES = gql`
 query Games {
 	listGames {
