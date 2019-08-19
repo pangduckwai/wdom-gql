@@ -7,7 +7,7 @@ export default function OpenGame(props) {
 	const [openGame, { loading, error }] = useMutation(OPEN_GAME, {
 		onCompleted(data) {
 			if (data.openGame.successful) {
-				localStorage.setItem("gameToken", data.openGame.event.token);
+				sessionStorage.setItem("gameToken", data.openGame.event.token);
 			}
 		}
 	});

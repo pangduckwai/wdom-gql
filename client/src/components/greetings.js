@@ -8,7 +8,7 @@ export default function Greetings(props) {
 		const [quitPlayer, { loading, error }] = useMutation(QUIT_PLAYER, {
 			onCompleted(data) {
 				if (data.quitPlayer.successful) {
-					localStorage.setItem("token", "");
+					sessionStorage.setItem("token", "");
 				}
 			}
 		});
@@ -29,7 +29,7 @@ export default function Greetings(props) {
 		const [closeGame, { loading, error }] = useMutation(CLOSE_GAME, {
 			onCompleted(data) {
 				if (data.closeGame.successful) {
-					localStorage.setItem("gameToken", "");
+					sessionStorage.setItem("gameToken", "");
 				}
 			}
 		});
@@ -50,7 +50,7 @@ export default function Greetings(props) {
 		const [leaveGame, { loading, error }] = useMutation(LEAVE_GAME, {
 			onCompleted(data) {
 				if (data.leaveGame.successful) {
-					localStorage.setItem("gameToken", "");
+					sessionStorage.setItem("gameToken", "");
 				}
 			}
 		});

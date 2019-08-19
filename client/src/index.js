@@ -14,7 +14,7 @@ const cache = new InMemoryCache();
 const authHttp = new ApolloLink((operation, forward) => {
 	operation.setContext({
 		headers: {
-			authorization: localStorage.getItem('token') || null
+			authorization: sessionStorage.getItem('token') || null
 		}
 	});
 	return forward(operation);

@@ -7,7 +7,7 @@ export default function JoinGame(props) {
 	const [joinGame, { loading, error }] = useMutation(JOIN_GAME, {
 		onCompleted(data) {
 			if (data.joinGame.successful) {
-				localStorage.setItem("gameToken", data.joinGame.event.token);
+				sessionStorage.setItem("gameToken", data.joinGame.event.token);
 			}
 		}
 	});
