@@ -1,12 +1,14 @@
 import React from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
 import { MYSELF } from '../queries';
-import Main from './app-main';
-import { useSubscription } from '@apollo/react-hooks';
+import { TAKE_ACTION } from '../mutations';
 import { BROADCAST_EVENT } from '../subscriptions';
+import Main from './app-main';
 
 export default function App() {
-	const { data: self, loading, error, refetch } = useQuery(MYSELF);
+	const { data: self, loading: sloading, error: serror, refetch } = useQuery(MYSELF);
+
+	const [takeAction, { loading: aloading, error: aerror }] = useMutation(TAKE_ACTION);
 
 	useSubscription(BROADCAST_EVENT, {
 		onSubscriptionData: ({ _, subscriptionData }) => {
@@ -17,16 +19,22 @@ export default function App() {
 		}
 	});
 
-	if (loading) return <p>Loading...</p>;
+	if (sloading || aloading) return <p>Loading...</p>;
 
-	if (error) {
-		console.log(JSON.stringify(error));
+	if (serror) {
+		console.log(JSON.stringify(serror));
+		return <p>ERROR</p>;
+	}
+
+	if (aerror) {
+		console.log(JSON.stringify(aerror));
 		return <p>ERROR</p>;
 	}
 
 	return (
 		<Main
 			refetch={refetch}
+			action={takeAction}
 			player={self.me}
 			players={self.myFellowPlayers} />
 	);

@@ -4,10 +4,10 @@ import { BROADCAST_PROGRESS } from '../subscriptions';
 
 export default function GameStatus(props) {
 	useSubscription(BROADCAST_PROGRESS, {
-		variables: { token: props.token },
+		variables: { token: props.player.joined.token },
 		onSubscriptionData: ({ _, subscriptionData }) => {
 			if (subscriptionData.data && subscriptionData.data.broadcastProgress) {
-				console.log("BROADCAST_PROGRESS !!!", props.token, JSON.stringify(subscriptionData));
+				console.log("BROADCAST_PROGRESS !!!", props.player.joined.token, JSON.stringify(subscriptionData));
 				props.refetch();
 			}
 		}

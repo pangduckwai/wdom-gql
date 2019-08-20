@@ -255,6 +255,9 @@ module.exports = {
 					}
 
 					await dataSources.eventDS.updateSnapshot();
+					pubsub.publish(topics.BROADCAST_PROGRESS.topic, {
+						broadcastProgress: a.event, token: g.token
+					});
 					return a;
 				}
 			} else {

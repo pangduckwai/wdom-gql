@@ -70,6 +70,8 @@ export default class Main extends React.Component {
 				selected: value,
 				focused: value
 			});
+			this.props.action({ variables: { name: value }});
+			this.props.refetch();
 		}
 	}
 

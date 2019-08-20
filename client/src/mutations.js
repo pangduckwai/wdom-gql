@@ -104,3 +104,18 @@ mutation Start {
 		}
 	}
 }`;
+
+export const TAKE_ACTION = gql`
+mutation Action($name: String!) {
+	takeAction(name: $name) {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			name
+			token
+		}
+	}
+}`;
