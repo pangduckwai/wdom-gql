@@ -28,7 +28,7 @@ export default class OpenGameComp extends React.Component {
 
 	render() {
 		return (
-			<form onSubmit={this.handleSubmit}>
+			<form id="create" onSubmit={this.handleSubmit}>
 				<input type="text" placeholder="Name of new game" value={this.state.name} onChange={this.handleChange} />
 				<input type="submit" value="Create" />
 			</form>

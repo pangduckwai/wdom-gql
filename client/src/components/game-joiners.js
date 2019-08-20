@@ -32,7 +32,7 @@ export default function JoinerList(props) {
 			<div className="title">Joined players</div>
 			<ul className="list">
 				{data.myFellowPlayers.map((player, index) =>
-					<li key={index}>- {player.name}</li>
+					<li key={index}>- <span className="name">{player.name}</span></li>
 				)}
 			</ul>
 		</>

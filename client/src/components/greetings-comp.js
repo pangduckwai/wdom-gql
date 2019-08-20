@@ -18,7 +18,7 @@ export default class GreetingsComp extends React.Component {
 
 	render() {
 		return (
-			<form className="greeting" onSubmit={this.handleSubmit}>
+			<form id="greeting" onSubmit={this.handleSubmit}>
 				<label className="title">Welcome <span className="name">{this.props.player.name}</span></label>
 				<input type="submit" value="&times;" />
 			</form>

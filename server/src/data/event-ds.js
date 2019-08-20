@@ -77,6 +77,8 @@ class EventDS extends DataSource {
 				obj = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 				if (obj) {
 					obj.joined = v.token;
+					obj.reinforcement = 0;
+					obj.cards = [];
 				}
 				break;
 			case evn.GAME_LEFT.id:

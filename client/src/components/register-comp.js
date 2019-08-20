@@ -29,8 +29,8 @@ export default class RegisterComp extends React.Component {
 	render() {
 		return (
 			<>
-				<div className="title greeting">Register as a player</div>
-				<form onSubmit={this.handleSubmit}>
+				<div id="greeting" className="title">Register as a player</div>
+				<form id="create" onSubmit={this.handleSubmit}>
 					<input type="text" placeholder="Your name" value={this.state.name} onChange={this.handleChange} />
 					<input type="submit" value="Register player" />
 				</form>

@@ -37,15 +37,15 @@ export default function Map(props) {
 					onMouseOver={props.handleHover} />))}
 
 			<text className="tname" x="450" y="590">
-				Territory: {(props.selected === "") ? props.focused : props.selected}
+				Territory: <tspan className="data">{(props.selected === "") ? props.focused : props.selected}</tspan>
 			</text>
 
 			{(props.player && props.player.joined) &&
 				<>
 					<polyline
 						className={`player${playerIdx[props.player.name]}`}
-						points="870,588 870,548 910,558 870,568" />
-					<text className="tname" x="814" y="590">Player: {props.player.name}</text>
+						points="810,592 810,552 850,562 810,572" />
+					<text className="tname" x="814" y="590">Player: <tspan className="data">{props.player.name}</tspan></text>
 				</>
 			}
 		</svg>

@@ -15,7 +15,7 @@ export default function GameStatus(props) {
 
 	return (
 		<>
-			<div className="list">
+			<div className="status">
 				{(props.player.joined.rounds <= 0) ? (
 					<div>Round: <span className="name">Preparation</span></div>
 				) : (
@@ -32,9 +32,22 @@ export default function GameStatus(props) {
 			</div>
 			<div className="mt">Territories:</div>
 			<ul className="list">
-				{props.player.joined.territories.filter(t => t.owner.token === props.player.token).map((t, idx) =>
-					<li key={idx} className="ml"><span className="name">{t.name}</span></li>
-				)}
+				{props.player.joined.territories
+					.filter(t => t.owner.token === props.player.token)
+					.sort((a, b) => {
+						if (a.name < b.name) {
+							return -1;
+						} else if (a.name > b.name) {
+							return 1;
+						} else {
+							return 0;
+						}
+					})
+					.map((t, idx) =>
+						(<li key={idx} className="ml">
+							<span>{('00' + (idx + 1)).slice(-2)}.</span> <label className="name">{t.name}</label>
+						</li>)
+					)}
 			</ul>
 		</>
 	);

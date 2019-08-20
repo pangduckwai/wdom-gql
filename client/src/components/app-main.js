@@ -77,7 +77,7 @@ export default class Main extends React.Component {
 		const registed = this.props.player && !this.props.player.joined;
 		const joined = this.props.player && this.props.player.joined;
 		return (
-			<div className="game">
+			<>
 				<Map
 					selected={this.state.selected}
 					focused={this.state.focused}
@@ -87,7 +87,7 @@ export default class Main extends React.Component {
 					handleUnhover={this.handleUnhover}
 					handleClick={this.handleClick}
 					handleHover={this.handleHover} />
-				<div className="control">
+				<div id="control">
 					{(!this.props.player || !this.props.player.token) ? (
 						<Register refetch={this.props.refetch} />
 					) : (
@@ -111,7 +111,7 @@ export default class Main extends React.Component {
 					{(joined && (this.props.player.joined.host.token !== this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
 						<>
 							<JoinerList refetch={this.props.refetch} token={this.props.player.joined.token} />
-							<div className="msg mt mb">Wait for game to start...</div>
+							<div id="msg" className="mt mb">Wait for game to start...</div>
 						</>
 					}
 					{(joined && (this.props.player.joined.rounds >= 0)) &&
@@ -120,7 +120,7 @@ export default class Main extends React.Component {
 							player={this.props.player} />
 					}
 				</div>
-			</div>
+			</>
 		);
 	}
 }
