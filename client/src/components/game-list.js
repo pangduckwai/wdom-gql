@@ -5,18 +5,16 @@ import { useSubscription } from '@apollo/react-hooks';
 import { BROADCAST_OPENED } from '../subscriptions';
 import JoinGame from './game-join';
 
-export default function ListGames(props) {
-	const { data, loading, error, refetch } = useQuery(ALL_GAMES);
+export default function GameList(props) {
+	const { data, loading, error, refetch } = useQuery(ALL_GAMES, {
+		fetchPolicy: "cache-and-network"
+	});
 
 	useSubscription(BROADCAST_OPENED, {
 		onSubscriptionData: ({ _, subscriptionData }) => {
 			if (subscriptionData.data && subscriptionData.data.broadcastOpened) {
-				console.log("SUBSCRIPTION!!!", JSON.stringify(subscriptionData));
+				console.log("BROADCAST_OPENED !!!", JSON.stringify(subscriptionData));
 				refetch();
-				if (subscriptionData.data.broadcastOpened.event === 6) {
-					console.log("Close game! Refetch");
-					props.refetch();
-				}
 			}
 		}
 	});

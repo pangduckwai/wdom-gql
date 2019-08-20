@@ -27,10 +27,20 @@ type Mutation {
 }
 
 type Subscription {
+	# Generic broadcast to all clients
+	broadcastEvent: Event
+
+	# Broadcast new player registering
 	broadcastRegistered: Event
+
+	# Broadcast new game opening
 	broadcastOpened: Event
-	broadcastJoined(token: String!): Event
-#	eventNotified(token: String!): Event
+
+	# Events of game preparation
+	broadcastPrepare(token: String!): Event
+
+	# Events of game progress
+	broadcastProgress(token: String!): Event
 }
 
 type Player {

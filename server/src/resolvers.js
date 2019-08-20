@@ -94,6 +94,7 @@ module.exports = {
 
 			await dataSources.eventDS.updateSnapshot();
 			pubsub.publish(topics.BROADCAST_OPENED.topic, { broadcastOpened: k.event });
+			pubsub.publish(topics.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
 			return k;
 		},
 		joinGame: async (_, { token }, { dataSources }) => {
@@ -116,8 +117,8 @@ module.exports = {
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_JOINED.topic, {
-				broadcastJoined: k.event, token: k.event.token
+			pubsub.publish(topics.BROADCAST_PREPARE.topic, {
+				broadcastPrepare: k.event, token: k.event.token
 			});
 			return k;
 		},
@@ -134,9 +135,10 @@ module.exports = {
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_JOINED.topic, {
-				broadcastJoined: k.event, token: k.event.token
+			pubsub.publish(topics.BROADCAST_PREPARE.topic, {
+				broadcastPrepare: k.event, token: k.event.token
 			});
+			pubsub.publish(topics.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
 			return k;
 		},
 		startGame: async (_, __, { dataSources }) => {
@@ -190,6 +192,9 @@ module.exports = {
 			}
 
 			await dataSources.eventDS.updateSnapshot();
+			pubsub.publish(topics.BROADCAST_PREPARE.topic, {
+				broadcastPrepare: k.event, token: k.event.token
+			});
 			return k;
 		},
 		takeAction: async (_, { name }, { dataSources }) => {
@@ -420,15 +425,26 @@ module.exports = {
 		}
 	},
 	Subscription: {
+		broadcastEvent: {
+			subscribe: () => pubsub.asyncIterator(topics.BROADCAST_EVENT.topic)
+		},
 		broadcastRegistered: {
 			subscribe: () => pubsub.asyncIterator(topics.BROADCAST_REGISTERED.topic)
 		},
 		broadcastOpened: {
 			subscribe: () => pubsub.asyncIterator(topics.BROADCAST_OPENED.topic)
 		},
-		broadcastJoined: {
+		broadcastPrepare: {
 			subscribe: withFilter(
-				() => pubsub.asyncIterator(topics.BROADCAST_JOINED.topic),
+				() => pubsub.asyncIterator(topics.BROADCAST_PREPARE.topic),
+				(payload, variables) => {
+					return payload.token === variables.token;
+				}
+			)
+		},
+		broadcastProgress: {
+			subscribe: withFilter(
+				() => pubsub.asyncIterator(topics.BROADCAST_PROGRESS.topic),
 				(payload, variables) => {
 					return payload.token === variables.token;
 				}

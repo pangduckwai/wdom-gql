@@ -3,9 +3,10 @@ import Map from './map';
 import Greetings from './greetings';
 import Register from './register';
 import OpenGame from './game-open';
-import ListGames from './game-list';
+import GameList from './game-list';
 import StartGame from './game-start';
-import GameJoiners from './game-joiners';
+import JoinerList from './game-joiners';
+import GameStatus from './game-status';
 import './map.css';
 
 let convert = (tid) => {
@@ -35,13 +36,6 @@ export default class Main extends React.Component {
 		this.handleClick = this.handleClick.bind(this);
 		this.handleHover = this.handleHover.bind(this);
 	}
-
-	// componentDidMount() {
-	// 	// const { data: eventBroadcasted, loading } = useSubscription(BROADCAST_EVENT);
-	// 	this.props.subscribe({
-	// 		document: BROADCAST_EVENT
-	// 	});
-	// }
 
 	////////////////////////
 	// Component <Game /> //
@@ -102,7 +96,7 @@ export default class Main extends React.Component {
 					{registed &&
 						<>
 							<OpenGame refetch={this.props.refetch} />
-							<ListGames refetch={this.props.refetch} />
+							<GameList refetch={this.props.refetch} />
 						</>
 					}
 					{joined &&
@@ -110,18 +104,20 @@ export default class Main extends React.Component {
 					}
 					{(joined && (this.props.player.joined.host.token === this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
 						<>
-							<GameJoiners refetch={this.props.refetch} token={this.props.player.joined.token} />
+							<JoinerList refetch={this.props.refetch} token={this.props.player.joined.token} />
 							<StartGame refetch={this.props.refetch} />
 						</>
 					}
 					{(joined && (this.props.player.joined.host.token !== this.props.player.token) && (this.props.player.joined.rounds < 0)) &&
 						<>
-							<GameJoiners refetch={this.props.refetch} token={this.props.player.joined.token} />
+							<JoinerList refetch={this.props.refetch} token={this.props.player.joined.token} />
 							<div className="msg mt mb">Wait for game to start...</div>
 						</>
 					}
 					{(joined && (this.props.player.joined.rounds >= 0)) &&
-						<span>Playing game...</span>
+						<GameStatus
+							refetch={this.props.refetch}
+							player={this.props.player} />
 					}
 				</div>
 			</div>

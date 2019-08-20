@@ -2,20 +2,19 @@ import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { JOINERS } from '../queries';
 import { useSubscription } from '@apollo/react-hooks';
-import { BROADCAST_JOINED } from '../subscriptions';
+import { BROADCAST_PREPARE } from '../subscriptions';
 
-export default function GameJoiners(props) {
+export default function JoinerList(props) {
 	const { data, loading, error, refetch } = useQuery(JOINERS);
 
-	useSubscription(BROADCAST_JOINED, {
+	useSubscription(BROADCAST_PREPARE, {
 		variables: { token: props.token },
 		onSubscriptionData: ({ _, subscriptionData }) => {
-			if (subscriptionData.data && subscriptionData.data.broadcastJoined) {
-				console.log("SUBSCRIPTION!!!", JSON.stringify(subscriptionData));
+			if (subscriptionData.data && subscriptionData.data.broadcastPrepare) {
+				console.log("BROADCAST_PREPARE !!!", props.token, JSON.stringify(subscriptionData));
 				refetch();
-				if (subscriptionData.data.broadcastJoined.event === 4) {
-					console.log("Leave game! Refetch");
-					props.refetch();
+				if (subscriptionData.data.broadcastPrepare.event === 7) {
+					props.refetch(); //Game started
 				}
 			}
 		}

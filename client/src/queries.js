@@ -21,11 +21,13 @@ query Myself {
 			}
 			turn {
 				token
+				name
 			}
 			rounds
 			territories {
 				name
 				owner {
+					token
 					name
 				}
 				troops
