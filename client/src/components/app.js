@@ -1,33 +1,33 @@
 import React from 'react';
-import { useQuery, useMutation, useSubscription } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { MYSELF } from '../queries';
 import { TAKE_ACTION } from '../mutations';
-import { BROADCAST_EVENT } from '../subscriptions';
+// import { BROADCAST_EVENT } from '../subscriptions';
 import Main from './app-main';
 
 export default function App() {
-	const { data: self, loading: sloading, error: serror, refetch } = useQuery(MYSELF);
+	const { data, loading, error, refetch } = useQuery(MYSELF);
 
-	const [takeAction, { loading: aloading, error: aerror }] = useMutation(TAKE_ACTION);
+	const [takeAction, { loading: mLoading, error: mError }] = useMutation(TAKE_ACTION);
 
-	useSubscription(BROADCAST_EVENT, {
-		onSubscriptionData: ({ _, subscriptionData }) => {
-			if (subscriptionData.data && subscriptionData.data.broadcastEvent) {
-				console.log("BROADCAST_EVENT !!!", JSON.stringify(subscriptionData));
-				refetch();
-			}
-		}
-	});
+	// useSubscription(BROADCAST_EVENT, {
+	// 	onSubscriptionData: ({ _, subscriptionData }) => {
+	// 		if (subscriptionData.data && subscriptionData.data.broadcastEvent) {
+	// 			console.log("BROADCAST_EVENT !!!", JSON.stringify(subscriptionData));
+	// 			refetch();
+	// 		}
+	// 	}
+	// });
 
-	if (sloading || aloading) return <p>Loading...</p>;
+	if (loading || mLoading) return <p>Loading...</p>;
 
-	if (serror) {
-		console.log(JSON.stringify(serror));
+	if (error) {
+		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
 	}
 
-	if (aerror) {
-		console.log(JSON.stringify(aerror));
+	if (mError) {
+		console.log(JSON.stringify(mError));
 		return <p>ERROR</p>;
 	}
 
@@ -35,7 +35,7 @@ export default function App() {
 		<Main
 			refetch={refetch}
 			action={takeAction}
-			player={self.me}
-			players={self.myFellowPlayers} />
+			player={data.me}
+			players={data.myFellowPlayers} />
 	);
 }

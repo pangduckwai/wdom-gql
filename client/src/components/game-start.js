@@ -1,10 +1,16 @@
 import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { START_GAME } from '../mutations';
-import StartGameComp from './game-start-comp';
 
 export default function StartGame(props) {
 	const [startGame, { loading, error }] = useMutation(START_GAME);
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		startGame().then(r => {
+			props.refetch();
+		});
+	};
 
 	if (loading) return <p>Loading...</p>;
 
@@ -14,8 +20,8 @@ export default function StartGame(props) {
 	}
 
 	return (
-		<StartGameComp
-			startGame={startGame}
-			refetch={props.refetch} />
+		<form className="game-ctrl" onSubmit={handleSubmit}>
+			<input type="submit" value="Start Game" />
+		</form>
 	);
 }

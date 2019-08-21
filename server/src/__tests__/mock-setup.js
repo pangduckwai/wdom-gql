@@ -31,10 +31,10 @@ module.exports.mockSetup = async ({ eventDS }) => {
 	await eventDS.updateSnapshot();
 	await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[3], gtokens[3]] }});
 	await eventDS.updateSnapshot();
-	await eventDS.add({ event: evn.GAME_OPENED, payload: { name: "Dave's Game", data: [ ptokens[4] ]}}).then(r => gtokens.push(r.event.token));
-	await eventDS.updateSnapshot();
-	await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[4], gtokens[4]] }});
-	await eventDS.updateSnapshot();
+	// await eventDS.add({ event: evn.GAME_OPENED, payload: { name: "Dave's Game", data: [ ptokens[4] ]}}).then(r => gtokens.push(r.event.token));
+	// await eventDS.updateSnapshot();
+	// await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[4], gtokens[4]] }});
+	// await eventDS.updateSnapshot();
 
 	// await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[2], gtokens[1]] }});
 	// await eventDS.updateSnapshot();

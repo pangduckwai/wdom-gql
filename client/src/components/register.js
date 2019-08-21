@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { REGISTER } from '../mutations';
-import RegisterComp from './register-comp';
 
 export default function Register(props) {
+	const [name, setName] = useState("");
+
 	const [register, { loading, error }] = useMutation(REGISTER, {
 		onCompleted(data) {
 			if (data.registerPlayer.successful) {
@@ -11,6 +12,13 @@ export default function Register(props) {
 			}
 		}
 	});
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		register({ variables: { name: name }}).then(r => {
+			props.refetch();
+		});
+	};
 
 	if (loading) return <p>Loading...</p>;
 
@@ -20,8 +28,12 @@ export default function Register(props) {
 	}
 
 	return (
-		<RegisterComp
-			register={register}
-			refetch={props.refetch} />
+		<>
+			<div id="greeting" className="title">Register as player</div>
+			<form id="create" onSubmit={handleSubmit}>
+				<input type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
+				<input type="submit" value="Register player" />
+			</form>
+		</>
 	);
 }
