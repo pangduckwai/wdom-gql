@@ -1,17 +1,17 @@
 import React from 'react';
-import { useSubscription } from '@apollo/react-hooks';
-import { BROADCAST_PROGRESS } from '../subscriptions';
+// import { useSubscription } from '@apollo/react-hooks';
+// import { BROADCAST_PROGRESS } from '../subscriptions';
 
 export default function GameStatus(props) {
-	useSubscription(BROADCAST_PROGRESS, {
-		variables: { token: props.player.joined.token },
-		onSubscriptionData: ({ _, subscriptionData }) => {
-			if (subscriptionData.data && subscriptionData.data.broadcastProgress) {
-				console.log("BROADCAST_PROGRESS !!!", props.player.joined.token, JSON.stringify(subscriptionData));
-				props.refetch();
-			}
-		}
-	});
+	// useSubscription(BROADCAST_PROGRESS, {
+	// 	variables: { token: props.player.joined.token },
+	// 	onSubscriptionData: ({ _, subscriptionData }) => {
+	// 		if (subscriptionData.data && subscriptionData.data.broadcastProgress) {
+	// 			console.log("BROADCAST_PROGRESS !!!", props.player.joined.token, JSON.stringify(subscriptionData));
+	// 			props.refetch();
+	// 		}
+	// 	}
+	// });
 
 	return (
 		<>

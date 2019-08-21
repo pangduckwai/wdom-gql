@@ -1,5 +1,5 @@
 import React from 'react';
-import { MAP, LINK, LINE } from '../constants';
+import { MAP, LINK, LINE } from '../consts';
 import Territory from './territory';
 import './map.css';
 

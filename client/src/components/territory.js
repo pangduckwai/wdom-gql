@@ -1,5 +1,5 @@
 import React from 'react';
-import { MAP } from '../constants';
+import { MAP } from '../consts';
 import './map.css';
 
 export default function Territory(props) {
