@@ -22,15 +22,6 @@ export default function App() {
 		fetchPolicy: "cache-and-network"
 	});
 
-	// useSubscription(BROADCAST_EVENT, {
-	// 	onSubscriptionData: ({ _, subscriptionData }) => {
-	// 		if (subscriptionData.data && subscriptionData.data.broadcastEvent) {
-	// 			console.log("BROADCAST_EVENT !!!", JSON.stringify(subscriptionData));
-	// 			refetch();
-	// 		}
-	// 	}
-	// });
-
 	const registed = (data.me && !data.me.joined);
 	const joined = (data.me && data.me.joined);
 
@@ -40,7 +31,7 @@ export default function App() {
 			if (joined) {
 				refetch();
 				break;
-			} // else go to case 5...
+			} // else go to case 5....
 		case 5:
 			setGameList(gameList + 1);
 			break;
@@ -51,8 +42,8 @@ export default function App() {
 		case 7:
 			refetch();
 			break;
-		case 23:
-			setMapComp(mapComp + 1); // TODO TEMP there is no event with number 23...
+		case 9:
+			setMapComp(mapComp + 1);
 			break;
 		default:
 			console.log("Event", event, "received...");
@@ -60,8 +51,11 @@ export default function App() {
 		}
 	};
 
-	// if (loading || mLoading) return <p>Loading...</p>;
-	if (loading) return <p>Loading...</p>;
+	const mapClicked = () => {
+		refetch();
+	};
+
+	if (loading) return <p>'Myself' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));
@@ -73,6 +67,7 @@ export default function App() {
 			<Map
 				refetch={refetch}
 				player={data.me}
+				clicked={mapClicked}
 				key={mapComp} />
 			<div id="control">
 				{(!data.me || !data.me.token) ? (
@@ -104,7 +99,8 @@ export default function App() {
 				{(joined && (data.me.joined.rounds >= 0)) &&
 					<GameStatus
 						refetch={refetch}
-						player={data.me} />
+						player={data.me}
+						key={mapComp} />
 				}
 			</div>
 			{registed &&

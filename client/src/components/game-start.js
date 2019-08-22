@@ -12,7 +12,7 @@ export default function StartGame(props) {
 		});
 	};
 
-	if (loading) return <p>Loading...</p>;
+	if (loading) return <p>'StartGame' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));

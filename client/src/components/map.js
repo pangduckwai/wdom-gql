@@ -12,7 +12,7 @@ export default function Map(props) {
 	const [selected, setSelected] = useState("");
 
 	const { data, loading, error } = useQuery(MY_GAME, {
-		fetchPolicy: "cache-and-network"
+		fetchPolicy: "no-cache"
 	});
 
 	const [takeAction, { loading: mLoading, error: mError }] = useMutation(TAKE_ACTION);
@@ -27,7 +27,7 @@ export default function Map(props) {
 	const territoryIdx = {};
 	const playerIdx = {};
 	if (props.player && props.player.joined && data.myGame) {
-		for (let i = 0; i < data.myGame.territories; i ++) {
+		for (let i = 0; i < data.myGame.territories.length; i ++) {
 			territoryIdx[data.myGame.territories[i].name] = i;
 		}
 		for (let i = 0; i < data.myFellowPlayers.length; i ++) {
@@ -68,7 +68,7 @@ export default function Map(props) {
 			if (data.myGame.rounds === 0) {
 				if (isOwned) {
 					takeAction({ variables: { name: value }});
-					props.refetch();
+					props.clicked();
 				}
 			} else if (data.myGame.rounds > 0) {
 				if (isOwned) {
@@ -82,7 +82,7 @@ export default function Map(props) {
 		}
 	};
 
-	if (loading || mLoading) return <p>Loading...</p>;
+	if (loading || mLoading) return <p>'Map' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));

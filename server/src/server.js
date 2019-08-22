@@ -49,7 +49,7 @@ xprs.use(helmet());
 // });
 let limiter = new limit({
 	windowMs: 900000, // 900,000 == 15*60*1000 == 15 minutes
-	max: 150,
+	max: 1500,
 	delayMs: 0 // disabled
 });
 xprs.use(limiter);

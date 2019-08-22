@@ -247,7 +247,7 @@ module.exports = {
 					}
 
 					await dataSources.eventDS.updateSnapshot();
-					// pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: a.event, token: p.token });
+					pubsub.publish(events.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: a.event, token: g.token });
 					return a;
 				}
 			} else {

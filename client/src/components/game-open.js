@@ -20,7 +20,7 @@ export default function OpenGame(props) {
 		});
 	};
 
-	if (loading) return <p>Loading...</p>;
+	if (loading) return <p>'OpenGame' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));
@@ -29,7 +29,7 @@ export default function OpenGame(props) {
 
 	return (
 		<form id="create" onSubmit={handleSubmit}>
-			<input type="text" placeholder="Name of new game" value={name} onChange={e => setName(e.target.value)} />
+			<input type="text" placeholder="Name of new game" autoFocus value={name} onChange={e => setName(e.target.value)} />
 			<input type="submit" value="Create" />
 		</form>
 	);

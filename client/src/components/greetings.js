@@ -40,7 +40,7 @@ export default function Greetings(props) {
 		});
 	};
 
-	if (loading) return <p>Loading...</p>;
+	if (loading) return <p>'Greetings' Loading...</p>;
 	if (error) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;

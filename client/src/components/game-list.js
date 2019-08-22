@@ -25,7 +25,7 @@ export default function GameList(props) {
 		});
 	};
 
-	if (loading || mLoading) return <p>Loading...</p>;
+	if (loading || mLoading) return <p>'GameList' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));

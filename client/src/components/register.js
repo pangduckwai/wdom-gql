@@ -20,7 +20,7 @@ export default function Register(props) {
 		});
 	};
 
-	if (loading) return <p>Loading...</p>;
+	if (loading) return <p>'Register' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));
@@ -31,7 +31,7 @@ export default function Register(props) {
 		<>
 			<div id="greeting" className="title">Register as player</div>
 			<form id="create" onSubmit={handleSubmit}>
-				<input type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
+				<input type="text" placeholder="Your name" autoFocus value={name} onChange={e => setName(e.target.value)} />
 				<input type="submit" value="Register player" />
 			</form>
 		</>

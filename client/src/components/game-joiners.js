@@ -7,7 +7,7 @@ export default function JoinerList() {
 		fetchPolicy: "no-cache"
 	});
 
-	if (loading) return <p>Loading...</p>;
+	if (loading) return <p>'Joiners' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));
