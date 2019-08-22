@@ -186,7 +186,7 @@ module.exports = {
 			}
 
 			await dataSources.eventDS.updateSnapshot();
-			// pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: k.event, token: p.token });
+			pubsub.publish(events.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
 			return k;
 		},
 		takeAction: async (_, { name }, { dataSources }) => {

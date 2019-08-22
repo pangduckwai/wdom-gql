@@ -3,7 +3,7 @@ const session = require('cookie-session')
 const helmet = require('helmet');
 // const csrf = require('csurf');
 const limit = require('express-rate-limit');
-const cors = require('cors'); //TODO TEMP: not for production use!!!
+// const cors = require('cors'); //TODO TEMP: not for production use!!!
 
 const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
@@ -21,6 +21,14 @@ const { SubscriptionServer } = require('subscriptions-transport-ws');
 ///////////////////
 ///// Express /////
 const xprs = express();
+
+//TODO TEMP!!!
+xprs.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
+
 xprs.set('trust proxy', 1); // trust first proxy
 xprs.use(session({
 		name: 'session',
@@ -45,7 +53,7 @@ let limiter = new limit({
 	delayMs: 0 // disabled
 });
 xprs.use(limiter);
-xprs.use(cors()); //TODO TEMP: not for production use!!!
+// xprs.use(cors()); //TODO TEMP: not for production use!!!
 
 //////////////////
 ///// Apollo /////

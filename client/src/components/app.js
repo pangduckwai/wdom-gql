@@ -17,22 +17,15 @@ import { convert } from '../utils';
 import './map.css';
 
 export default function App() {
-	const [focused, setFocused] = useState("");
-	const [selected, setSelected] = useState("");
+	const [mapComp, setMapComp] = useState(0);
 	const [gameList, setGameList] = useState(0);
 	const [joinGame, setJoinGame] = useState(0);
 
+	const [focused, setFocused] = useState("");
+	const [selected, setSelected] = useState("");
+
 	const { data, loading, error, refetch } = useQuery(MYSELF, {
 		fetchPolicy: "cache-and-network"
-		// onCompleted(data) {
-		// 	if (!data.me) {
-		// 		setPtoken(null);
-		// 		setGtoken(null);
-		// 	} else {
-		// 		if (data.me) setPtoken(data.me.token);
-		// 		if (data.me.joined) setGtoken(data.me.joined.token);
-		// 	}
-		// }
 	});
 
 	// const [takeAction, { loading: mLoading, error: mError }] = useMutation(TAKE_ACTION);
@@ -83,14 +76,22 @@ export default function App() {
 	const eventReceived = (event) => {
 		switch (event) {
 		case 6:
-			if (!joined) setGameList(gameList + 1);
-			break;
+			if (joined) {
+				refetch();
+				break;
+			} // else go to case 5...
 		case 5:
 			setGameList(gameList + 1);
 			break;
-		case 4:
 		case 3:
+		case 4:
 			setJoinGame(joinGame + 1);
+			break;
+		case 7:
+			refetch();
+			break;
+		case 23:
+			setMapComp(mapComp + 1); // TODO TEMP there is no event with number 23...
 			break;
 		default:
 			console.log("Event", event, "received...");
@@ -121,7 +122,8 @@ export default function App() {
 				handleClear={handleClear}
 				handleUnhover={handleUnhover}
 				handleClick={handleClick}
-				handleHover={handleHover} />
+				handleHover={handleHover}
+				key={mapComp} />
 			<div id="control">
 				{(!data.me || !data.me.token) ? (
 					<Register refetch={refetch} />

@@ -4,7 +4,7 @@ import { JOINERS } from '../queries';
 
 export default function JoinerList() {
 	const { data, loading, error } = useQuery(JOINERS, {
-		fetchPolicy: "cache-and-network"
+		fetchPolicy: "no-cache"
 	});
 
 	if (loading) return <p>Loading...</p>;
