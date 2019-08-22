@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-// import { useQuery, useMutation } from '@apollo/react-hooks';
 import { useQuery } from '@apollo/react-hooks';
 import { MYSELF } from '../queries';
-// import { TAKE_ACTION } from '../mutations';
 import Subscriber from './subscriber';
 import GameSubscriber from './subscriber-game';
 import Map from './map';
@@ -13,7 +11,6 @@ import GameList from './game-list';
 import StartGame from './game-start';
 import JoinerList from './game-joiners';
 import GameStatus from './game-status';
-import { convert } from '../utils';
 import './map.css';
 
 export default function App() {
@@ -21,14 +18,9 @@ export default function App() {
 	const [gameList, setGameList] = useState(0);
 	const [joinGame, setJoinGame] = useState(0);
 
-	const [focused, setFocused] = useState("");
-	const [selected, setSelected] = useState("");
-
 	const { data, loading, error, refetch } = useQuery(MYSELF, {
 		fetchPolicy: "cache-and-network"
 	});
-
-	// const [takeAction, { loading: mLoading, error: mError }] = useMutation(TAKE_ACTION);
 
 	// useSubscription(BROADCAST_EVENT, {
 	// 	onSubscriptionData: ({ _, subscriptionData }) => {
@@ -38,37 +30,6 @@ export default function App() {
 	// 		}
 	// 	}
 	// });
-
-	const handleClear = (e) => {
-		e.preventDefault();
-		setSelected("");
-	};
-
-	const handleUnhover = (e) => {
-		e.preventDefault();
-		setFocused("");
-	};
-
-	const handleHover = (e) => {
-		e.stopPropagation();
-		e.nativeEvent.stopImmediatePropagation();
-		if (typeof(e.target.dataset.tid) !== "undefined") {
-			const value = convert(e.target.dataset.tid);
-			setFocused(value);
-		}
-	};
-
-	const handleClick = (e) => {
-		e.stopPropagation();
-		e.nativeEvent.stopImmediatePropagation();
-		if (typeof(e.target.dataset.tid) !== "undefined") {
-			const value = convert(e.target.dataset.tid);
-			setFocused(value);
-			setSelected(value);
-			// takeAction({ variables: { name: value }});
-			// refetch();
-		}
-	};
 
 	const registed = (data.me && !data.me.joined);
 	const joined = (data.me && data.me.joined);
@@ -107,22 +68,11 @@ export default function App() {
 		return <p>ERROR</p>;
 	}
 
-	// if (mError) {
-	// 	console.log(JSON.stringify(mError));
-	// 	return <p>ERROR</p>;
-	// }
-
 	return (
 		<>
 			<Map
-				focused={focused}
-				selected={selected}
+				refetch={refetch}
 				player={data.me}
-				players={data.myFellowPlayers}
-				handleClear={handleClear}
-				handleUnhover={handleUnhover}
-				handleClick={handleClick}
-				handleHover={handleHover}
 				key={mapComp} />
 			<div id="control">
 				{(!data.me || !data.me.token) ? (
