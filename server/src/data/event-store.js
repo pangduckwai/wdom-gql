@@ -1,6 +1,6 @@
 const { UserInputError } = require('apollo-server-express');
 const crypto = require('crypto');
-const evn = require('../const-events');
+const evn = require('../consts');
 
 let copy = (orig) => {
 	let copy = {};

@@ -1,5 +1,5 @@
 const { DataSource } = require('apollo-datasource');
-const evn = require('../const-events');
+const evn = require('../consts');
 
 class EventDS extends DataSource {
 	constructor({ store, rules }) {

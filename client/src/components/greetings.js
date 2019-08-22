@@ -8,7 +8,7 @@ export default function Greetings(props) {
 			return [QUIT_PLAYER, {
 				onCompleted(data) {
 					if (data.quitPlayer.successful) {
-						sessionStorage.setItem("token", "");
+						sessionStorage.setItem("token", null);
 					}
 				}
 			}];
@@ -16,7 +16,7 @@ export default function Greetings(props) {
 			return [CLOSE_GAME, {
 				onCompleted(data) {
 					if (data.closeGame.successful) {
-						sessionStorage.setItem("gameToken", "");
+						sessionStorage.setItem("gameToken", null);
 					}
 				}
 			}];
@@ -24,7 +24,7 @@ export default function Greetings(props) {
 			return [LEAVE_GAME, {
 				onCompleted(data) {
 					if (data.leaveGame.successful) {
-						sessionStorage.setItem("gameToken", "");
+						sessionStorage.setItem("gameToken", null);
 					}
 				}
 			}];

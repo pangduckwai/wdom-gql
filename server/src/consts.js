@@ -43,5 +43,11 @@ module.exports = Object.freeze({
 		id: 21, type: "GN"
 	}, TURN_ENDED: {
 		id: 22, type: "GN"
+	},
+
+	BROADCAST_EVENT: {
+		topic: "BROADCAST_EVENT"
+	}, BROADCAST_GAME_EVENT: {
+		topic: "BROADCAST_GAME_EVENT"
 	}
 });

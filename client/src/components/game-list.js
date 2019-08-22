@@ -2,14 +2,10 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { ALL_GAMES } from '../queries';
 import { JOIN_GAME } from '../mutations';
-// import { useSubscription } from '@apollo/react-hooks';
-// import { BROADCAST_OPENED } from '../subscriptions';
-// import JoinGame from './game-join';
 
 export default function GameList(props) {
 	const [value, setValue] = useState("");
 
-	// const { data, loading, error, refetch } = useQuery(ALL_GAMES, {
 	const { data, loading, error } = useQuery(ALL_GAMES, {
 		fetchPolicy: "cache-and-network"
 	});
@@ -21,15 +17,6 @@ export default function GameList(props) {
 			}
 		}
 	});
-
-	// useSubscription(BROADCAST_OPENED, {
-	// 	onSubscriptionData: ({ _, subscriptionData }) => {
-	// 		if (subscriptionData.data && subscriptionData.data.broadcastOpened) {
-	// 			console.log("BROADCAST_OPENED !!!", JSON.stringify(subscriptionData));
-	// 			refetch();
-	// 		}
-	// 	}
-	// });
 
 	const handleSubmit = (e) => {
 		e.preventDefault();

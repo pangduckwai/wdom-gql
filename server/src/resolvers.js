@@ -1,7 +1,6 @@
 const { UserInputError } = require('apollo-server-express');
 const { PubSub, withFilter } = require('graphql-subscriptions');
-const events = require('./const-events');
-const topics = require('./const-topics');
+const events = require('./consts');
 
 const pubsub = new PubSub();
 
@@ -42,7 +41,7 @@ module.exports = {
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_REGISTERED.topic, { broadcastRegistered: q.event });
+			// pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: q.event });
 			return q;
 		},
 		quitPlayer: async (_, __, { dataSources }) => {
@@ -53,7 +52,7 @@ module.exports = {
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_REGISTERED.topic, { broadcastRegistered: q.event });
+			// pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: q.event });
 			return q;
 		},
 		openGame: async (_, { name }, { dataSources }) => {
@@ -74,7 +73,7 @@ module.exports = {
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_OPENED.topic, { broadcastOpened: h.event });
+			pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: h.event });
 			return h;
 		},
 		closeGame: async (_, __, { dataSources }) => {
@@ -93,8 +92,8 @@ module.exports = {
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_OPENED.topic, { broadcastOpened: k.event });
-			pubsub.publish(topics.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
+			pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
+			pubsub.publish(events.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
 			return k;
 		},
 		joinGame: async (_, { token }, { dataSources }) => {
@@ -117,9 +116,7 @@ module.exports = {
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_PREPARE.topic, {
-				broadcastPrepare: k.event, token: k.event.token
-			});
+			pubsub.publish(events.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: token });
 			return k;
 		},
 		leaveGame: async (_, __, { dataSources }) => {
@@ -135,10 +132,7 @@ module.exports = {
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_PREPARE.topic, {
-				broadcastPrepare: k.event, token: k.event.token
-			});
-			pubsub.publish(topics.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
+			pubsub.publish(events.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
 			return k;
 		},
 		startGame: async (_, __, { dataSources }) => {
@@ -192,9 +186,7 @@ module.exports = {
 			}
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(topics.BROADCAST_PREPARE.topic, {
-				broadcastPrepare: k.event, token: k.event.token
-			});
+			// pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: k.event, token: p.token });
 			return k;
 		},
 		takeAction: async (_, { name }, { dataSources }) => {
@@ -255,9 +247,7 @@ module.exports = {
 					}
 
 					await dataSources.eventDS.updateSnapshot();
-					pubsub.publish(topics.BROADCAST_PROGRESS.topic, {
-						broadcastProgress: a.event, token: g.token
-					});
+					// pubsub.publish(events.BROADCAST_EVENT.topic, { broadcastEvent: a.event, token: p.token });
 					return a;
 				}
 			} else {
@@ -429,34 +419,16 @@ module.exports = {
 	},
 	Subscription: {
 		broadcastEvent: {
-			subscribe: () => pubsub.asyncIterator(topics.BROADCAST_EVENT.topic)
+			subscribe: () => pubsub.asyncIterator(events.BROADCAST_EVENT.topic)
 		},
-		broadcastRegistered: {
-			subscribe: () => pubsub.asyncIterator(topics.BROADCAST_REGISTERED.topic)
-		},
-		broadcastOpened: {
-			subscribe: () => pubsub.asyncIterator(topics.BROADCAST_OPENED.topic)
-		},
-		broadcastPrepare: {
+		broadcastGameEvent: {
 			subscribe: withFilter(
-				() => pubsub.asyncIterator(topics.BROADCAST_PREPARE.topic),
-				(payload, variables) => {
-					return payload.token === variables.token;
-				}
-			)
-		},
-		broadcastProgress: {
-			subscribe: withFilter(
-				() => pubsub.asyncIterator(topics.BROADCAST_PROGRESS.topic),
+				() => pubsub.asyncIterator(events.BROADCAST_GAME_EVENT.topic),
 				(payload, variables) => {
 					return payload.token === variables.token;
 				}
 			)
 		}
-		// eventAdded: {
-		// 	subscribe: withFilter(
-		// 		() => pubsub.asyncIterator(env.EVENT_ADDED.value)
-		// }
 	},
 	Player: {
 		joined: (player, _, { dataSources }) => {

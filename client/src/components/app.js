@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { MYSELF } from '../queries';
 // import { TAKE_ACTION } from '../mutations';
+import Subscriber from './subscriber';
+import GameSubscriber from './subscriber-game';
 import Map from './map';
 import Greetings from './greetings';
 import Register from './register';
@@ -13,13 +15,25 @@ import JoinerList from './game-joiners';
 import GameStatus from './game-status';
 import { convert } from '../utils';
 import './map.css';
-// import { BROADCAST_EVENT } from '../subscriptions';
 
 export default function App() {
 	const [focused, setFocused] = useState("");
 	const [selected, setSelected] = useState("");
+	const [gameList, setGameList] = useState(0);
+	const [joinGame, setJoinGame] = useState(0);
 
-	const { data, loading, error, refetch } = useQuery(MYSELF);
+	const { data, loading, error, refetch } = useQuery(MYSELF, {
+		fetchPolicy: "cache-and-network"
+		// onCompleted(data) {
+		// 	if (!data.me) {
+		// 		setPtoken(null);
+		// 		setGtoken(null);
+		// 	} else {
+		// 		if (data.me) setPtoken(data.me.token);
+		// 		if (data.me.joined) setGtoken(data.me.joined.token);
+		// 	}
+		// }
+	});
 
 	// const [takeAction, { loading: mLoading, error: mError }] = useMutation(TAKE_ACTION);
 
@@ -63,6 +77,27 @@ export default function App() {
 		}
 	};
 
+	const registed = (data.me && !data.me.joined);
+	const joined = (data.me && data.me.joined);
+
+	const eventReceived = (event) => {
+		switch (event) {
+		case 6:
+			if (!joined) setGameList(gameList + 1);
+			break;
+		case 5:
+			setGameList(gameList + 1);
+			break;
+		case 4:
+		case 3:
+			setJoinGame(joinGame + 1);
+			break;
+		default:
+			console.log("Event", event, "received...");
+			break;
+		}
+	};
+
 	// if (loading || mLoading) return <p>Loading...</p>;
 	if (loading) return <p>Loading...</p>;
 
@@ -76,8 +111,6 @@ export default function App() {
 	// 	return <p>ERROR</p>;
 	// }
 
-	const registed = data.me && !data.me.joined;
-	const joined = data.me && data.me.joined;
 	return (
 		<>
 			<Map
@@ -93,12 +126,12 @@ export default function App() {
 				{(!data.me || !data.me.token) ? (
 					<Register refetch={refetch} />
 				) : (
-					<Greetings player={data.me} refetch={refetch} />
+					<Greetings refetch={refetch} player={data.me} />
 				)}
 				{registed &&
 					<>
 						<OpenGame refetch={refetch} />
-						<GameList refetch={refetch} />
+						<GameList refetch={refetch} key={gameList} />
 					</>
 				}
 				{joined &&
@@ -106,13 +139,13 @@ export default function App() {
 				}
 				{(joined && (data.me.joined.host.token === data.me.token) && (data.me.joined.rounds < 0)) &&
 					<>
-						<JoinerList refetch={refetch} token={data.me.joined.token} />
+						<JoinerList key={joinGame} />
 						<StartGame refetch={refetch} />
 					</>
 				}
 				{(joined && (data.me.joined.host.token !== data.me.token) && (data.me.joined.rounds < 0)) &&
 					<>
-						<JoinerList refetch={refetch} token={data.me.joined.token} />
+						<JoinerList key={joinGame} />
 						<div id="msg" className="mt mb">Wait for game to start...</div>
 					</>
 				}
@@ -122,6 +155,12 @@ export default function App() {
 						player={data.me} />
 				}
 			</div>
+			{registed &&
+				<Subscriber player={data.me} receiver={eventReceived} />
+			}
+			{joined &&
+				<GameSubscriber game={data.me.joined} receiver={eventReceived} />
+			}
 		</>
 	);
 }

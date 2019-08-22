@@ -1,4 +1,4 @@
-const evn = require('../const-events');
+const evn = require('../consts');
 
 module.exports.mockSetup = async ({ eventDS }) => {
 	let ptokens = [];
