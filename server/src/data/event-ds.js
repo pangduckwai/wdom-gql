@@ -1,5 +1,5 @@
 const { DataSource } = require('apollo-datasource');
-const evn = require('../consts');
+const consts = require('../consts');
 
 class EventDS extends DataSource {
 	constructor({ store, rules }) {
@@ -55,7 +55,7 @@ class EventDS extends DataSource {
 
 		switch (v.event) {
 			//Player events
-			case evn.PLAYER_REGISTERED.id:
+			case consts.PLAYER_REGISTERED.id:
 				obj = {
 					ready: true,
 					token: v.token,
@@ -66,14 +66,14 @@ class EventDS extends DataSource {
 				len = this.store.players.push(obj);
 				if (len > 0) this.store.rebuildPlayerIndex();
 				break;
-			case evn.PLAYER_QUITTED.id:
+			case consts.PLAYER_QUITTED.id:
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					this.store.players.splice(this.store.idxPlayerToken[v.token], 1);
 					this.store.rebuildPlayerIndex();
 				}
 				break;
-			case evn.GAME_JOINED.id:
+			case consts.GAME_JOINED.id:
 				obj = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 				if (obj) {
 					obj.joined = v.token;
@@ -81,13 +81,13 @@ class EventDS extends DataSource {
 					obj.cards = [];
 				}
 				break;
-			case evn.GAME_LEFT.id:
+			case consts.GAME_LEFT.id:
 				obj = this.store.players[this.store.idxPlayerToken[v.data[0]]];
 				if (obj) {
 					delete obj.joined;
 				}
 				break;
-			case evn.TROOP_ASSIGNED.id:
+			case consts.TROOP_ASSIGNED.id:
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					if (v.amount >= 0) {
@@ -97,7 +97,7 @@ class EventDS extends DataSource {
 					}
 				}
 				break;
-			case evn.TROOP_DEPLOYED.id:
+			case consts.TROOP_DEPLOYED.id:
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					if ((v.amount >= 0) && (obj.reinforcement >= v.amount)) {
@@ -109,7 +109,7 @@ class EventDS extends DataSource {
 				break;
 
 			// Game events
-			case evn.GAME_OPENED.id:
+			case consts.GAME_OPENED.id:
 				obj = {
 					ready: true,
 					token: v.token,
@@ -128,40 +128,40 @@ class EventDS extends DataSource {
 				len = this.store.games.push(obj);
 				if (len > 0) this.store.rebuildGameIndex();
 				break;
-			case evn.GAME_CLOSED.id:
+			case consts.GAME_CLOSED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.host === v.data[0])) { //Only the host can close a game
 					this.store.games.splice(this.store.idxGameToken[v.token], 1);
 					this.store.rebuildGameIndex();
 				}
 				break;
-			case evn.GAME_STARTED.id:
+			case consts.GAME_STARTED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.host === v.data[0])) { //Only the host can start a game
 					obj.turn = obj.host;
 					obj.rounds = 0;
 				}
 				break;
-			case evn.TERRITORY_ASSIGNED.id:
+			case consts.TERRITORY_ASSIGNED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj) {
 					obj.territories[obj.t_index[v.name]].owner = v.data[0];
 					obj.territories[obj.t_index[v.name]].troops = 1;
 				}
 				break;
-			case evn.TROOP_ADDED.id:
+			case consts.TROOP_ADDED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
 					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
 				}
 				break;
-			case evn.TERRITORY_SELECTED.id:
+			case consts.TERRITORY_SELECTED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
 					obj.current = v.name;
 				}
 				break;
-			case evn.NEXT_PLAYER.id:
+			case consts.NEXT_PLAYER.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const plys = this.listPlayersByGame({ token: v.token });
@@ -197,14 +197,14 @@ class EventDS extends DataSource {
 					}
 				}
 				break;
-			case evn.SETUP_FINISHED.id:
+			case consts.SETUP_FINISHED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.rounds === 0)) {
 					obj.turn = obj.host;
 					obj.rounds = 1;
 				}
 				break;
-			case evn.TURN_STARTED.id:
+			case consts.TURN_STARTED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					obj.fortified = false;
@@ -212,7 +212,7 @@ class EventDS extends DataSource {
 					if (ply) ply.conquer = false;
 				}
 				break;
-			case evn.CARD_RETURNED.id:
+			case consts.CARD_RETURNED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && ((obj.rounds === 0) || (obj.turn === v.data[0]))) {
 					const card = this.gameRules.getCard(v.name);
@@ -221,7 +221,7 @@ class EventDS extends DataSource {
 					}
 				}
 				break;
-			case evn.CARDS_REDEEMED.id: //TODO test a player redeem 2 sets of cards in 1 round
+			case consts.CARDS_REDEEMED.id: //TODO test a player redeem 2 sets of cards in 1 round
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const reinforcement = this.gameRules.redeemReinforcement(obj.redeemed);
@@ -239,7 +239,7 @@ class EventDS extends DataSource {
 					}
 				}
 				break;
-			case evn.TERRITORY_ATTACKED.id:
+			case consts.TERRITORY_ATTACKED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const fm = obj.territories[obj.t_index[v.data[2]]];
@@ -254,7 +254,7 @@ class EventDS extends DataSource {
 						to.troops = 0;
 				}
 				break;
-			case evn.TERRITORY_CONQUERED.id:
+			case consts.TERRITORY_CONQUERED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const fm = obj.territories[obj.t_index[v.data[2]]];
@@ -268,7 +268,7 @@ class EventDS extends DataSource {
 					if (ply) ply.conquer = true;
 				}
 				break;
-			case evn.PLAYER_ATTACKED.id:
+			case consts.PLAYER_ATTACKED.id:
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
 					const ply = this.store.players[this.store.idxPlayerToken[v.data[2]]];
@@ -280,7 +280,7 @@ class EventDS extends DataSource {
 					}
 				}
 				break;
-			case evn.FORTIFIED.id:
+			case consts.FORTIFIED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					const fm = obj.territories[obj.t_index[v.data[2]]];
@@ -292,7 +292,7 @@ class EventDS extends DataSource {
 					obj.current = v.data[3];
 				}
 				break;
-			case evn.TURN_ENDED.id:
+			case consts.TURN_ENDED.id:
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.turn === v.data[0])) {
 					obj.rounds ++;

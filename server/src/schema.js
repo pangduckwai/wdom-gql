@@ -84,12 +84,6 @@ type Response {
 	message: String
 	event: Event
 }
-
-schema {
-	query: Query
-	mutation: Mutation
-	subscription: Subscription
-}
 `;
 
 module.exports = typeDefs;
