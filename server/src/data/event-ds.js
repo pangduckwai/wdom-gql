@@ -51,15 +51,17 @@ class EventDS extends DataSource {
 	}
 
 	process(v) {
-		let obj, len;
+		let obj, len, amt;
 
+		let fltr1, fltr2, fltr3, fltr4, fltr5;
 		switch (v.event) {
 			//Player events
 			case consts.PLAYER_REGISTERED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerName"));
 				obj = {
 					ready: true,
 					token: v.token,
-					name: v.name,
+					name: fltr1[0].value,
 					reinforcement: 0,
 					cards: [],
 				};
@@ -74,7 +76,8 @@ class EventDS extends DataSource {
 				}
 				break;
 			case consts.GAME_JOINED.id:
-				obj = this.store.players[this.store.idxPlayerToken[v.data[0]]];
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				obj = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 				if (obj) {
 					obj.joined = v.token;
 					obj.reinforcement = 0;
@@ -82,26 +85,31 @@ class EventDS extends DataSource {
 				}
 				break;
 			case consts.GAME_LEFT.id:
-				obj = this.store.players[this.store.idxPlayerToken[v.data[0]]];
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				obj = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 				if (obj) {
 					delete obj.joined;
 				}
 				break;
 			case consts.TROOP_ASSIGNED.id:
+				fltr1 = v.data.filter(d => (d.name === "amount"));
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
-					if (v.amount >= 0) {
-						obj.reinforcement = obj.reinforcement + v.amount;
+					amt = parseInt(fltr1[0].value, 10);
+					if (amt >= 0) {
+						obj.reinforcement = obj.reinforcement + amt;
 					} else {
 						obj.ready = false;
 					}
 				}
 				break;
 			case consts.TROOP_DEPLOYED.id:
+				fltr1 = v.data.filter(d => (d.name === "amount"));
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
-					if ((v.amount >= 0) && (obj.reinforcement >= v.amount)) {
-						obj.reinforcement = obj.reinforcement - v.amount;
+					amt = parseInt(fltr1[0].value, 10);
+					if ((amt >= 0) && (obj.reinforcement >= amt)) {
+						obj.reinforcement = obj.reinforcement - amt;
 					} else {
 						obj.ready = false;
 					}
@@ -110,11 +118,13 @@ class EventDS extends DataSource {
 
 			// Game events
 			case consts.GAME_OPENED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "gameName"));
 				obj = {
 					ready: true,
 					token: v.token,
-					name: v.name,
-					host: v.data[0],
+					name: fltr2[0].value,
+					host: fltr1[0].value,
 					rounds: -1,
 					redeemed: 0,
 					cards: [],
@@ -129,45 +139,55 @@ class EventDS extends DataSource {
 				if (len > 0) this.store.rebuildGameIndex();
 				break;
 			case consts.GAME_CLOSED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.host === v.data[0])) { //Only the host can close a game
+				if (obj && (obj.host === fltr1[0].value)) { //Only the host can close a game
 					this.store.games.splice(this.store.idxGameToken[v.token], 1);
 					this.store.rebuildGameIndex();
 				}
 				break;
 			case consts.GAME_STARTED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.host === v.data[0])) { //Only the host can start a game
+				if (obj && (obj.host === fltr1[0].value)) { //Only the host can start a game
 					obj.turn = obj.host;
 					obj.rounds = 0;
 				}
 				break;
 			case consts.TERRITORY_ASSIGNED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "territoryName"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj) {
-					obj.territories[obj.t_index[v.name]].owner = v.data[0];
-					obj.territories[obj.t_index[v.name]].troops = 1;
+					obj.territories[obj.t_index[fltr2[0].value]].owner = fltr1[0].value;
+					obj.territories[obj.t_index[fltr2[0].value]].troops = 1;
 				}
 				break;
 			case consts.TROOP_ADDED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "territoryName"));
+				fltr3 = v.data.filter(d => (d.name === "amount"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
-					obj.territories[obj.t_index[v.name]].troops = obj.territories[obj.t_index[v.name]].troops + v.amount;
+				if (obj && (obj.territories[obj.t_index[fltr2[0].value]].owner === fltr1[0].value)) {
+					obj.territories[obj.t_index[fltr2[0].value]].troops = obj.territories[obj.t_index[fltr2[0].value]].troops + parseInt(fltr3[0].value, 10);
 				}
 				break;
 			case consts.TERRITORY_SELECTED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "territoryName"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.territories[obj.t_index[v.name]].owner === v.data[0])) {
-					obj.current = v.name;
+				if (obj && (obj.territories[obj.t_index[fltr2[0].value]].owner === fltr1[0].value)) {
+					obj.current = fltr2[0].value;
 				}
 				break;
 			case consts.NEXT_PLAYER.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.data[0])) {
+				if (obj && (obj.turn === fltr1[0].value)) {
 					const plys = this.listPlayersByGame({ token: v.token });
 					let idx = 0;
 					for (const ply of plys) {
-						if (ply.token === v.data[0]) break;
+						if (ply.token === fltr1[0].value) break;
 						idx ++;
 					}
 					let off = ((idx + 1) >= plys.length) ? 0 : idx + 1;
@@ -192,7 +212,7 @@ class EventDS extends DataSource {
 						if (off !== idx)
 							obj.turn = plys[off].token;
 						else {
-							obj.winner = v.data[0];
+							obj.winner = fltr1[0].value;
 						}
 					}
 				}
@@ -205,74 +225,92 @@ class EventDS extends DataSource {
 				}
 				break;
 			case consts.TURN_STARTED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.data[0])) {
+				if (obj && (obj.turn === fltr1[0].value)) {
 					obj.fortified = false;
-					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 					if (ply) ply.conquer = false;
 				}
 				break;
 			case consts.CARD_RETURNED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "territoryName"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && ((obj.rounds === 0) || (obj.turn === v.data[0]))) {
-					const card = this.gameRules.getCard(v.name);
-					if (card && (obj.cards.filter(c => c.name === v.name).length <= 0)) {
+				if (obj && ((obj.rounds === 0) || (obj.turn === fltr1[0].value))) {
+					const card = this.gameRules.getCard(fltr2[0].value);
+					if (card && (obj.cards.filter(c => c.name === fltr2[0].value).length <= 0)) {
 						obj.cards.push(card);
 					}
 				}
 				break;
 			case consts.CARDS_REDEEMED.id: //TODO test a player redeem 2 sets of cards in 1 round
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "card1") || (d.name === "card2") || (d.name === "card3"));
+				const cards = fltr2.map(itm => itm.value);
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.data[0])) {
+				if (obj && (obj.turn === fltr1[0].value)) {
 					const reinforcement = this.gameRules.redeemReinforcement(obj.redeemed);
-					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 					if (ply) {
 						obj.redeemed = reinforcement;
 						ply.reinforcement += reinforcement;
-						ply.cards = ply.cards.filter(c => (c.name !== v.data[2]) && (c.name !== v.data[3]) && (c.name !== v.data[4]));
+						ply.cards = ply.cards.filter(c => !cards.includes(c.name));
 
-						const territories = this.listTerritoriesByPlayer({token: v.data[0]})
-						for (let i = 2; i < v.data.length; i ++) {
-							const territory = territories.filter(t => t.name === v.data[i]);
+						const territories = this.listTerritoriesByPlayer({token: fltr1[0].value})
+						for (let i = 0; i < fltr2.length; i ++) {
+							const territory = territories.filter(t => t.name === fltr2[i].value);
 							if (territory.length > 0) territory[0].troops += 2;
 						}
 					}
 				}
 				break;
 			case consts.TERRITORY_ATTACKED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "fromTerritory"));
+				fltr3 = v.data.filter(d => (d.name === "toTerritory"));
+				fltr4 = v.data.filter(d => (d.name === "attackerLoss"));
+				fltr5 = v.data.filter(d => (d.name === "defenderLoss"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.data[0])) {
-					const fm = obj.territories[obj.t_index[v.data[2]]];
-					const to = obj.territories[obj.t_index[v.data[3]]];
-					if (fm.troops > v.data[4])
-						fm.troops -= v.data[4];
+				if (obj && (obj.turn === fltr1[0].value)) {
+					const fm = obj.territories[obj.t_index[fltr2[0].value]];
+					const to = obj.territories[obj.t_index[fltr3[0].value]];
+					const ca = parseInt(fltr4[0].value, 10);
+					const cd = parseInt(fltr5[0].value, 10);
+					if (fm.troops > ca)
+						fm.troops -= ca;
 					else
 						fm.troops = 1;
-					if (to.troops >= v.data[5])
-						to.troops -= v.data[5];
+					if (to.troops >= cd)
+						to.troops -= cd;
 					else
 						to.troops = 0;
 				}
 				break;
 			case consts.TERRITORY_CONQUERED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "fromTerritory"));
+				fltr3 = v.data.filter(d => (d.name === "toTerritory"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.data[0])) {
-					const fm = obj.territories[obj.t_index[v.data[2]]];
-					const to = obj.territories[obj.t_index[v.data[3]]];
-					to.owner = v.data[0];
+				if (obj && (obj.turn === fltr1[0].value)) {
+					const fm = obj.territories[obj.t_index[fltr2[0].value]];
+					const to = obj.territories[obj.t_index[fltr3[0].value]];
+					to.owner = fltr1[0].value;
 					to.troops = fm.troops - 1;
 					fm.troops = 1;
-					obj.current = v.data[3];
+					obj.current = fltr3[0].value;
 
-					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 					if (ply) ply.conquer = true;
 				}
 				break;
 			case consts.PLAYER_ATTACKED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "defenderToken"));
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
 				if (obj) {
-					const ply = this.store.players[this.store.idxPlayerToken[v.data[2]]];
-					const left = this.listTerritoriesByPlayer({ token: v.data[2] });
+					const ply = this.store.players[this.store.idxPlayerToken[fltr2[0].value]];
+					const left = this.listTerritoriesByPlayer({ token: fltr2[0].value });
 					if (left.length <= 0) {
 						//Player defeated
 						obj.cards.push(...ply.cards);
@@ -281,23 +319,29 @@ class EventDS extends DataSource {
 				}
 				break;
 			case consts.FORTIFIED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
+				fltr2 = v.data.filter(d => (d.name === "fromTerritory"));
+				fltr3 = v.data.filter(d => (d.name === "toTerritory"));
+				fltr4 = v.data.filter(d => (d.name === "amount"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.data[0])) {
-					const fm = obj.territories[obj.t_index[v.data[2]]];
-					const to = obj.territories[obj.t_index[v.data[3]]];
-					let value = (v.amount >= fm.troops) ? fm.troops - 1 : v.amount;
+				if (obj && (obj.turn === fltr1[0].value)) {
+					const fm = obj.territories[obj.t_index[fltr2[0].value]];
+					const to = obj.territories[obj.t_index[fltr3[0].value]];
+					const amt = parseInt(fltr4[0].value, 10);
+					const value = (amt >= fm.troops) ? fm.troops - 1 : amt;
 					to.troops += value;
 					fm.troops -= value;
 					obj.fortified = true;
-					obj.current = v.data[3];
+					obj.current = fltr3[0].value;
 				}
 				break;
 			case consts.TURN_ENDED.id:
+				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === v.data[0])) {
+				if (obj && (obj.turn === fltr1[0].value)) {
 					obj.rounds ++;
 
-					const ply = this.store.players[this.store.idxPlayerToken[v.data[0]]];
+					const ply = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 					if (ply && ply.conquer) {
 						const card = obj.cards.splice(0, 1)[0];
 						ply.cards.push(card);

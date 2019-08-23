@@ -37,22 +37,20 @@ module.exports = {
 			const p = dataSources.eventDS.findPlayerByName({ name });
 			if (p) throw new UserInputError(`[REGISTER] Player '${name}' already exists`);
 
-			const q = await dataSources.eventDS.add({ event: consts.PLAYER_REGISTERED, payload: { name: name }});
+			const q = await dataSources.eventDS.add({ event: consts.PLAYER_REGISTERED, payload: [{ name: "playerName", value: name }]});
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			// pubsub.publish(consts.BROADCAST_EVENT.topic, { broadcastEvent: q.event });
 			return q;
 		},
 		quitPlayer: async (_, __, { dataSources }) => {
 			const p = dataSources.eventDS.me();
 			if (!p) throw new UserInputError("[QUIT] You are not a registered player yet");
 
-			const q = await dataSources.eventDS.add({ event: consts.PLAYER_QUITTED, payload: { data: [p.token] }});
+			const q = await dataSources.eventDS.add({ event: consts.PLAYER_QUITTED, payload: [{ name: "playerToken", value: p.token }]});
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			// pubsub.publish(consts.BROADCAST_EVENT.topic, { broadcastEvent: q.event });
 			return q;
 		},
 		openGame: async (_, { name }, { dataSources }) => {
@@ -66,10 +64,14 @@ module.exports = {
 			const g = dataSources.eventDS.findGameByName({ name });
 			if (g) throw new UserInputError(`[OPEN] Game '${name}' already exists`);
 
-			const h = await dataSources.eventDS.add({ event: consts.GAME_OPENED, payload: { name: name, data: [ p.token ] }});
+			const h = await dataSources.eventDS.add({ event: consts.GAME_OPENED, payload: [
+				{ name: "playerToken", value: p.token }, { name: "gameName", value: name }
+			]});
 			if (!h.successful) throw new UserInputError(h.message);
 
-			const q = await dataSources.eventDS.add({ event: consts.GAME_JOINED, payload: { data: [p.token, h.event.token] }});
+			const q = await dataSources.eventDS.add({ event: consts.GAME_JOINED, payload: [
+				{ name: "playerToken", value: p.token }, { name: "gameToken", value: h.event.token }
+			]});
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -85,10 +87,14 @@ module.exports = {
 			if (!g) throw new UserInputError(`[CLOSE] Game '${p.joined}' not found`);
 			if (g.host !== p.token) throw new UserInputError("[CLOSE] Can only close your own game");
 
-			const k = await dataSources.eventDS.add({ event: consts.GAME_CLOSED, payload: { data: [p.token, g.token] }});
+			const k = await dataSources.eventDS.add({ event: consts.GAME_CLOSED, payload: [
+				{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }
+			]});
 			if (!k.successful) throw new UserInputError(k.message);
 
-			const q = await dataSources.eventDS.add({ event: consts.GAME_LEFT, payload: { data: [p.token, g.token] }});
+			const q = await dataSources.eventDS.add({ event: consts.GAME_LEFT, payload: [
+				{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }
+			]});
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -112,7 +118,9 @@ module.exports = {
 			if (players.length >= dataSources.eventDS.gameRules.MAX_PLAYER_PER_GAME)
 				throw new UserInputError(`[JOIN] Game '${g.name}' is full already`);
 
-			const k = await dataSources.eventDS.add({ event: consts.GAME_JOINED, payload: { data: [p.token, token] }});
+			const k = await dataSources.eventDS.add({ event: consts.GAME_JOINED, payload: [
+				{ name: "playerToken", value: p.token }, { name: "gameToken", value: token }
+			]});
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -128,7 +136,9 @@ module.exports = {
 			if (!g) throw new UserInputError(`[LEAVE] Game '${p.joined}' not found`);
 			if (g.host === p.token) throw new UserInputError("[LEAVE] Cannot leave your own game");
 
-			const k = await dataSources.eventDS.add({ event: consts.GAME_LEFT, payload: { data: [p.token, g.token] }});
+			const k = await dataSources.eventDS.add({ event: consts.GAME_LEFT, payload: [
+				{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }
+			]});
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -148,7 +158,9 @@ module.exports = {
 			if (players.length < dataSources.eventDS.gameRules.MIN_PLAYER_PER_GAME)
 				throw new UserInputError(`[START] Minimum number of players is ${dataSources.eventDS.gameRules.MIN_PLAYER_PER_GAME}`);
 
-			const k = await dataSources.eventDS.add({ event: consts.GAME_STARTED, payload: { data: [p.token, g.token] }});
+			const k = await dataSources.eventDS.add({ event: consts.GAME_STARTED, payload: [
+				{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }
+			]});
 			if (!k.successful) throw new UserInputError(k);
 
 			const deck = dataSources.eventDS.gameRules.shuffleCards(players.map(q => q.token));
@@ -161,9 +173,9 @@ module.exports = {
 				}
 
 				const m = await dataSources.eventDS.add({
-					event: consts.TERRITORY_ASSIGNED,
-					payload: { name: c, data: [deck[c], g.token] }
-				});
+					event: consts.TERRITORY_ASSIGNED, payload: [
+						{ name: "playerToken", value: deck[c] }, { name: "gameToken", value: g.token }, { name: "territoryName", value: c }
+					]});
 				if (!m.successful) throw new UserInputError(m.message);
 			}
 
@@ -171,7 +183,11 @@ module.exports = {
 			for (const player of players) {
 				const n = await dataSources.eventDS.add({
 					event: consts.TROOP_ASSIGNED,
-					payload: { amount: (troops - hold[player.token]), data: [player.token, g.token] }
+					payload: [
+						{ name: "playerToken", value: player.token },
+						{ name: "gameToken", value: g.token },
+						{ name: "amount", value: ''+(troops - hold[player.token]) }
+					]
 				});
 				if (!n.successful) throw new UserInputError(n.message);
 			}
@@ -179,9 +195,9 @@ module.exports = {
 			const cards = dataSources.eventDS.gameRules.shuffleCards(); // Need to do it here because need to record each card in a event, otherwise cannot replay
 			for (const card of cards) {
 				const d = await dataSources.eventDS.add({
-					event: consts.CARD_RETURNED,
-					payload: { name: card.name, data: [p.token, g.token] }
-				});
+					event: consts.CARD_RETURNED, payload: [
+						{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }, { name: "territoryName", value: card.name }
+					]});
 				if (!d.successful) throw new UserInputError(d.message);
 			}
 
@@ -203,9 +219,9 @@ module.exports = {
 			let c;
 			if (owned) {
 				c = await dataSources.eventDS.add({
-					event: consts.TERRITORY_SELECTED,
-					payload: { name: name, data: [p.token, g.token] }
-				});
+					event: consts.TERRITORY_SELECTED, payload: [
+					{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }, { name: "territoryName", value: name }
+				]});
 				if (!c.successful) throw new UserInputError(c.message);
 			}
 
@@ -221,27 +237,30 @@ module.exports = {
 					}
 
 					const a = await dataSources.eventDS.add({
-						event: consts.TROOP_ADDED,
-						payload: { name: name, amount: 1, data: [p.token, g.token] }
-					});
+						event: consts.TROOP_ADDED, payload: [
+							{ name: "playerToken", value: p.token },
+							{ name: "gameToken", value: g.token },
+							{ name: "territoryName", value: name },
+							{ name: "amount", value: "1" }
+						]});
 					if (!a.successful) throw new UserInputError(a.message);
 
 					const d = await dataSources.eventDS.add({
-						event: consts.TROOP_DEPLOYED,
-						payload: { amount: 1, data: [p.token, g.token] }
-					});
+						event: consts.TROOP_DEPLOYED, payload: [
+							{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }, { name: "amount", value: "1" }
+						]});
 					if (!d.successful) throw new UserInputError(d.message);
 
 					if (!setupFinished) {
 						const n = await dataSources.eventDS.add({
 							event: consts.NEXT_PLAYER,
-							payload: { data: [p.token, g.token] }
+							payload: [{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }]
 						});
 						if (!n.successful) throw new UserInputError(n.message);
 					} else {
 						const s = await dataSources.eventDS.add({
 							event: consts.SETUP_FINISHED,
-							payload: { data: [p.token, g.token] }
+							payload: [{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }]
 						});
 						if (!s.successful) throw new UserInputError(s.message);
 					}
@@ -255,15 +274,18 @@ module.exports = {
 					// Reinforcement stage
 					if (owned && (p.cards.length < 5)) {
 						const a = await dataSources.eventDS.add({
-							event: consts.TROOP_ADDED,
-							payload: { name: name, amount: 1, data: [p.token, g.token] }
-						});
+							event: consts.TROOP_ADDED, payload: [
+								{ name: "playerToken", value: p.token },
+								{ name: "gameToken", value: g.token },
+								{ name: "territoryName", value: name },
+								{ name: "amount", value: "1" }
+							]});
 						if (!a.successful) throw new UserInputError(a.message);
 
 						const d = await dataSources.eventDS.add({
-							event: consts.TROOP_DEPLOYED,
-							payload: { amount: 1, data: [p.token, g.token] }
-						});
+							event: consts.TROOP_DEPLOYED, payload: [
+								{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }, { name: "amount", value: "1" }
+							]});
 						if (!d.successful) throw new UserInputError(d.message);
 
 						await dataSources.eventDS.updateSnapshot();
@@ -280,16 +302,24 @@ module.exports = {
 								const casualties = dataSources.eventDS.gameRules.doBattle({ attacker: fm.troops, defender: to.troops });
 
 								const k = await dataSources.eventDS.add({
-									event: consts.TERRITORY_ATTACKED,
-									payload: { data: [p.token, g.token, g.current, name, casualties.attacker, casualties.defender] }
-								});
+									event: consts.TERRITORY_ATTACKED, payload: [
+										{ name: "playerToken", value: p.token },
+										{ name: "gameToken", value: g.token },
+										{ name: "fromTerritory", value: g.current },
+										{ name: "toTerritory", value: name },
+										{ name: "attackerLoss", value: ''+casualties.attacker },
+										{ name: "defenderLoss", value: ''+casualties.defender }
+									]});
 								if (!k.successful) throw new UserInputError(k.message);
 
 								if (casualties.defender >= to.troops) {
 									const u = await dataSources.eventDS.add({
-										event: consts.TERRITORY_CONQUERED,
-										payload: { data: [p.token, g.token, g.current, name] }
-									});
+										event: consts.TERRITORY_CONQUERED, payload: [
+											{ name: "playerToken", value: p.token },
+											{ name: "gameToken", value: g.token },
+											{ name: "fromTerritory", value: g.current },
+											{ name: "toTerritory", value: name }
+										]});
 									if (!u.successful) throw new UserInputError(u.message);
 
 									//Only trigger this when a territory changed hand
@@ -297,9 +327,11 @@ module.exports = {
 									if (!q) throw new UserInputError(`[ACTION] Player '${to.owner}' not found`);
 
 									const t = await dataSources.eventDS.add({
-										event: consts.PLAYER_ATTACKED,
-										payload: { data: [p.token, g.token, q.token]}
-									});
+										event: consts.PLAYER_ATTACKED, payload: [
+											{ name: "playerToken", value: p.token },
+											{ name: "gameToken", value: g.token },
+											{ name: "defenderToken", value: q.token }
+										]});
 									if (!t.successful) throw new UserInputError(t.message);
 								}
 								await dataSources.eventDS.updateSnapshot();
@@ -325,7 +357,7 @@ module.exports = {
 
 			const t = await dataSources.eventDS.add({
 				event: consts.TURN_STARTED,
-				payload: { data: [p.token, g.token] }
+				payload: [{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }]
 			});
 			if (!t.successful) throw new UserInputError(t.message);
 
@@ -334,9 +366,9 @@ module.exports = {
 				dataSources.eventDS.gameRules.basicReinforcement(holdings) +
 				dataSources.eventDS.gameRules.continentReinforcement(holdings); //TODO - Plus troops from trading in cards
 			const s = await dataSources.eventDS.add({
-				event: consts.TROOP_ASSIGNED,
-				payload: { amount: reinforcement, data: [p.token, g.token] }
-			});
+				event: consts.TROOP_ASSIGNED, payload: [
+					{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }, { name: "amount", value: ''+reinforcement }
+				]});
 			if (!s.successful) throw new UserInputError(s.message);
 
 			await dataSources.eventDS.updateSnapshot();
@@ -360,21 +392,25 @@ module.exports = {
 					if (amount >= g.territories[g.t_index[from]].troops) value = g.territories[g.t_index[from]].troops - 1;
 
 					const f = await dataSources.eventDS.add({
-						event: consts.FORTIFIED,
-						payload: { amount: value, data: [p.token, g.token, from, to] }
-					});
+						event: consts.FORTIFIED, payload: [
+							{ name: "playerToken", value: p.token },
+							{ name: "gameToken", value: g.token },
+							{ name: "fromTerritory", value: from },
+							{ name: "toTerritory", value: to },
+							{ name: "amount", value: ''+value }
+						]});
 					if (!f.successful) throw new UserInputError(f.message);
 				}
 			}
 
 			const e = await dataSources.eventDS.add({
 				event: consts.TURN_ENDED,
-				payload: { data: [p.token, g.token] }
+				payload: [{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }]
 			});
 			if (!e.successful) throw new UserInputError(e.message);
 			const n = await dataSources.eventDS.add({
 				event: consts.NEXT_PLAYER,
-				payload: { data: [p.token, g.token] }
+				payload: [{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }]
 			});
 			if (!n.successful) throw new UserInputError(n.message);
 
@@ -401,16 +437,20 @@ module.exports = {
 			if (!dataSources.eventDS.gameRules.isRedeemable(redeeming)) throw new UserInputError("[REDEEM] The set of cards is not redeemable");
 
 			const d = await dataSources.eventDS.add({
-				event: consts.CARDS_REDEEMED,
-				payload: { data: [p.token, g.token, ...cards] }
-			});
+				event: consts.CARDS_REDEEMED, payload: [
+					{ name: "playerToken", value: p.token },
+					{ name: "gameToken", value: g.token },
+					{ name: "card1", value: cards[0] },
+					{ name: "card2", value: cards[1] },
+					{ name: "card3", value: cards[2] }
+				]});
 			if (!d.successful) throw new UserInputError(d.message);
 
 			for (const card of cards) {
 				const t = await dataSources.eventDS.add({
-					event: consts.CARD_RETURNED,
-					payload: { name: card, data: [p.token, g.token] }
-				});
+					event: consts.CARD_RETURNED, payload: [
+						{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }, { name: "territoryName", value: card }
+					]});
 				if (!t.successful) throw new UserInputError(t.message);
 			}
 			await dataSources.eventDS.updateSnapshot();

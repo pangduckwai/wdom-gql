@@ -68,15 +68,18 @@ type Card {
 	type: String!
 }
 
+type EventData {
+	name: String!
+	value: String!
+}
+
 type Event {
 	eventid: String!
 	timestamp: String!
 	event: Int!
 	type: String!
-	name: String
-	amount: Int
-	data: [String]
 	token: String!
+	data: [EventData]!
 }
 
 type Response {

@@ -9,7 +9,6 @@ mutation Register($name: String!) {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
@@ -24,7 +23,6 @@ mutation Quit {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
@@ -39,7 +37,6 @@ mutation Open($name: String!) {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
@@ -54,7 +51,6 @@ mutation Join($token: String!) {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
@@ -69,7 +65,6 @@ mutation Leave {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
@@ -84,7 +79,6 @@ mutation Close {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
@@ -99,7 +93,6 @@ mutation Start {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
@@ -114,7 +107,6 @@ mutation Action($name: String!) {
 			timestamp
 			event
 			type
-			name
 			token
 		}
 	}
