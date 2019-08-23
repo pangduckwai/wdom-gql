@@ -3,8 +3,6 @@ const session = require('cookie-session')
 const helmet = require('helmet');
 // const csrf = require('csurf');
 const limit = require('express-rate-limit');
-// const cors = require('cors'); //TODO TEMP: not for production use!!!
-
 const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
 const typeDefs = require('./schema');
@@ -12,11 +10,10 @@ const resolvers = require('./resolvers');
 const gameRules = require('./rules');
 const EventDS = require('./data/event-ds')
 const EventStore = require('./data/event-store');
-const { mockSetup } = require('./__tests__/mock-setup'); //TEMP!!!
-
 const { createServer } = require('http');
 const { execute, subscribe } = require('graphql');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
+const { mockSetup } = require('./__tests__/mock-setup'); //TEMP!!!
 
 ///////////////////
 ///// Express /////
@@ -28,6 +25,7 @@ xprs.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
 });
+//TODO TEMP!!!
 
 xprs.set('trust proxy', 1); // trust first proxy
 xprs.use(session({
@@ -53,7 +51,6 @@ let limiter = new limit({
 	delayMs: 0 // disabled
 });
 xprs.use(limiter);
-// xprs.use(cors()); //TODO TEMP: not for production use!!!
 
 //////////////////
 ///// Apollo /////

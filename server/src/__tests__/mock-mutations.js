@@ -105,19 +105,6 @@ mutation Action($name: String!) {
 		}
 	}
 }`,
-START_TURN: gql`
-mutation StartTurn {
-	startTurn {
-		successful
-		message
-		event {
-			timestamp
-			event
-			type
-			token
-		}
-	}
-}`,
 END_TURN: gql`
 mutation EndTurn($from: String, $to: String, $amount: Int) {
 	endTurn(from: $from, to: $to, amount: $amount) {

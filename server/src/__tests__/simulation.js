@@ -7,7 +7,7 @@ const EventStore = require('../data/event-store');
 const gameRules = require('../rules');
 
 const {
-	REGISTER, QUIT_PLAYER, OPEN_GAME, CLOSE_GAME, JOIN_GAME, LEAVE_GAME, START_GAME, TAKE_ACTION, START_TURN, END_TURN, REDEEM_CARD
+	REGISTER, QUIT_PLAYER, OPEN_GAME, CLOSE_GAME, JOIN_GAME, LEAVE_GAME, START_GAME, TAKE_ACTION, END_TURN, REDEEM_CARD
 } = require('./mock-mutations');
 const { MYSELF, MY_GAME, FELLOW_PLAYERS, ALL_PLAYERS, ALL_GAMES, MY_TERRITORIES, PLAYER_TERRITORIES } = require('./mock-queries');
 const { mockShuffleCards, mockDoBattle } = require('./mock-rules');
@@ -252,7 +252,7 @@ describe("Test Gameplay", () => {
 			const server = new ApolloServer(createServer(ptokens[current]));
 			const { mutate, query } = createTestClient(server);
 
-			await mutate({ mutation: START_TURN });
+			// await mutate({ mutation: START_TURN });
 
 			if (script.c) {
 				for (const set of script.c) {

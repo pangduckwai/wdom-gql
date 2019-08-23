@@ -90,8 +90,6 @@ class EventStore {
 			};
 			let rspn = { successful: false };
 
-			// if (payload.name !== null) obj.name = payload.name;
-			// if (payload.amount >= 0) obj.amount = payload.amount;
 			obj.data = [];
 			for (let d of payload) {
 				obj.data.push(d);
@@ -121,7 +119,6 @@ class EventStore {
 				case consts.GAME_STARTED.id:
 				case consts.NEXT_PLAYER.id:
 				case consts.SETUP_FINISHED.id:
-				case consts.TURN_STARTED.id:
 				case consts.TURN_ENDED.id:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
@@ -175,13 +172,8 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value); //token of the game in question
 					}
 					break;
-				// case consts.TROOP_ASSIGNED.id:
-					// TROOP_ASSIGNED: NOTE - use for assigning troops to a player at:
-					//  1. during setup phase, assigning remaining troops after adding 1 troop to each owned territory
-					//  2. at the begining of each turn when receiving reinforcement
-					//  3. after redeem cards for additional reinforcement
 				case consts.TROOP_DEPLOYED.id:
-					// TROOP_DEPLOYED: NOTE - subtract currently available reinforcement of a player after troops added to a territory
+					// NOTE - TROOP_DEPLOYED is used to subtract currently available reinforcement of a player after troops added to a territory
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "amount"));

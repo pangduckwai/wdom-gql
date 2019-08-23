@@ -180,19 +180,6 @@ module.exports = {
 				if (!m.successful) throw new UserInputError(m.message);
 			}
 
-			// const troops = dataSources.eventDS.gameRules.initialTroops(players.length);
-			// for (const player of players) {
-			// 	const n = await dataSources.eventDS.add({
-			// 		event: consts.TROOP_ASSIGNED,
-			// 		payload: [
-			// 			{ name: "playerToken", value: player.token },
-			// 			{ name: "gameToken", value: g.token },
-			// 			{ name: "amount", value: ''+(troops - hold[player.token]) }
-			// 		]
-			// 	});
-			// 	if (!n.successful) throw new UserInputError(n.message);
-			// }
-
 			const cards = dataSources.eventDS.gameRules.shuffleCards(); // Need to do it here because need to record each card in a event, otherwise cannot replay
 			for (const card of cards) {
 				const d = await dataSources.eventDS.add({
@@ -345,35 +332,6 @@ module.exports = {
 					}
 				}
 			}
-		},
-		startTurn: async (_, __, { dataSources }) => {
-			const p = dataSources.eventDS.me();
-			if (!p) throw new UserInputError("[TURN] You are not a registered player yet");
-			if (!p.joined) throw new UserInputError("[TURN] You are not in any game");
-
-			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
-			if (!g) throw new UserInputError(`[TURN] Game '${p.joined}' not found`);
-			if (g.rounds <= 0) throw new UserInputError("[TURN] The game is not ready yet");
-			if (g.turn !== p.token) throw new UserInputError("[TURN] Now is not your turn yet");
-
-			const t = await dataSources.eventDS.add({
-				event: consts.TURN_STARTED,
-				payload: [{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }]
-			});
-			if (!t.successful) throw new UserInputError(t.message);
-
-			// const holdings = dataSources.eventDS.listTerritoriesByPlayer({ token: p.token });
-			// const reinforcement =
-			// 	dataSources.eventDS.gameRules.basicReinforcement(holdings) +
-			// 	dataSources.eventDS.gameRules.continentReinforcement(holdings);
-			// const s = await dataSources.eventDS.add({
-			// 	event: consts.TROOP_ASSIGNED, payload: [
-			// 		{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }, { name: "amount", value: ''+reinforcement }
-			// 	]});
-			// if (!s.successful) throw new UserInputError(s.message);
-
-			await dataSources.eventDS.updateSnapshot();
-			return s;
 		},
 		endTurn: async (_, { from, to, amount }, { dataSources }) => {
 			const p = dataSources.eventDS.me();

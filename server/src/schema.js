@@ -21,7 +21,6 @@ type Mutation {
 	leaveGame: Response
 	startGame: Response
 	takeAction(name: String!): Response
-	startTurn: Response
 	endTurn(from: String, to: String, amount: Int): Response
 	redeemCards(cards: [String]!): Response
 }

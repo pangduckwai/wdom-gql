@@ -91,18 +91,6 @@ class EventDS extends DataSource {
 					delete obj.joined;
 				}
 				break;
-			// case consts.TROOP_ASSIGNED.id:
-			// 	fltr1 = v.data.filter(d => (d.name === "amount"));
-			// 	obj = this.store.players[this.store.idxPlayerToken[v.token]];
-			// 	if (obj) {
-			// 		amt = parseInt(fltr1[0].value, 10);
-			// 		if (amt >= 0) {
-			// 			obj.reinforcement = obj.reinforcement + amt;
-			// 		} else {
-			// 			obj.ready = false;
-			// 		}
-			// 	}
-			// 	break;
 			case consts.TROOP_DEPLOYED.id:
 				fltr1 = v.data.filter(d => (d.name === "amount"));
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
@@ -216,13 +204,22 @@ class EventDS extends DataSource {
 						}
 						if (!finished) obj.turn = plys[off].token;
 					} else if (obj.rounds > 0) {
+						// Gameplay phase
 						while (this.listTerritoriesByPlayer({ token: plys[off].token }).length <= 0) {
 							off ++;
 							if (off >= plys.length) off = 0;
 						}
-						if (off !== idx)
+						if (off !== idx) {
 							obj.turn = plys[off].token;
-						else {
+							obj.fortified = false;
+
+							const ply = this.store.players[this.store.idxPlayerToken[obj.turn]];
+							if (ply) {
+								const holdings = this.listTerritoriesByPlayer({token: obj.turn});
+								ply.reinforcement = this.gameRules.basicReinforcement(holdings) + this.gameRules.continentReinforcement(holdings);
+								ply.conquer = false;
+							}
+						} else {
 							obj.winner = fltr1[0].value;
 						}
 					}
@@ -233,16 +230,11 @@ class EventDS extends DataSource {
 				if (obj && (obj.rounds === 0)) {
 					obj.turn = obj.host;
 					obj.rounds = 1;
-				}
-				break;
-			case consts.TURN_STARTED.id:
-				fltr1 = v.data.filter(d => (d.name === "playerToken"));
-				obj = this.store.games[this.store.idxGameToken[v.token]];
-				if (obj && (obj.turn === fltr1[0].value)) {
 					obj.fortified = false;
-					const ply = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
+
+					const ply = this.store.players[this.store.idxPlayerToken[obj.turn]];
 					if (ply) {
-						const holdings = this.listTerritoriesByPlayer({token: fltr1[0].value});
+						const holdings = this.listTerritoriesByPlayer({token: obj.turn});
 						ply.reinforcement = this.gameRules.basicReinforcement(holdings) + this.gameRules.continentReinforcement(holdings);
 						ply.conquer = false;
 					}
