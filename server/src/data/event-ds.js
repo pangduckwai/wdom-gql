@@ -91,18 +91,18 @@ class EventDS extends DataSource {
 					delete obj.joined;
 				}
 				break;
-			case consts.TROOP_ASSIGNED.id:
-				fltr1 = v.data.filter(d => (d.name === "amount"));
-				obj = this.store.players[this.store.idxPlayerToken[v.token]];
-				if (obj) {
-					amt = parseInt(fltr1[0].value, 10);
-					if (amt >= 0) {
-						obj.reinforcement = obj.reinforcement + amt;
-					} else {
-						obj.ready = false;
-					}
-				}
-				break;
+			// case consts.TROOP_ASSIGNED.id:
+			// 	fltr1 = v.data.filter(d => (d.name === "amount"));
+			// 	obj = this.store.players[this.store.idxPlayerToken[v.token]];
+			// 	if (obj) {
+			// 		amt = parseInt(fltr1[0].value, 10);
+			// 		if (amt >= 0) {
+			// 			obj.reinforcement = obj.reinforcement + amt;
+			// 		} else {
+			// 			obj.ready = false;
+			// 		}
+			// 	}
+			// 	break;
 			case consts.TROOP_DEPLOYED.id:
 				fltr1 = v.data.filter(d => (d.name === "amount"));
 				obj = this.store.players[this.store.idxPlayerToken[v.token]];
@@ -152,6 +152,13 @@ class EventDS extends DataSource {
 				if (obj && (obj.host === fltr1[0].value)) { //Only the host can start a game
 					obj.turn = obj.host;
 					obj.rounds = 0;
+
+					//Assign initial troops to each player
+					const players = this.listPlayersByGame({ token: v.token });
+					const troops = this.gameRules.initialTroops(players.length);
+					for (const player of players) {
+						player.reinforcement = troops;
+					}
 				}
 				break;
 			case consts.TERRITORY_ASSIGNED.id:
@@ -161,6 +168,10 @@ class EventDS extends DataSource {
 				if (obj) {
 					obj.territories[obj.t_index[fltr2[0].value]].owner = fltr1[0].value;
 					obj.territories[obj.t_index[fltr2[0].value]].troops = 1;
+					const ply = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
+					if (ply) {
+						ply.reinforcement -= 1;
+					}
 				}
 				break;
 			case consts.TROOP_ADDED.id:
@@ -230,7 +241,11 @@ class EventDS extends DataSource {
 				if (obj && (obj.turn === fltr1[0].value)) {
 					obj.fortified = false;
 					const ply = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
-					if (ply) ply.conquer = false;
+					if (ply) {
+						const holdings = this.listTerritoriesByPlayer({token: fltr1[0].value});
+						ply.reinforcement = this.gameRules.basicReinforcement(holdings) + this.gameRules.continentReinforcement(holdings);
+						ply.conquer = false;
+					}
 				}
 				break;
 			case consts.CARD_RETURNED.id:
@@ -257,7 +272,7 @@ class EventDS extends DataSource {
 						ply.reinforcement += reinforcement;
 						ply.cards = ply.cards.filter(c => !cards.includes(c.name));
 
-						const territories = this.listTerritoriesByPlayer({token: fltr1[0].value})
+						const territories = this.listTerritoriesByPlayer({token: fltr1[0].value});
 						for (let i = 0; i < fltr2.length; i ++) {
 							const territory = territories.filter(t => t.name === fltr2[i].value);
 							if (territory.length > 0) territory[0].troops += 2;

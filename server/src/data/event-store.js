@@ -175,7 +175,7 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value); //token of the game in question
 					}
 					break;
-				case consts.TROOP_ASSIGNED.id:
+				// case consts.TROOP_ASSIGNED.id:
 					// TROOP_ASSIGNED: NOTE - use for assigning troops to a player at:
 					//  1. during setup phase, assigning remaining troops after adding 1 troop to each owned territory
 					//  2. at the begining of each turn when receiving reinforcement
