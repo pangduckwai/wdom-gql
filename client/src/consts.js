@@ -116,3 +116,26 @@ export const LINK = {
 	"Peru":      {connected: ["Argentina", "Brazil", "Venezuela"]},
 	"Venezuela": {connected: ["Brazil", "Peru", "Mexico"]}
 };
+
+export const EVENTS = {
+	PLAYER_REGISTERED: 1,
+	PLAYER_QUITTED: 2,
+	GAME_JOINED: 3,
+	GAME_LEFT: 4,
+	GAME_OPENED: 5,
+	GAME_CLOSED: 6,
+	GAME_STARTED: 7,
+	TERRITORY_ASSIGNED: 8,
+	TROOP_ADDED: 9,
+	TROOP_DEPLOYED: 10,
+	TERRITORY_SELECTED: 11,
+	NEXT_PLAYER: 12,
+	SETUP_FINISHED: 13,
+	CARD_RETURNED: 14,
+	CARDS_REDEEMED: 15,
+	TERRITORY_ATTACKED: 16,
+	TERRITORY_CONQUERED: 17,
+	PLAYER_ATTACKED: 18,
+	FORTIFIED: 19,
+	TURN_ENDED: 20
+};

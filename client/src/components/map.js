@@ -57,8 +57,10 @@ export default function Map(props) {
 	const handleClick = (e) => {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
-		if (typeof(e.target.dataset.tid) !== "undefined") {
-			const value = convert(e.target.dataset.tid);
+		if (typeof(e.target.dataset.tid) === "undefined") return;
+
+		const value = convert(e.target.dataset.tid);
+		if (data.myGame) {
 			const isOwned = (data.myGame.territories[territoryIdx[value]].owner.token === props.player.token);
 
 			if (data.myGame.turn.token !== props.player.token) {
@@ -77,9 +79,9 @@ export default function Map(props) {
 					console.log("Attacking...");
 				}
 			}
-			setFocused(value);
-			setSelected(value);
 		}
+		setFocused(value);
+		setSelected(value);
 	};
 
 	if (loading || mLoading) return <p>'Map' Loading...</p>;

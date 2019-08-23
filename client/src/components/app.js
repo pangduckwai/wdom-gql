@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { MYSELF } from '../queries';
+import { EVENTS } from '../consts';
 import Subscriber from './subscriber';
 import GameSubscriber from './subscriber-game';
 import Map from './map';
@@ -27,22 +28,22 @@ export default function App() {
 
 	const eventReceived = (event) => {
 		switch (event) {
-		case 6:
+		case EVENTS.GAME_CLOSED:
 			if (joined) {
 				refetch();
 				break;
-			} // else go to case 5....
-		case 5:
+			} // else go to case GAME_OPENED....
+		case EVENTS.GAME_OPENED:
 			setGameList(gameList + 1);
 			break;
-		case 3:
-		case 4:
+		case EVENTS.GAME_JOINED:
+		case EVENTS.GAME_LEFT:
 			setJoinGame(joinGame + 1);
 			break;
-		case 7:
+		case EVENTS.GAME_STARTED:
 			refetch();
 			break;
-		case 9:
+		case EVENTS.TROOP_ADDED:
 			setMapComp(mapComp + 1);
 			break;
 		default:
