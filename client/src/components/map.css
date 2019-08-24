@@ -83,6 +83,7 @@ input[type="text"] {
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
+	flex-grow: 1;
 }
 .game-ctrl input[type="submit"] {
 	margin-top: auto;

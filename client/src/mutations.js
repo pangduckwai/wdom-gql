@@ -111,3 +111,17 @@ mutation Action($name: String!) {
 		}
 	}
 }`;
+
+export const END_TURN = gql`
+mutation EndTurn($from: String, $to: String, $amount: Int) {
+	endTurn(from: $from, to: $to, amount: $amount) {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			token
+		}
+	}
+}`;

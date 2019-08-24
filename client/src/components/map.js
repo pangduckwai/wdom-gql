@@ -68,12 +68,8 @@ export default function Map(props) {
 				props.clicked();
 			}
 		} else if (props.game.rounds > 0) {
-			if (isOwned) {
-				takeAction({ variables: { name: value }});
-				props.clicked();
-			} else {
-				console.log("Attacking...");
-			}
+			takeAction({ variables: { name: value }});
+			props.clicked();
 		}
 	};
 

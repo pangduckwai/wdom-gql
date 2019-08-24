@@ -49,12 +49,11 @@ export default function App() {
 			setJoinGame(joinGame + 1);
 			break;
 		case EVENTS.GAME_STARTED:
-			refetchAll();
-			break;
 		case EVENTS.TROOP_PLACED:
 			refetchAll();
 			break;
 		case EVENTS.TROOP_ADDED:
+		case EVENTS.TERRITORY_ATTACKED:
 			refetchMyGame();
 			break;
 		default:
@@ -96,7 +95,7 @@ export default function App() {
 					</>
 				}
 				{joined &&
-					<div className="title bb mt mb">Game <span className="name">{myGame.myGame.name}</span></div>
+					<div className="title bb mb">Game <span className="name">{myGame.myGame.name}</span></div>
 				}
 				{(joined && (myGame.myGame.host.token === myself.me.token) && (myGame.myGame.rounds < 0)) &&
 					<>
@@ -112,7 +111,7 @@ export default function App() {
 				}
 				{(joined && (myGame.myGame.rounds >= 0)) &&
 					<GameStatus
-						refetch={refetchMyself}
+						refetch={refetchAll}
 						player={myself.me}
 						game={myGame.myGame} />
 				}

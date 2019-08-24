@@ -1,9 +1,27 @@
 import React from 'react';
+import { useMutation } from '@apollo/react-hooks';
+import { END_TURN } from '../mutations';
 
 export default function GameStatus(props) {
+	const [endTurn, { loading, error }] = useMutation(END_TURN);
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		endTurn().then(r => {
+			props.refetch();
+		});
+	};
+
+	if (loading) return <p>'EndTurn' Loading...</p>;
+
+	if (error) {
+		console.log(JSON.stringify(error));
+		return <p>ERROR</p>;
+	}
+
 	return (
 		<>
-			<div className="status">
+			<div id="status">
 				{(props.game.rounds <= 0) ? (
 					<div>Round: <span className="name">Preparation</span></div>
 				) : (
@@ -32,11 +50,14 @@ export default function GameStatus(props) {
 						}
 					})
 					.map((t, idx) =>
-						(<li key={idx} className="ml">
+						(<li key={idx}>
 							<span>{('00' + (idx + 1)).slice(-2)}.</span> <label className="name">{t.name}</label>
 						</li>)
 					)}
 			</ul>
+			<form className="game-ctrl" onSubmit={handleSubmit}>
+				<input type="submit" value="End turn" />
+			</form>
 		</>
 	);
 }
