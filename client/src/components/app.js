@@ -15,7 +15,6 @@ import GameStatus from './game-status';
 import './map.css';
 
 export default function App() {
-	// const [mapComp, setMapComp] = useState(0);
 	const [gameList, setGameList] = useState(0);
 	const [joinGame, setJoinGame] = useState(0);
 
@@ -52,8 +51,11 @@ export default function App() {
 		case EVENTS.GAME_STARTED:
 			refetchAll();
 			break;
-		case EVENTS.TROOP_ADDED:
+		case EVENTS.TROOP_PLACED:
 			refetchAll();
+			break;
+		case EVENTS.TROOP_ADDED:
+			refetchMyGame();
 			break;
 		default:
 			console.log("Event", event, "received...");

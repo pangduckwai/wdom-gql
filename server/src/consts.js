@@ -15,30 +15,32 @@ module.exports = Object.freeze({
 		id: 7, type: "GN"
 	}, TERRITORY_ASSIGNED: {
 		id: 8, type: "TN"
-	}, TROOP_ADDED: {
+	}, TROOP_PLACED: {
 		id: 9, type: "TN"
+	}, TROOP_ADDED: {
+		id: 10, type: "TN"
 	}, TROOP_DEPLOYED: {
-		id: 10, type: "PN"
+		id: 11, type: "PN"
 	}, TERRITORY_SELECTED: {
-		id: 11, type: "GN"
-	}, NEXT_PLAYER: {
 		id: 12, type: "GN"
-	}, SETUP_FINISHED: {
+	}, NEXT_PLAYER: {
 		id: 13, type: "GN"
-	}, CARD_RETURNED: {
+	}, SETUP_FINISHED: {
 		id: 14, type: "GN"
-	}, CARDS_REDEEMED: {
+	}, CARD_RETURNED: {
 		id: 15, type: "GN"
-	}, TERRITORY_ATTACKED: {
+	}, CARDS_REDEEMED: {
 		id: 16, type: "GN"
-	}, TERRITORY_CONQUERED: {
+	}, TERRITORY_ATTACKED: {
 		id: 17, type: "GN"
+	}, TERRITORY_CONQUERED: {
+		id: 18, type: "GN"
 	}, PLAYER_ATTACKED: {
-		id: 18, type: "PN"
+		id: 19, type: "PN"
 	}, FORTIFIED: {
-		id: 19, type: "GN"
-	}, TURN_ENDED: {
 		id: 20, type: "GN"
+	}, TURN_ENDED: {
+		id: 21, type: "GN"
 	},
 
 	BROADCAST_EVENT: {

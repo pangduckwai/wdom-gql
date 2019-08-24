@@ -225,11 +225,10 @@ module.exports = {
 					}
 
 					const a = await dataSources.eventDS.add({
-						event: consts.TROOP_ADDED, payload: [
+						event: consts.TROOP_PLACED, payload: [
 							{ name: "playerToken", value: p.token },
 							{ name: "gameToken", value: g.token },
-							{ name: "territoryName", value: name },
-							{ name: "amount", value: "1" }
+							{ name: "territoryName", value: name }
 						]});
 					if (!a.successful) throw new UserInputError(a.message);
 
@@ -265,8 +264,7 @@ module.exports = {
 							event: consts.TROOP_ADDED, payload: [
 								{ name: "playerToken", value: p.token },
 								{ name: "gameToken", value: g.token },
-								{ name: "territoryName", value: name },
-								{ name: "amount", value: "1" }
+								{ name: "territoryName", value: name }
 							]});
 						if (!a.successful) throw new UserInputError(a.message);
 
@@ -277,6 +275,7 @@ module.exports = {
 						if (!d.successful) throw new UserInputError(d.message);
 
 						await dataSources.eventDS.updateSnapshot();
+						pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: a.event, token: g.token });
 						return a;
 					}
 				} else {

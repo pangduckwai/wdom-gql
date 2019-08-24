@@ -120,16 +120,30 @@ let gameRules = new function() {
 		}
 	};
 
+	//TODO: this is real
+	// this.initialTroops = (players) => {
+	// 	switch(players) {
+	// 		case 3:
+	// 			return 35;
+	// 		case 4:
+	// 			return 30;
+	// 		case 5:
+	// 			return 25;
+	// 		case 6:
+	// 			return 20;
+	// 	}
+	// };
+	// TODO: This is for testing
 	this.initialTroops = (players) => {
 		switch(players) {
 			case 3:
-				return 35;
+				return 19;
 			case 4:
-				return 30;
+				return 15;
 			case 5:
-				return 25;
+				return 13;
 			case 6:
-				return 20;
+				return 12;
 		}
 	};
 

@@ -153,21 +153,17 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value);
 					}
 					break;
+				case consts.TROOP_PLACED.id:
+					// NOTE - used during game setup, fired when an owned territory is clicked, and add 1 troop
 				case consts.TROOP_ADDED.id:
-					// NOTE - used for both during game setup, and start of turns when adding troops to owned territories
-					//      - usually correspond to a click to a territory, meaning to add 1 troop.
-					//      - exception: when redeeming cards, if any of the territory on the cards are owned by the same player,
-					//        add 2 troops directly to that territory
+					// NOTE - used during start of turns when adding troops to owned territories, fired when an owned territory is clicked, and add 1 troop
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "territoryName"));
-					fltr4 = payload.filter(d => (d.name === "amount"));
 					if ((fltr1.length !== 1) || (fltr2.length !== 1)) {
 						rspn.message = "[ADD] Missing player and/or game IDs";
 					} else if (fltr3.length !== 1) {
 						rspn.message = "[ADD] Missing territory name";
-					} else if ((fltr4.length !== 1) || isNaN(fltr4[0].value)) {
-						rspn.message = "[ADD] Missing number of troops";
 					} else {
 						rspn.successful = populate(obj, fltr2[0].value); //token of the game in question
 					}

@@ -69,7 +69,8 @@ export default function Map(props) {
 			}
 		} else if (props.game.rounds > 0) {
 			if (isOwned) {
-				console.log("Your own territory");
+				takeAction({ variables: { name: value }});
+				props.clicked();
 			} else {
 				console.log("Attacking...");
 			}

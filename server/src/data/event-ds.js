@@ -162,13 +162,13 @@ class EventDS extends DataSource {
 					}
 				}
 				break;
+			case consts.TROOP_PLACED.id:
 			case consts.TROOP_ADDED.id:
 				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				fltr2 = v.data.filter(d => (d.name === "territoryName"));
-				fltr3 = v.data.filter(d => (d.name === "amount"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.territories[obj.t_index[fltr2[0].value]].owner === fltr1[0].value)) {
-					obj.territories[obj.t_index[fltr2[0].value]].troops = obj.territories[obj.t_index[fltr2[0].value]].troops + parseInt(fltr3[0].value, 10);
+					obj.territories[obj.t_index[fltr2[0].value]].troops += 1;
 				}
 				break;
 			case consts.TERRITORY_SELECTED.id:
