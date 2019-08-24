@@ -14,11 +14,6 @@ query Myself {
 		}
 		joined {
 			token
-			name
-			host {
-				token
-			}
-			rounds
 		}
 	}
 }`;

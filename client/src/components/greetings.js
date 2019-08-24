@@ -4,7 +4,7 @@ import { QUIT_PLAYER, CLOSE_GAME, LEAVE_GAME } from '../mutations';
 
 export default function Greetings(props) {
 	const resolve = () => {
-		if (props.player && !props.player.joined) {
+		if (!props.player.joined) {
 			return [QUIT_PLAYER, {
 				onCompleted(data) {
 					if (data.quitPlayer.successful) {
@@ -12,7 +12,7 @@ export default function Greetings(props) {
 					}
 				}
 			}];
-		} else if (props.player && (props.player.joined.host.token === props.player.token)) {
+		} else if (props.game && (props.game.host.token === props.player.token)) {
 			return [CLOSE_GAME, {
 				onCompleted(data) {
 					if (data.closeGame.successful) {

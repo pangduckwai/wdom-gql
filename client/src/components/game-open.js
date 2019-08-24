@@ -15,9 +15,11 @@ export default function OpenGame(props) {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		openGame({ variables: { name: name }}).then(r => {
-			props.refetch();
-		});
+		if (name && (name != null) && (name !== "")) {
+			openGame({ variables: { name: name }}).then(r => {
+				props.refetch();
+			});
+		}
 	};
 
 	if (loading) return <p>'OpenGame' Loading...</p>;

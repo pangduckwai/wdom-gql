@@ -15,9 +15,11 @@ export default function Register(props) {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		register({ variables: { name: name }}).then(r => {
-			props.refetch();
-		});
+		if (name && (name != null) && (name !== "")) {
+			register({ variables: { name: name }}).then(r => {
+				props.refetch();
+			});
+		}
 	};
 
 	if (loading) return <p>'Register' Loading...</p>;

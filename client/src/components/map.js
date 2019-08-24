@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import { MY_GAME } from '../queries';
+import { useMutation } from '@apollo/react-hooks';
 import { TAKE_ACTION } from '../mutations';
 import { MAP, LINK, LINE } from '../consts';
 import Territory from './territory';
@@ -11,13 +10,9 @@ export default function Map(props) {
 	const [focused, setFocused] = useState("");
 	const [selected, setSelected] = useState("");
 
-	const { data, loading, error } = useQuery(MY_GAME, {
-		fetchPolicy: "no-cache"
-	});
+	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
 
-	const [takeAction, { loading: mLoading, error: mError }] = useMutation(TAKE_ACTION);
-
-	const territories = (props.player && props.player.joined && data.myGame) ? data.myGame.territories :
+	const territories = (props.player && props.game) ? props.game.territories :
 		Object.keys(MAP).map((key) => {
 			const t = {};
 			t.name = key;
@@ -26,12 +21,12 @@ export default function Map(props) {
 
 	const territoryIdx = {};
 	const playerIdx = {};
-	if (props.player && props.player.joined && data.myGame) {
-		for (let i = 0; i < data.myGame.territories.length; i ++) {
-			territoryIdx[data.myGame.territories[i].name] = i;
+	if (props.player && props.game) {
+		for (let i = 0; i < props.game.territories.length; i ++) {
+			territoryIdx[props.game.territories[i].name] = i;
 		}
-		for (let i = 0; i < data.myFellowPlayers.length; i ++) {
-			playerIdx[data.myFellowPlayers[i].name] = i + 1;
+		for (let i = 0; i < props.players.length; i ++) {
+			playerIdx[props.players[i].name] = i + 1;
 		}
 	}
 
@@ -57,42 +52,34 @@ export default function Map(props) {
 	const handleClick = (e) => {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
+
 		if (typeof(e.target.dataset.tid) === "undefined") return;
-
 		const value = convert(e.target.dataset.tid);
-		if (data.myGame) {
-			const isOwned = (data.myGame.territories[territoryIdx[value]].owner.token === props.player.token);
-
-			if (data.myGame.turn.token !== props.player.token) {
-				return;
-			}
-
-			if (data.myGame.rounds === 0) {
-				if (isOwned) {
-					takeAction({ variables: { name: value }});
-					props.clicked();
-				}
-			} else if (data.myGame.rounds > 0) {
-				if (isOwned) {
-					console.log("Your own territory");
-				} else {
-					console.log("Attacking...");
-				}
-			}
-		}
 		setFocused(value);
 		setSelected(value);
+
+		if (!props.game) return;
+		const isOwned = (props.game.territories[territoryIdx[value]].owner.token === props.player.token);
+		if (props.game.turn.token !== props.player.token) return;
+
+		if (props.game.rounds === 0) {
+			if (isOwned) {
+				takeAction({ variables: { name: value }});
+				props.clicked();
+			}
+		} else if (props.game.rounds > 0) {
+			if (isOwned) {
+				console.log("Your own territory");
+			} else {
+				console.log("Attacking...");
+			}
+		}
 	};
 
-	if (loading || mLoading) return <p>'Map' Loading...</p>;
+	if (loading) return <p>'TakeAction' Loading...</p>;
 
 	if (error) {
 		console.log(JSON.stringify(error));
-		return <p>ERROR</p>;
-	}
-
-	if (mError) {
-		console.log(JSON.stringify(mError));
 		return <p>ERROR</p>;
 	}
 
@@ -120,7 +107,7 @@ export default function Map(props) {
 				Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
 			</text>
 
-			{(props.player && props.player.joined) &&
+			{(props.player && props.game) &&
 				<>
 					<polyline
 						className={`player${playerIdx[props.player.name]}`}

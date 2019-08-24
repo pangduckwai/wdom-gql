@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { MYSELF } from '../queries';
+import { MYSELF, MY_GAME } from '../queries';
 import { EVENTS } from '../consts';
 import Subscriber from './subscriber';
 import GameSubscriber from './subscriber-game';
@@ -15,22 +15,31 @@ import GameStatus from './game-status';
 import './map.css';
 
 export default function App() {
-	const [mapComp, setMapComp] = useState(0);
+	// const [mapComp, setMapComp] = useState(0);
 	const [gameList, setGameList] = useState(0);
 	const [joinGame, setJoinGame] = useState(0);
 
-	const { data, loading, error, refetch } = useQuery(MYSELF, {
+	const { data: myself, loading: loadings, error: errors, refetch: refetchMyself } = useQuery(MYSELF, {
 		fetchPolicy: "cache-and-network"
 	});
 
-	const registed = (data.me && !data.me.joined);
-	const joined = (data.me && data.me.joined);
+	const { data: myGame, loading: loadingg, error: errorg, refetch: refetchMyGame } = useQuery(MY_GAME, {
+		fetchPolicy: "no-cache"
+	});
+
+	const registed = (myself.me && !myself.me.joined);
+	const joined = (myself.me && myself.me.joined);
+
+	const refetchAll = () => {
+		refetchMyGame();
+		refetchMyself();
+	};
 
 	const eventReceived = (event) => {
 		switch (event) {
 		case EVENTS.GAME_CLOSED:
 			if (joined) {
-				refetch();
+				refetchMyself();
 				break;
 			} // else go to case GAME_OPENED....
 		case EVENTS.GAME_OPENED:
@@ -41,10 +50,10 @@ export default function App() {
 			setJoinGame(joinGame + 1);
 			break;
 		case EVENTS.GAME_STARTED:
-			refetch();
+			refetchAll();
 			break;
 		case EVENTS.TROOP_ADDED:
-			setMapComp(mapComp + 1);
+			refetchAll();
 			break;
 		default:
 			console.log("Event", event, "received...");
@@ -52,63 +61,65 @@ export default function App() {
 		}
 	};
 
-	const mapClicked = () => {
-		refetch();
-	};
+	if (loadings) return <p>'Myself' Loading...</p>;
+	if (loadingg) return <p>'MyGame' Loading...</p>;
 
-	if (loading) return <p>'Myself' Loading...</p>;
-
-	if (error) {
-		console.log(JSON.stringify(error));
+	if (errors) {
+		console.log(JSON.stringify(errors));
+		return <p>ERROR</p>;
+	}
+	if (errorg) {
+		console.log(JSON.stringify(errorg));
 		return <p>ERROR</p>;
 	}
 
 	return (
 		<>
 			<Map
-				refetch={refetch}
-				player={data.me}
-				clicked={mapClicked}
-				key={mapComp} />
+				refetch={refetchMyself}
+				player={myself.me}
+				players={myGame.myFellowPlayers}
+				game={myGame.myGame}
+				clicked={refetchAll} />
 			<div id="control">
-				{(!data.me || !data.me.token) ? (
-					<Register refetch={refetch} />
+				{(!myself.me || !myself.me.token) ? (
+					<Register refetch={refetchMyself} />
 				) : (
-					<Greetings refetch={refetch} player={data.me} />
+					<Greetings refetch={refetchAll} player={myself.me} game={myGame.myGame} />
 				)}
 				{registed &&
 					<>
-						<OpenGame refetch={refetch} />
-						<GameList refetch={refetch} key={gameList} />
+						<OpenGame refetch={refetchAll} />
+						<GameList refetch={refetchAll} key={gameList} />
 					</>
 				}
 				{joined &&
-					<div className="title bb mt mb">Game <span className="name">{data.me.joined.name}</span></div>
+					<div className="title bb mt mb">Game <span className="name">{myGame.myGame.name}</span></div>
 				}
-				{(joined && (data.me.joined.host.token === data.me.token) && (data.me.joined.rounds < 0)) &&
+				{(joined && (myGame.myGame.host.token === myself.me.token) && (myGame.myGame.rounds < 0)) &&
 					<>
 						<JoinerList key={joinGame} />
-						<StartGame refetch={refetch} />
+						<StartGame refetch={refetchAll} />
 					</>
 				}
-				{(joined && (data.me.joined.host.token !== data.me.token) && (data.me.joined.rounds < 0)) &&
+				{(joined && (myGame.myGame.host.token !== myself.me.token) && (myGame.myGame.rounds < 0)) &&
 					<>
 						<JoinerList key={joinGame} />
 						<div id="msg" className="mt mb">Wait for game to start...</div>
 					</>
 				}
-				{(joined && (data.me.joined.rounds >= 0)) &&
+				{(joined && (myGame.myGame.rounds >= 0)) &&
 					<GameStatus
-						refetch={refetch}
-						player={data.me}
-						key={mapComp} />
+						refetch={refetchMyself}
+						player={myself.me}
+						game={myGame.myGame} />
 				}
 			</div>
 			{registed &&
-				<Subscriber player={data.me} receiver={eventReceived} />
+				<Subscriber player={myself.me} receiver={eventReceived} />
 			}
 			{joined &&
-				<GameSubscriber game={data.me.joined} receiver={eventReceived} />
+				<GameSubscriber game={myGame.myGame} receiver={eventReceived} />
 			}
 		</>
 	);
