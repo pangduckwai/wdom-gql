@@ -40,7 +40,7 @@ export default function App() {
 			if (joined) {
 				refetchMyself();
 				break;
-			} // else go to case GAME_OPENED....
+			} // else go to case GAME_OPENED...
 		case EVENTS.GAME_OPENED:
 			setGameList(gameList + 1);
 			break;
@@ -99,8 +99,7 @@ export default function App() {
 				}
 				{(joined && (myGame.myGame.host.token === myself.me.token) && (myGame.myGame.rounds < 0)) &&
 					<>
-						<JoinerList key={joinGame} />
-						<StartGame refetch={refetchAll} />
+						<StartGame key={joinGame} refetch={refetchAll} />
 					</>
 				}
 				{(joined && (myGame.myGame.host.token !== myself.me.token) && (myGame.myGame.rounds < 0)) &&

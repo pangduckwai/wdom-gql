@@ -1,6 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { START_GAME } from '../mutations';
+import JoinerList from './game-joiners';
 
 export default function StartGame(props) {
 	const [startGame, { loading, error }] = useMutation(START_GAME);
@@ -21,6 +22,7 @@ export default function StartGame(props) {
 
 	return (
 		<form className="game-ctrl" onSubmit={handleSubmit}>
+			<JoinerList />
 			<input type="submit" value="Start Game" />
 		</form>
 	);

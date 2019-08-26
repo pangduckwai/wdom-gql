@@ -9,6 +9,7 @@ type Query {
 	myFellowPlayers: [Player]!
 	listPlayers: [Player]!
 	listGames: [Game]!
+	listAvailableGames: [Game]!
 	listTerritories(token: String!): [Territory]!
 }
 

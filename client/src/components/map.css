@@ -49,6 +49,9 @@ body {
 	padding-left: 0;
 	margin-top: 0;
 	margin-bottom: 3px;
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 1;
 }
 input[type="submit"]:focus {
 	box-shadow: none;

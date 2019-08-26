@@ -37,25 +37,25 @@ export default function GameStatus(props) {
 				)}
 			</div>
 			<div className="mt">Territories:</div>
-			<ul className="list">
-				{props.game.territories
-					.filter(t => t.owner.token === props.player.token)
-					.sort((a, b) => {
-						if (a.name < b.name) {
-							return -1;
-						} else if (a.name > b.name) {
-							return 1;
-						} else {
-							return 0;
-						}
-					})
-					.map((t, idx) =>
-						(<li key={idx}>
-							<span>{('00' + (idx + 1)).slice(-2)}.</span> <label className="name">{t.name}</label>
-						</li>)
-					)}
-			</ul>
 			<form className="game-ctrl" onSubmit={handleSubmit}>
+				<ul className="list">
+					{props.game.territories
+						.filter(t => t.owner.token === props.player.token)
+						.sort((a, b) => {
+							if (a.name < b.name) {
+								return -1;
+							} else if (a.name > b.name) {
+								return 1;
+							} else {
+								return 0;
+							}
+						})
+						.map((t, idx) =>
+							(<li key={idx}>
+								<span>{('00' + (idx + 1)).slice(-2)}.</span> <label className="name">{t.name}</label>
+							</li>)
+						)}
+				</ul>
 				<input type="submit" value="End turn" />
 			</form>
 		</>

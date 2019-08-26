@@ -37,6 +37,9 @@ class EventDS extends DataSource {
 	listGames() {
 		return this.store.games;
 	}
+	listAvailableGames() {
+		return this.store.games.filter(g => g.rounds < 0);
+	}
 	findGameByToken({ token }) {
 		return this.store.games[this.store.idxGameToken[token]];
 	}

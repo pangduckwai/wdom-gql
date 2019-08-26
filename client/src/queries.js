@@ -73,7 +73,7 @@ query Joiners {
 
 export const ALL_GAMES = gql`
 query Games {
-	listGames {
+	listAvailableGames {
 		token
 		name
 		host {

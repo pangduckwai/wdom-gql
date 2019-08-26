@@ -22,19 +22,18 @@ module.exports.mockSetup = async ({ eventDS }) => {
 	await eventDS.updateSnapshot();
 	await eventDS.add({ event: evn.GAME_JOINED, payload: [{ name: "playerToken", value: ptokens[1] }, { name: "gameToken", value: gtokens[1] }]});
 	await eventDS.updateSnapshot();
-
-	// await eventDS.add({ event: evn.GAME_OPENED, payload: { name: "Bill's Game", data: [ ptokens[2] ]}}).then(r => gtokens.push(r.event.token));
-	// await eventDS.updateSnapshot();
-	// await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[2], gtokens[2]] }});
-	// await eventDS.updateSnapshot();
-	// await eventDS.add({ event: evn.GAME_OPENED, payload: { name: "Jess's Game", data: [ ptokens[3] ]}}).then(r => gtokens.push(r.event.token));
-	// await eventDS.updateSnapshot();
-	// await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[3], gtokens[3]] }});
-	// await eventDS.updateSnapshot();
-	// await eventDS.add({ event: evn.GAME_OPENED, payload: { name: "Dave's Game", data: [ ptokens[4] ]}}).then(r => gtokens.push(r.event.token));
-	// await eventDS.updateSnapshot();
-	// await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[4], gtokens[4]] }});
-	// await eventDS.updateSnapshot();
+	await eventDS.add({ event: evn.GAME_OPENED, payload: [{ name: "playerToken", value: ptokens[2] }, { name: "gameName", value: "Bill's Game" }]}).then(r => gtokens.push(r.event.token));
+	await eventDS.updateSnapshot();
+	await eventDS.add({ event: evn.GAME_JOINED, payload: [{ name: "playerToken", value: ptokens[2] }, { name: "gameToken", value: gtokens[2] }]});
+	await eventDS.updateSnapshot();
+	await eventDS.add({ event: evn.GAME_OPENED, payload: [{ name: "playerToken", value: ptokens[3] }, { name: "gameName", value: "Jess's Game" }]}).then(r => gtokens.push(r.event.token));
+	await eventDS.updateSnapshot();
+	await eventDS.add({ event: evn.GAME_JOINED, payload: [{ name: "playerToken", value: ptokens[3] }, { name: "gameToken", value: gtokens[3] }]});
+	await eventDS.updateSnapshot();
+	await eventDS.add({ event: evn.GAME_OPENED, payload: [{ name: "playerToken", value: ptokens[4] }, { name: "gameName", value: "Dave's Game" }]}).then(r => gtokens.push(r.event.token));
+	await eventDS.updateSnapshot();
+	await eventDS.add({ event: evn.GAME_JOINED, payload: [{ name: "playerToken", value: ptokens[4] }, { name: "gameToken", value: gtokens[4] }]});
+	await eventDS.updateSnapshot();
 
 	// await eventDS.add({ event: evn.GAME_JOINED, payload: { data: [ptokens[2], gtokens[1]] }});
 	// await eventDS.updateSnapshot();

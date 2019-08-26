@@ -30,6 +30,7 @@ module.exports = {
 		},
 		listPlayers: (_, __, { dataSources }) => dataSources.eventDS.listPlayers(),
 		listGames: (_, __, { dataSources }) => dataSources.eventDS.listGames(),
+		listAvailableGames: (_, __, { dataSources }) => dataSources.eventDS.listAvailableGames(),
 		listTerritories: (_, { token }, { dataSources }) => dataSources.eventDS.listTerritoriesByPlayer({ token })
 	},
 	Mutation: {
@@ -190,6 +191,7 @@ module.exports = {
 			}
 
 			await dataSources.eventDS.updateSnapshot();
+			pubsub.publish(consts.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
 			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
 			return k;
 		},

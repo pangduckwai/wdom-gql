@@ -42,7 +42,7 @@ export default function GameList(props) {
 			<div className="title bt mt mb">Available games</div>
 			<form className="game-ctrl" onSubmit={handleSubmit}>
 				<ul className="list" onChange={e => setValue(e.target.value)}>
-					{data.listGames.map((game) =>
+					{data.listAvailableGames.map((game) =>
 						(<li key={game.token}>
 							<input
 								type="radio"
