@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { START_GAME } from '../mutations';
 import JoinerList from './game-joiners';
 
-export default function StartGame() {
+export default function StartGame(props) {
+	const [render, setRender] = useState(true);
+
 	const [startGame, { loading, error }] = useMutation(START_GAME);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		startGame();
+		setRender(false);
+		startGame().then(r => {
+			props.refresh({
+				player: true,
+				game: true
+			});
+		});
 	};
 
 	if (loading) return <p>'StartGame' Loading...</p>;
@@ -20,7 +28,9 @@ export default function StartGame() {
 
 	return (
 		<form className="game-ctrl" onSubmit={handleSubmit}>
-			<JoinerList />
+			{render &&
+				<JoinerList />
+			}
 			<input type="submit" value="Start Game" />
 		</form>
 	);

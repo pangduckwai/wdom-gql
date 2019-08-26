@@ -86,13 +86,12 @@ export default function App() {
 			refresh({ joined: true });
 			break;
 		case EVENTS.GAME_STARTED:
-			let parm = {};
-			if (gameHost === playerToken) parm.joined = true;
+			if (gameHost === playerToken) break;
 		case EVENTS.TROOP_PLACED:
-			if (!parm) parm = {};
-			parm.player = true;
-			parm.game = true;
-			refresh(parm);
+			refresh({
+				player: true,
+				game: true
+			});
 			break;
 		case EVENTS.TROOP_ADDED:
 		case EVENTS.TERRITORY_ATTACKED:
@@ -128,7 +127,8 @@ export default function App() {
 				}
 				{(joined && isHost && isSetup) &&
 					<StartGame
-						key={joinKey} />
+						key={joinKey}
+						refresh={refresh} />
 				}
 				{(joined && !isHost && isSetup) &&
 					<>

@@ -147,16 +147,22 @@ class EventDS extends DataSource {
 				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.host === fltr1[0].value)) { //Only the host can start a game
-					obj.turn = obj.host;
-					obj.rounds = 0;
-
 					//Assign initial troops to each player
 					const players = this.listPlayersByGame({ token: v.token });
 					const troops = this.gameRules.initialTroops(players.length);
+
+					let first = { token: null, min: 7};
 					for (const player of players) {
 						player.reinforcement = troops;
-						if (player.order === 1) obj.turn = player.token; // red always start first
+
+						if (player.order < first.min) {
+							first.min = player.order;
+							first.token = player.token;
+						}
 					}
+
+					obj.turn = first.token;
+					obj.rounds = 0;
 				}
 				break;
 			case consts.TERRITORY_ASSIGNED.id:
@@ -240,13 +246,14 @@ class EventDS extends DataSource {
 				if (obj && (obj.rounds === 0)) {
 					obj.turn = obj.host;
 					const players = this.listPlayersByGame({ token: v.token });
+					let first = { token: null, min: 7};
 					for (const player of players) {
-						if (player.order === 1) {
-							obj.turn = player.token; // red always start first
-							break;
+						if (player.order < first.min) {
+							first.min = player.order;
+							first.token = player.token;
 						}
 					}
-
+					obj.turn = first.token;
 					obj.rounds = 1;
 					obj.fortified = false;
 
