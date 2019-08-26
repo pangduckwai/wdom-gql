@@ -1,6 +1,6 @@
 import React from 'react';
 import { MAP } from '../consts';
-import './map.css';
+import './app.css';
 
 export default function Territory(props) {
 	const local = MAP[props.tid];
@@ -18,7 +18,7 @@ export default function Territory(props) {
 				data-tid={tid}
 				className={`${local.continent} ${local.cindex}`}
 				d={local.svgPath}/>
-			<text data-tid={tid} className={"tarmy"} x={local.loc[0]} y={local.loc[1]}>
+			<text draggable data-tid={tid} className={"tarmy"} x={local.loc[0]} y={local.loc[1]}>
 				{props.army}
 			</text>
 			<polyline

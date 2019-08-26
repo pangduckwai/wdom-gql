@@ -9,14 +9,16 @@ export default function Greetings(props) {
 				onCompleted(data) {
 					if (data.quitPlayer.successful) {
 						sessionStorage.setItem("token", null);
+						props.setPlayer(null);
 					}
 				}
 			}];
-		} else if (props.game && (props.game.host.token === props.player.token)) {
+		} else if (props.player.joined.host.token === props.player.token) {
 			return [CLOSE_GAME, {
 				onCompleted(data) {
 					if (data.closeGame.successful) {
 						sessionStorage.setItem("gameToken", null);
+						props.refresh({ game: true });
 					}
 				}
 			}];
@@ -25,6 +27,7 @@ export default function Greetings(props) {
 				onCompleted(data) {
 					if (data.leaveGame.successful) {
 						sessionStorage.setItem("gameToken", null);
+						props.refresh({ game: true });
 					}
 				}
 			}];

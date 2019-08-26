@@ -8,7 +8,7 @@ export default function GameStatus(props) {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		endTurn().then(r => {
-			props.refetch();
+			props.refresh({ game: true });
 		});
 	};
 
@@ -22,25 +22,25 @@ export default function GameStatus(props) {
 	return (
 		<>
 			<div id="status">
-				{(props.game.rounds <= 0) ? (
+				{(props.rounds <= 0) ? (
 					<div>Round: <span className="name">Preparation</span></div>
 				) : (
-					<div>Round: <span className="name">{Math.floor((props.game.rounds - 1) / 5) + 1}</span></div>
+					<div>Round: <span className="name">{Math.floor((props.rounds - 1) / 5) + 1}</span></div>
 				)}
-				{(props.game.turn.token === props.player.token) ? (
+				{(props.turnToken === props.playerToken) ? (
 					<>
 						<div>Turn: <span className="name">Your turn</span></div>
-						<div>Troops: <span className="name">{props.player.reinforcement}</span></div>
+						<div>Troops: <span className="name">{props.reinforcement}</span></div>
 					</>
 				) : (
-					<div>Turn: <span className="name">{props.game.turn.name}</span></div>
+					<div>Turn: <span className="name">{props.turnName}</span></div>
 				)}
 			</div>
 			<div className="mt">Territories:</div>
 			<form className="game-ctrl" onSubmit={handleSubmit}>
 				<ul className="list">
-					{props.game.territories
-						.filter(t => t.owner.token === props.player.token)
+					{props.territories
+						.filter(t => t.owner.token === props.playerToken)
 						.sort((a, b) => {
 							if (a.name < b.name) {
 								return -1;

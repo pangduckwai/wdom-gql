@@ -1,18 +1,30 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { MY_GAME } from '../queries';
 import { TAKE_ACTION } from '../mutations';
 import { MAP, LINK, LINE } from '../consts';
-import Territory from './territory';
+import Territory from './map-territory';
 import { convert } from '../utils';
-import './map.css';
+import './app.css';
 
 export default function Map(props) {
 	const [focused, setFocused] = useState("");
 	const [selected, setSelected] = useState("");
 
-	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
+	const { data, loading: loadingg, error: errorg, refetch } = useQuery(MY_GAME, {
+		fetchPolicy: "no-cache",
+		onCompleted(data) {
+			if (data.myGame) {
+				props.callback(data.myGame);
+			} else {
+				props.callback(null);
+			}
+		}
+	});
 
-	const territories = (props.player && props.game) ? props.game.territories :
+	const [takeAction, { loading: loadinga, error: errora }] = useMutation(TAKE_ACTION);
+
+	const territories = (data.myGame) ? data.myGame.territories :
 		Object.keys(MAP).map((key) => {
 			const t = {};
 			t.name = key;
@@ -21,12 +33,14 @@ export default function Map(props) {
 
 	const territoryIdx = {};
 	const playerIdx = {};
-	if (props.player && props.game) {
-		for (let i = 0; i < props.game.territories.length; i ++) {
-			territoryIdx[props.game.territories[i].name] = i;
+	if (data.myGame) {
+		for (let i = 0; i < data.myGame.territories.length; i ++) {
+			territoryIdx[data.myGame.territories[i].name] = i;
 		}
-		for (let i = 0; i < props.players.length; i ++) {
-			playerIdx[props.players[i].name] = i + 1;
+	}
+	if (data.myFellowPlayers) {
+		for (let i = 0; i < data.myFellowPlayers.length; i ++) {
+			playerIdx[data.myFellowPlayers[i].name] = i + 1;
 		}
 	}
 
@@ -58,25 +72,23 @@ export default function Map(props) {
 		setFocused(value);
 		setSelected(value);
 
-		if (!props.game) return;
-		const isOwned = (props.game.territories[territoryIdx[value]].owner.token === props.player.token);
-		if (props.game.turn.token !== props.player.token) return;
+		if (!data.myGame || (data.myGame.rounds < 0)) return;
+		const isOwned = (data.myGame.territories[territoryIdx[value]].owner.token === props.playerToken);
+		if (data.myGame.turn.token !== props.playerToken) return;
 
-		if (props.game.rounds === 0) {
-			if (isOwned) {
-				takeAction({ variables: { name: value }});
-				props.clicked();
-			}
-		} else if (props.game.rounds > 0) {
-			takeAction({ variables: { name: value }});
-			props.clicked();
+		if (((data.myGame.rounds === 0) && isOwned) || (data.myGame.rounds > 0)) {
+			takeAction({ variables: { name: value }}).then(r => {
+				refetch();
+			});
 		}
 	};
 
-	if (loading) return <p>'TakeAction' Loading...</p>;
-
-	if (error) {
-		console.log(JSON.stringify(error));
+	if (errorg) {
+		console.log(JSON.stringify(errorg));
+		return <p>ERROR</p>;
+	}
+	if (errora) {
+		console.log(JSON.stringify(errora));
 		return <p>ERROR</p>;
 	}
 
@@ -100,16 +112,20 @@ export default function Map(props) {
 					onClick={handleClick}
 					onMouseOver={handleHover} />))}
 
-			<text className="tname" x="450" y="590">
-				Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
-			</text>
+			{(!loadingg && !loadinga) ? (
+				<text className="tname" x="450" y="590">
+					Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
+				</text>
+			) : (
+				<text className="tname" x="450" y="590">Loading...</text>
+			)}
 
-			{(props.player && props.game) &&
+			{(data.myGame) &&
 				<>
 					<polyline
-						className={`player${playerIdx[props.player.name]}`}
+						className={`player${playerIdx[props.playerName]}`}
 						points="810,592 810,552 850,562 810,572" />
-					<text className="tname" x="814" y="590">Player: <tspan className="data">{props.player.name}</tspan></text>
+					<text className="tname" x="814" y="590">Player: <tspan className="data">{props.playerName}</tspan></text>
 				</>
 			}
 		</svg>

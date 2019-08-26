@@ -9,6 +9,7 @@ export default function OpenGame(props) {
 		onCompleted(data) {
 			if (data.openGame.successful) {
 				sessionStorage.setItem("gameToken", data.openGame.event.token);
+				props.refresh({ player: true, game: true });
 			}
 		}
 	});
@@ -30,7 +31,7 @@ export default function OpenGame(props) {
 	}
 
 	return (
-		<form id="create" onSubmit={handleSubmit}>
+		<form id="create" className="bb mb pb" onSubmit={handleSubmit}>
 			<input type="text" placeholder="Name of new game" autoFocus value={name} onChange={e => setName(e.target.value)} />
 			<input type="submit" value="Create" />
 		</form>

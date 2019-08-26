@@ -21,7 +21,7 @@ export default function GameList(props) {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		joinGame({ variables: { token: value }}).then(r => {
-			props.refetch();
+			props.refresh({ player: true, game: true });
 		});
 	};
 
@@ -39,7 +39,7 @@ export default function GameList(props) {
 
 	return (
 		<>
-			<div className="title bt mt mb">Available games</div>
+			<div className="title mb">Available games</div>
 			<form className="game-ctrl" onSubmit={handleSubmit}>
 				<ul className="list" onChange={e => setValue(e.target.value)}>
 					{data.listAvailableGames.map((game) =>

@@ -3,14 +3,12 @@ import { useMutation } from '@apollo/react-hooks';
 import { START_GAME } from '../mutations';
 import JoinerList from './game-joiners';
 
-export default function StartGame(props) {
+export default function StartGame() {
 	const [startGame, { loading, error }] = useMutation(START_GAME);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		startGame().then(r => {
-			props.refetch();
-		});
+		startGame();
 	};
 
 	if (loading) return <p>'StartGame' Loading...</p>;
