@@ -9,6 +9,7 @@ import JoinerList from './game-joiners';
 import GameStatus from './game-status';
 import Player from './player';
 import './app.css';
+import Game from './game';
 
 export default function App() {
 	const [playerKey, setPlayerKey] = useState(Math.floor(Math.random() * 100000));
@@ -18,13 +19,14 @@ export default function App() {
 
 	const [playerToken, setPlayerToken] = useState(null);
 	const [playerName, setPlayerName] = useState(null);
-	const [playerOrder, setPlayerOrder] = useState(null);
+	const [playerOrder, setPlayerOrder] = useState(0);
 	const [reinforcement, setReinforcement] = useState(0);
 	const [gameToken, setGameToken] = useState(null);
 	const [gameHost, setGameHost] = useState(null);
 	const [turnToken, setTurnToken] = useState(null);
 	const [turnName, setTurnName] = useState(null);
 	const [rounds, setRounds] = useState(-1);
+	const [players, setPlayers] = useState(null);
 	const [territories, setTerritories] = useState(null);
 
 	const setPlayer = (player) => {
@@ -37,15 +39,17 @@ export default function App() {
 			setPlayerToken(null);
 			setPlayerName(null);
 			setReinforcement(0);
+			setPlayerOrder(0);
 		}
 	};
-	const setGame = (game) => {
+	const setGame = (game, players) => {
 		if (game) {
 			setGameToken(game.token);
 			setGameHost(game.host.token);
 			if (game.turn) setTurnToken(game.turn.token);
 			if (game.turn) setTurnName(game.turn.name);
 			setRounds(game.rounds);
+			if (players) setPlayers(players);
 			if (game.territories) setTerritories(game.territories);
 		} else {
 			setGameToken(null);
@@ -53,6 +57,7 @@ export default function App() {
 			setTurnToken(null);
 			setTurnName(null);
 			setRounds(-1);
+			setPlayers(null);
 			setTerritories(null);
 		}
 	};
@@ -97,7 +102,7 @@ export default function App() {
 			});
 			break;
 		default:
-			console.log("Event", event, "received...");
+			console.log("Event", event, "received....");
 			break;
 		}
 	};
@@ -105,16 +110,27 @@ export default function App() {
 	return (
 		<>
 			<Map
-				key={gameKey}
 				callback={setGame}
 				playerToken={playerToken}
 				playerName={playerName}
-				playerOrder={playerOrder} />
+				playerOrder={playerOrder}
+				gameToken={gameToken}
+				turnToken={turnToken}
+				rounds={rounds}
+				players={players}
+				territories={territories} />
 			<div id="control">
 				<Player
 					key={playerKey}
+					gameToken={gameToken}
+					gameHost={gameHost}
 					refresh={refresh}
 					setPlayer={setPlayer} />
+				<Game
+					key={gameKey}
+					playerToken={playerToken}
+					refresh={refresh}
+					setGame={setGame} />
 				{registed &&
 					<GameList
 						key={listKey}

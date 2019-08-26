@@ -22,13 +22,11 @@ export default function Register(props) {
 		}
 	};
 
-	if (loading) return <p>'Register' Loading...</p>;
-
 	if (error) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
 	}
-
+	if (loading) return <div id="greeting">Loading...</div>;
 	return (
 		<>
 			<div id="greeting" className="title">Register as player</div>

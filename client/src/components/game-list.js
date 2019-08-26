@@ -25,8 +25,6 @@ export default function GameList(props) {
 		});
 	};
 
-	if (loading || mLoading) return <p>'GameList' Loading...</p>;
-
 	if (error) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
@@ -36,6 +34,8 @@ export default function GameList(props) {
 		console.log(JSON.stringify(mError));
 		return <p>ERROR</p>;
 	}
+
+	if (loading || mLoading) return <div className="title mb">Loading...</div>;
 
 	return (
 		<>

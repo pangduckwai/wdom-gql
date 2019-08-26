@@ -13,13 +13,6 @@ query Myself {
 			name
 			type
 		}
-		joined {
-			token
-			name
-			host {
-				token
-			}
-		}
 	}
 }`;
 

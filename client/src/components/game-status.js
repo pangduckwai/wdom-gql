@@ -12,12 +12,12 @@ export default function GameStatus(props) {
 		});
 	};
 
-	if (loading) return <p>'EndTurn' Loading...</p>;
-
 	if (error) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
 	}
+
+	if (loading) return <div id="status">Loading...</div>;
 
 	const isTurn = (props.turnToken === props.playerToken);
 
@@ -30,13 +30,11 @@ export default function GameStatus(props) {
 					<div>Round: <span className="name">{Math.floor((props.rounds - 1) / 5) + 1}</span></div>
 				)}
 				{isTurn ? (
-					<>
-						<div>Turn: <span className="name">Your turn</span></div>
-						<div>Troops: <span className="name">{props.reinforcement}</span></div>
-					</>
+					<div>Turn: <span className="name">Your turn</span></div>
 				) : (
 					<div>Turn: <span className="name">{props.turnName}</span></div>
 				)}
+				<div>Troops: <span className="name">{props.reinforcement}</span></div>
 			</div>
 			<div className="mt">Territories:</div>
 			<form className="game-ctrl" onSubmit={handleSubmit}>
@@ -58,7 +56,7 @@ export default function GameStatus(props) {
 							</li>)
 						)}
 				</ul>
-				{isTurn &&
+				{(isTurn && (props.rounds > 0)) &&
 					<input type="submit" value="End turn" />
 				}
 			</form>

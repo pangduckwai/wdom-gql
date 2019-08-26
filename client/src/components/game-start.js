@@ -19,13 +19,11 @@ export default function StartGame(props) {
 		});
 	};
 
-	if (loading) return <p>'StartGame' Loading...</p>;
-
 	if (error) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
 	}
-
+	if (loading) return <div className="title">Loading...</div>;
 	return (
 		<form className="game-ctrl" onSubmit={handleSubmit}>
 			{render &&

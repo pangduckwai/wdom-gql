@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import { MY_GAME } from '../queries';
+import { useMutation } from '@apollo/react-hooks';
 import { TAKE_ACTION } from '../mutations';
 import { MAP, LINK, LINE } from '../consts';
 import Territory from './map-territory';
@@ -11,20 +10,9 @@ export default function Map(props) {
 	const [focused, setFocused] = useState("");
 	const [selected, setSelected] = useState("");
 
-	const { data, loading: loadingg, error: errorg, refetch } = useQuery(MY_GAME, {
-		fetchPolicy: "no-cache",
-		onCompleted(data) {
-			if (data.myGame) {
-				props.callback(data.myGame);
-			} else {
-				props.callback(null);
-			}
-		}
-	});
+	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
 
-	const [takeAction, { loading: loadinga, error: errora }] = useMutation(TAKE_ACTION);
-
-	const territories = (data.myGame) ? data.myGame.territories :
+	const territories = (props.gameToken) ? props.territories :
 		Object.keys(MAP).map((key) => {
 			const t = {};
 			t.name = key;
@@ -33,14 +21,14 @@ export default function Map(props) {
 
 	const territoryIdx = {};
 	const playerIdx = {};
-	if (data.myGame) {
-		for (let i = 0; i < data.myGame.territories.length; i ++) {
-			territoryIdx[data.myGame.territories[i].name] = i;
+	if (props.gameToken) {
+		for (let i = 0; i < props.territories.length; i ++) {
+			territoryIdx[props.territories[i].name] = i;
 		}
 	}
-	if (data.myFellowPlayers) {
-		for (let i = 0; i < data.myFellowPlayers.length; i ++) {
-			playerIdx[data.myFellowPlayers[i].name] = data.myFellowPlayers[i].order;
+	if (props.players) {
+		for (let i = 0; i < props.players.length; i ++) {
+			playerIdx[props.players[i].name] = props.players[i].order;
 		}
 	}
 
@@ -70,31 +58,28 @@ export default function Map(props) {
 		if (typeof(e.target.dataset.tid) === "undefined") return;
 		const value = convert(e.target.dataset.tid);
 
-		if (!data.myGame || (data.myGame.rounds < 0)) {
+		if (!props.gameToken || (props.rounds < 0)) {
 			setFocused(value);
 			setSelected(value);
 			return;
 		}
 
-		if (data.myGame.turn.token !== props.playerToken) return;
+		if (props.turnToken !== props.playerToken) return;
 
-		if (data.myGame.territories[territoryIdx[value]].owner.token === props.playerToken) {
+		if (props.territories[territoryIdx[value]].owner.token === props.playerToken) {
 			setFocused(value);
 			setSelected(value); //can only select your own territory
-		} else if (data.myGame.rounds === 0) {
+		} else if (props.rounds === 0) {
 			return; //can do nothing to other's territories during setup phase
 		}
-		takeAction({ variables: { name: value }}).then(r => {
-			refetch();
-		});
+		// takeAction({ variables: { name: value }}).then(r => {
+		// 	refetch();
+		// });
+		takeAction({ variables: { name: value }});
 	};
 
-	if (errorg) {
-		console.log(JSON.stringify(errorg));
-		return <p>ERROR</p>;
-	}
-	if (errora) {
-		console.log(JSON.stringify(errora));
+	if (error) {
+		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
 	}
 
@@ -119,7 +104,7 @@ export default function Map(props) {
 					onClick={handleClick}
 					onMouseOver={handleHover} />))}
 
-			{(!loadingg && !loadinga) ? (
+			{!loading ? (
 				<text className="tname" x="380" y="600">
 					Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
 				</text>
@@ -127,7 +112,7 @@ export default function Map(props) {
 				<text className="tname" x="380" y="600">Loading...</text>
 			)}
 
-			{(data.myGame) &&
+			{(props.gameToken) &&
 				<>
 					<polyline
 						className={`player${order}`}
@@ -137,5 +122,5 @@ export default function Map(props) {
 				</>
 			}
 		</svg>
-	);//810,592 810,552 850,562 810,572   814
+	);
 }
