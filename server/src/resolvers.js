@@ -376,6 +376,7 @@ module.exports = {
 			if (!n.successful) throw new UserInputError(n.message);
 
 			await dataSources.eventDS.updateSnapshot();
+			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: e.event, token: g.token });
 			return e;
 		},
 		redeemCards: async (_, { cards }, { dataSources }) => {

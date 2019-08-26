@@ -19,6 +19,8 @@ export default function GameStatus(props) {
 		return <p>ERROR</p>;
 	}
 
+	const isTurn = (props.turnToken === props.playerToken);
+
 	return (
 		<>
 			<div id="status">
@@ -27,7 +29,7 @@ export default function GameStatus(props) {
 				) : (
 					<div>Round: <span className="name">{Math.floor((props.rounds - 1) / 5) + 1}</span></div>
 				)}
-				{(props.turnToken === props.playerToken) ? (
+				{isTurn ? (
 					<>
 						<div>Turn: <span className="name">Your turn</span></div>
 						<div>Troops: <span className="name">{props.reinforcement}</span></div>
@@ -56,7 +58,9 @@ export default function GameStatus(props) {
 							</li>)
 						)}
 				</ul>
-				<input type="submit" value="End turn" />
+				{isTurn &&
+					<input type="submit" value="End turn" />
+				}
 			</form>
 		</>
 	);

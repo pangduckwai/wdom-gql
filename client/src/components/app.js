@@ -88,18 +88,13 @@ export default function App() {
 		case EVENTS.GAME_STARTED:
 			if (gameHost === playerToken) break;
 		case EVENTS.TROOP_PLACED:
+		case EVENTS.TROOP_ADDED:
+		case EVENTS.TERRITORY_ATTACKED:
+		case EVENTS.TURN_ENDED:
 			refresh({
 				player: true,
 				game: true
 			});
-			break;
-		case EVENTS.TROOP_ADDED:
-		case EVENTS.TERRITORY_ATTACKED:
-			let args = {
-				player: true,
-				game: true
-			};
-			refresh(args);
 			break;
 		default:
 			console.log("Event", event, "received...");

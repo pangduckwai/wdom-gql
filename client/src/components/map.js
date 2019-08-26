@@ -120,21 +120,22 @@ export default function Map(props) {
 					onMouseOver={handleHover} />))}
 
 			{(!loadingg && !loadinga) ? (
-				<text className="tname" x="450" y="590">
+				<text className="tname" x="380" y="600">
 					Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
 				</text>
 			) : (
-				<text className="tname" x="450" y="590">Loading...</text>
+				<text className="tname" x="380" y="600">Loading...</text>
 			)}
 
 			{(data.myGame) &&
 				<>
 					<polyline
 						className={`player${order}`}
-						points="810,592 810,552 850,562 810,572" />
-					<text className="tname" x="814" y="590">Player: <tspan className="data">{props.playerName}</tspan></text>
+						points="0,0 0,-40 40,-30 0,-20"
+						transform="translate(394,580)" />
+					<text className="tname" x="398" y="578">Player: <tspan className="data">{props.playerName}</tspan></text>
 				</>
 			}
 		</svg>
-	);
+	);//810,592 810,552 850,562 810,572   814
 }
