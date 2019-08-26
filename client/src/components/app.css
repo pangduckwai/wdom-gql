@@ -253,10 +253,10 @@ text {
 	}
 }
 
-.player0 { fill:lightgray; }
+.player0 { fill: none; }
 .player1 { fill:red; }
 .player2 { fill:blueviolet; }
-.player3 { fill:burlywood; }
+.player3 { fill:orange; }
 .player4 { fill:aqua; }
 .player5 { fill:black; }
 .player6 { fill:white; }

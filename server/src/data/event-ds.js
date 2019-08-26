@@ -82,9 +82,14 @@ class EventDS extends DataSource {
 				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 				if (obj) {
+					const game = this.store.games[this.store.idxGameToken[v.token]];
 					obj.joined = v.token;
+					obj.order = game.init_player;
 					obj.reinforcement = 0;
 					obj.cards = [];
+
+					game.init_player ++;
+					if (game.init_player > 6) game.init_player = 1;
 				}
 				break;
 			case consts.GAME_LEFT.id:
@@ -120,7 +125,8 @@ class EventDS extends DataSource {
 					redeemed: 0,
 					cards: [],
 					territories: this.gameRules.buildTerritory(),
-					t_index: {}
+					t_index: {},
+					init_player: Math.floor(Math.random() * 6) + 1
 				};
 				for (let i = 0; i < obj.territories.length; i ++) {
 					obj.t_index[obj.territories[i].name] = i;
@@ -149,6 +155,7 @@ class EventDS extends DataSource {
 					const troops = this.gameRules.initialTroops(players.length);
 					for (const player of players) {
 						player.reinforcement = troops;
+						if (player.order === 1) obj.turn = player.token; // red always start first
 					}
 				}
 				break;
@@ -232,6 +239,14 @@ class EventDS extends DataSource {
 				obj = this.store.games[this.store.idxGameToken[v.token]];
 				if (obj && (obj.rounds === 0)) {
 					obj.turn = obj.host;
+					const players = this.listPlayersByGame({ token: v.token });
+					for (const player of players) {
+						if (player.order === 1) {
+							obj.turn = player.token; // red always start first
+							break;
+						}
+					}
+
 					obj.rounds = 1;
 					obj.fortified = false;
 

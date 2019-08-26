@@ -18,6 +18,7 @@ export default function App() {
 
 	const [playerToken, setPlayerToken] = useState(null);
 	const [playerName, setPlayerName] = useState(null);
+	const [playerOrder, setPlayerOrder] = useState(null);
 	const [reinforcement, setReinforcement] = useState(0);
 	const [gameToken, setGameToken] = useState(null);
 	const [gameHost, setGameHost] = useState(null);
@@ -31,6 +32,7 @@ export default function App() {
 			setPlayerToken(player.token);
 			setPlayerName(player.name);
 			setReinforcement(player.reinforcement);
+			setPlayerOrder(player.order);
 		} else {
 			setPlayerToken(null);
 			setPlayerName(null);
@@ -112,7 +114,8 @@ export default function App() {
 				key={gameKey}
 				callback={setGame}
 				playerToken={playerToken}
-				playerName={playerName} />
+				playerName={playerName}
+				playerOrder={playerOrder} />
 			<div id="control">
 				<Player
 					key={playerKey}

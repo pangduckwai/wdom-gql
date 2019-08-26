@@ -8,6 +8,7 @@ query Myself {
         redeemable
 		reinforcement
 		conquer
+		order
 		cards {
 			name
 			type
@@ -65,6 +66,7 @@ query MyGame {
 	}
 	myFellowPlayers {
 		name
+		order
 	}
 }`;
 

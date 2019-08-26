@@ -40,7 +40,7 @@ export default function Map(props) {
 	}
 	if (data.myFellowPlayers) {
 		for (let i = 0; i < data.myFellowPlayers.length; i ++) {
-			playerIdx[data.myFellowPlayers[i].name] = i + 1;
+			playerIdx[data.myFellowPlayers[i].name] = data.myFellowPlayers[i].order;
 		}
 	}
 
@@ -69,18 +69,24 @@ export default function Map(props) {
 
 		if (typeof(e.target.dataset.tid) === "undefined") return;
 		const value = convert(e.target.dataset.tid);
-		setFocused(value);
-		setSelected(value);
 
-		if (!data.myGame || (data.myGame.rounds < 0)) return;
-		const isOwned = (data.myGame.territories[territoryIdx[value]].owner.token === props.playerToken);
+		if (!data.myGame || (data.myGame.rounds < 0)) {
+			setFocused(value);
+			setSelected(value);
+			return;
+		}
+
 		if (data.myGame.turn.token !== props.playerToken) return;
 
-		if (((data.myGame.rounds === 0) && isOwned) || (data.myGame.rounds > 0)) {
-			takeAction({ variables: { name: value }}).then(r => {
-				refetch();
-			});
+		if (data.myGame.territories[territoryIdx[value]].owner.token === props.playerToken) {
+			setFocused(value);
+			setSelected(value); //can only select your own territory
+		} else if (data.myGame.rounds === 0) {
+			return; //can do nothing to other's territories during setup phase
 		}
+		takeAction({ variables: { name: value }}).then(r => {
+			refetch();
+		});
 	};
 
 	if (errorg) {
@@ -93,6 +99,7 @@ export default function Map(props) {
 	}
 
 	const curr = (selected !== "") ? LINK[selected].connected : [];
+	const order = (props.playerOrder) ? props.playerOrder : 0;
 
 	return (
 		<svg viewBox="0 0 1225 628" preserveAspectRatio="xMidYMid meet"
@@ -123,7 +130,7 @@ export default function Map(props) {
 			{(data.myGame) &&
 				<>
 					<polyline
-						className={`player${playerIdx[props.playerName]}`}
+						className={`player${order}`}
 						points="810,592 810,552 850,562 810,572" />
 					<text className="tname" x="814" y="590">Player: <tspan className="data">{props.playerName}</tspan></text>
 				</>

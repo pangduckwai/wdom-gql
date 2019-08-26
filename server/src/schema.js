@@ -38,6 +38,7 @@ type Player {
 	cards: [Card]!
 	redeemable: Boolean
 	joined: Game
+	order: Int
 	conquer: Boolean
 }
 
