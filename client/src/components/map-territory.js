@@ -12,7 +12,9 @@ export default function Territory(props) {
 	return (
 		<g className={clazz} id={props.tid}
 			onClick={props.onClick}
-			onMouseOver={props.onMouseOver}>
+			onMouseOver={props.onMouseOver}
+			onMouseDown={props.onMouseDown}
+			onMouseUp={props.onMouseUp} >
 
 			<path
 				data-tid={tid}

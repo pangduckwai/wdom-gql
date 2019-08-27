@@ -12,3 +12,11 @@ export function convert(tid) {
 	}
 	return buff.join("");
 }
+
+export function getMousePosition(svg, xpos, ypos) {
+	const CTM = svg.getScreenCTM();
+	return {
+		xpos: (xpos - CTM.e) / CTM.a,
+		ypos: (ypos - CTM.f) / CTM.d
+	};
+}

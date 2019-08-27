@@ -288,3 +288,9 @@ text {
 .South-America.v0 { fill:#9370d8; }
 .South-America.v1 { fill:#885fd8; }
 .South-America.v2 { fill:#7c4ed8; }
+
+.drag polyline {
+	stroke:grey;
+	stroke-width: 2px;
+	fill: grey;
+}
