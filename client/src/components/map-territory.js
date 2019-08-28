@@ -11,10 +11,9 @@ export default function Territory(props) {
 	const tid = props.tid.toLowerCase();
 	return (
 		<g className={clazz} id={props.tid}
-			onClick={props.onClick}
-			onMouseOver={props.onMouseOver}
 			onMouseDown={props.onMouseDown}
-			onMouseUp={props.onMouseUp} >
+			onClick={props.onClick}
+			onMouseOver={props.onMouseOver} >
 
 			<path
 				data-tid={tid}
@@ -27,7 +26,8 @@ export default function Territory(props) {
 				data-tid={tid}
 				className={`player${props.player}`}
 				points="0,0 0,-20 20,-15 0,-10"
-				transform={`translate(${local.loc[2]}, ${local.loc[3]})`} />
+				transform={`translate(${local.loc[2]}, ${local.loc[3]})`}
+				pointerEvents="none" />
 		</g>
 	);
 }

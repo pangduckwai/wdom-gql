@@ -1,12 +1,12 @@
 /* Classes for the map */
-body {
-	margin: 0;
-	background: lightskyblue;
-}
 /* body {
 	margin: 0;
-	background: white;
+	background: lightskyblue;
 } */
+body {
+	margin: 0;
+	background: white;
+}
 
 #root {
 	width: 95vw;
@@ -183,7 +183,7 @@ input[type="text"] {
 	font-weight: 900;
 }
 
-svg {
+/* svg {
 	background-color:lightskyblue;
 }
 path {
@@ -204,14 +204,13 @@ text {
 	text-anchor: middle;
 	dominant-baseline: middle;
 	display: block;
-}
-/* svg {
-	background-color:white;
+} */
+svg {
+	background-color:#f5f5f5;
 }
 path {
-	stroke:#fefefe;
+	stroke:#efefef;
 	stroke-width: 2px;
-	fill: #fefefe;
 }
 line {
 	stroke:white;
@@ -220,7 +219,6 @@ line {
 polyline {
 	stroke:white;
 	stroke-width: 2;
-	fill: none;
 }
 text {
 	fill: #dddddd;
@@ -228,7 +226,7 @@ text {
 	text-anchor: middle;
 	dominant-baseline: middle;
 	display: block;
-} */
+}
 
 .s polyline {
 	animation-name: flag;
@@ -253,7 +251,7 @@ text {
 	}
 }
 
-.player0 { fill: none; }
+/* .player0 { fill:lightskyblue; }
 .player1 { fill:red; }
 .player2 { fill:blueviolet; }
 .player3 { fill:orange; }
@@ -287,10 +285,44 @@ text {
 .North-America.v4 { fill:#ff6d33; }
 .South-America.v0 { fill:#9370d8; }
 .South-America.v1 { fill:#885fd8; }
-.South-America.v2 { fill:#7c4ed8; }
+.South-America.v2 { fill:#7c4ed8; } */
+.player0 { fill:white; }
+.player1 { fill:white; }
+.player2 { fill:white; }
+.player3 { fill:white; }
+.player4 { fill:white; }
+.player5 { fill:white; }
+.player6 { fill:white; }
 
-.drag polyline {
-	stroke:grey;
-	stroke-width: 2px;
-	fill: grey;
+.Africa.v0 { fill:#efefef; }
+.Africa.v1 { fill:#efefef; }
+.Africa.v2 { fill:#efefef; }
+.Africa.v3 { fill:#efefef; }
+.Asia.v0 { fill:#efefef; }
+.Asia.v1 { fill:#efefef; }
+.Asia.v2 { fill:#efefef; }
+.Asia.v3 { fill:#efefef; }
+.Asia.v4 { fill:#efefef; }
+.Asia.v5 { fill:#efefef; }
+.Australia.v0 { fill:#efefef; }
+.Australia.v1 { fill:#efefef; }
+.Australia.v2 { fill:#efefef; }
+.Australia.v3 { fill:#efefef; }
+.Europe.v0 { fill:#efefef; }
+.Europe.v1 { fill:#efefef; }
+.Europe.v2 { fill:#efefef; }
+.Europe.v3 { fill:#efefef; }
+.Europe.v4 { fill:#efefef; }
+.North-America.v0 { fill:#efefef; }
+.North-America.v1 { fill:#efefef; }
+.North-America.v2 { fill:#efefef; }
+.North-America.v3 { fill:#efefef; }
+.North-America.v4 { fill:#efefef; }
+.South-America.v0 { fill:#efefef; }
+.South-America.v1 { fill:#efefef; }
+.South-America.v2 { fill:#efefef; }
+
+.drag {
+	stroke:#101010;
+	stroke-width: 3px;
 }

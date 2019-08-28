@@ -4,16 +4,16 @@ import { TAKE_ACTION } from '../mutations';
 import { MAP, LINK, LINE } from '../consts';
 import Territory from './map-territory';
 import DragIcon from './map-drag';
-import { convert, getMousePosition } from '../utils';
+import { convert, getMousePosition, getArrowHead } from '../utils';
 import './app.css';
 
 export default function Map(props) {
 	const [selected, setSelected] = useState("");
 	const [focused, setFocused] = useState("");
-	const [dragged, setDragged] = useState("");
 	const [mouseDown, setMouseDown] = useState(false);
-	const [xpos, setXPos] = useState(0);
-	const [ypos, setYPos] = useState(0);
+	const [dragged, setDragged] = useState("");
+	const [xpos, setXPos] = useState(613);
+	const [ypos, setYPos] = useState(314);
 
 	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
 
@@ -47,15 +47,6 @@ export default function Map(props) {
 		setFocused("");
 	};
 
-	const handleHover = (e) => {
-		e.stopPropagation();
-		e.nativeEvent.stopImmediatePropagation();
-		if (typeof(e.target.dataset.tid) !== "undefined") {
-			const value = convert(e.target.dataset.tid);
-			setFocused(value);
-		}
-	};
-
 	const handleClick = (e) => {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
@@ -80,29 +71,73 @@ export default function Map(props) {
 		takeAction({ variables: { name: value }});
 	};
 
+	const handleHover = (e) => {
+		e.stopPropagation();
+		e.nativeEvent.stopImmediatePropagation();
+		if (typeof(e.target.dataset.tid) !== "undefined") {
+			const value = convert(e.target.dataset.tid);
+			setFocused(value);
+		}
+	};
+
 	const handleMouseDown = (e) => {
 		e.preventDefault();
-		setMouseDown(true);
-		setDragged(focused);
+
+		if (typeof(e.target.dataset.tid) === "undefined") return;
+		const dragIcon0 = document.getElementById("drag-icon-0");
+		const dragIcon1 = document.getElementById("drag-icon-1");
+		const dragIcon2 = document.getElementById("drag-icon-2");
 		const { xpos: x, ypos: y } = getMousePosition(e.target, e.clientX, e.clientY);
+		dragIcon0.setAttributeNS(null, "x1", x);
+		dragIcon0.setAttributeNS(null, "y1", y);
+		dragIcon0.setAttributeNS(null, "x2", x);
+		dragIcon0.setAttributeNS(null, "y2", y);
+		dragIcon1.setAttributeNS(null, "x1", x);
+		dragIcon1.setAttributeNS(null, "y1", y);
+		dragIcon1.setAttributeNS(null, "x2", x);
+		dragIcon1.setAttributeNS(null, "y2", y);
+		dragIcon2.setAttributeNS(null, "x1", x);
+		dragIcon2.setAttributeNS(null, "y1", y);
+		dragIcon2.setAttributeNS(null, "x2", x);
+		dragIcon2.setAttributeNS(null, "y2", y);
 		setXPos(x);
 		setYPos(y);
+
+		setMouseDown(true);
+		setDragged(convert(e.target.dataset.tid));
 	};
+
 	const handleMouseMove = (e) => {
 		if (mouseDown) {
-			e.preventDefault();
+			const dragIcon0 = document.getElementById("drag-icon-0");
+			const dragIcon1 = document.getElementById("drag-icon-1");
+			const dragIcon2 = document.getElementById("drag-icon-2");
 			const { xpos: x, ypos: y } = getMousePosition(e.target, e.clientX, e.clientY);
-			setXPos(x);
-			setYPos(y);
+			const [{ p, q }, { r, s }] = getArrowHead({ a: xpos, b: ypos }, { c: x, d: y}, 16, 12);
+			dragIcon0.setAttributeNS(null, "x2", x);
+			dragIcon0.setAttributeNS(null, "y2", y);
+			dragIcon1.setAttributeNS(null, "x1", x);
+			dragIcon1.setAttributeNS(null, "y1", y);
+			dragIcon1.setAttributeNS(null, "x2", p);
+			dragIcon1.setAttributeNS(null, "y2", q);
+			dragIcon2.setAttributeNS(null, "x1", x);
+			dragIcon2.setAttributeNS(null, "y1", y);
+			dragIcon2.setAttributeNS(null, "x2", r);
+			dragIcon2.setAttributeNS(null, "y2", s);
 		}
 	};
+
 	const handleMouseUp = (e) => {
+		e.preventDefault();
+
 		setMouseDown(false);
-		if (dragged !== focused) {
-			console.log("Drag from", dragged, "to", focused);
-		} else {
-			console.log("Drag cancelled");
-		}
+		setTimeout(() => {
+			if (dragged !== focused) {
+				console.log("Drag from", dragged, "to", focused);
+			} else {
+				console.log("Drag cancelled");
+			}
+		}, 500);
 	};
 
 	if (error) {
@@ -115,11 +150,10 @@ export default function Map(props) {
 
 	return (
 		<svg viewBox="0 0 1225 628" preserveAspectRatio="xMidYMid meet"
-			onClick={handleClear}
-			onMouseOver={handleUnhover}
-			onMouseDown={handleMouseDown}
 			onMouseMove={handleMouseMove}
-			onMouseUp={handleMouseUp}>
+			onMouseUp={handleMouseUp}
+			onClick={handleClear}
+			onMouseOver={handleUnhover}>
 
 			{LINE.map((points, i) =>
 				<line key={i} x1={points[0]} y1={points[1]} x2={points[2]} y2={points[3]} />)}
@@ -131,10 +165,9 @@ export default function Map(props) {
 					army={territory.troops || 0}
 					sel={territory.name === selected}
 					lnk={curr.includes(territory.name)}
-					onClick={handleClick}
-					onMouseOver={handleHover}
 					onMouseDown={handleMouseDown}
-					onMouseUp={handleMouseUp} />))}
+					onClick={handleClick}
+					onMouseOver={handleHover} />))}
 
 			{!loading ? (
 				<text className="tname" x="380" y="600">
@@ -154,10 +187,7 @@ export default function Map(props) {
 				</>
 			}
 
-			<DragIcon
-				dragging={mouseDown}
-				xpos={xpos}
-				ypos={ypos} />
+			<DragIcon dragging={mouseDown} />
 		</svg>
 	);
 }
