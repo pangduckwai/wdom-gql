@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
-import { TAKE_ACTION } from '../mutations';
+import { TAKE_ACTION, END_TURN } from '../mutations';
 import { MAP, LINK, LINE } from '../consts';
 import Territory from './map-territory';
 import DragIcon from './map-drag';
@@ -12,10 +12,11 @@ export default function Map(props) {
 	const [focused, setFocused] = useState("");
 	const [mouseDown, setMouseDown] = useState(false);
 	const [dragged, setDragged] = useState("");
-	const [xpos, setXPos] = useState(613);
-	const [ypos, setYPos] = useState(314);
+	const [xpos, setXPos] = useState(0);
+	const [ypos, setYPos] = useState(0);
 
 	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
+	const [endTurn, { loading: fLoading, error: fError }] = useMutation(END_TURN);
 
 	const territories = (props.gameToken) ? props.territories :
 		Object.keys(MAP).map((key) => {
@@ -135,17 +136,44 @@ export default function Map(props) {
 		e.preventDefault();
 
 		setMouseDown(false);
-		setTimeout(() => {
-			if (dragged !== focused) {
-				console.log("Drag from", dragged, "to", focused);
-			} else {
-				console.log("Drag cancelled");
-			}
-		}, 500);
+		if (dragged === focused) {
+			console.log("Drag cancelled");
+			return;
+		}
+
+		if (!focused || (focused === null) || (focused === "")) {
+			console.log("Drag to nothing");
+			return;
+		}
+
+		if (LINK[dragged].connected.filter(c => c === focused).length <= 0) {
+			console.log(dragged, "not connected to", focused);
+			return;
+		}
+
+		if (!props.gameToken || (props.rounds <= 0)) {
+			console.log("Dragged from", dragged, "to", focused);
+			setSelected(focused);
+			return;
+		}
+
+		if (props.turnToken !== props.playerToken) return;
+
+		console.log("Fortifying from", dragged, "to", focused);
+		if ((props.territories[territoryIdx[dragged]].owner.token === props.playerToken) &&
+			(props.territories[territoryIdx[focused]].owner.token === props.playerToken)) {
+			setSelected(focused);
+			endTurn({ variables: { from: dragged, to: focused, amount: props.territories[territoryIdx[dragged]].troops - 1 }});
+		}
 	};
 
 	if (error) {
 		console.log(JSON.stringify(error));
+		return <p>ERROR</p>;
+	}
+
+	if (fError) {
+		console.log(JSON.stringify(fError));
 		return <p>ERROR</p>;
 	}
 
@@ -174,7 +202,7 @@ export default function Map(props) {
 					onClick={handleClick}
 					onMouseOver={handleHover} />))}
 
-			{!loading ? (
+			{!(loading && fLoading) ? (
 				<text className="tname" x="380" y="600">
 					Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
 				</text>
