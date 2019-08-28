@@ -46,3 +46,20 @@ module.exports.mockDoBattle = ({ attacker, defender }) => {
 	else
 		return { attacker: 1, defender: 1 };
 };
+
+module.exports.mockInitTroops = (players) => {
+	switch(players) {
+		case 3:
+			return 35;
+		case 4:
+			return 30;
+		case 5:
+			return 25;
+		case 6:
+			return 20;
+	}
+};
+
+module.exports.mockInitPlayer = () => {
+	return 3;
+}

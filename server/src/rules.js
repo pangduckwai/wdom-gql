@@ -147,6 +147,10 @@ let gameRules = new function() {
 		}
 	};
 
+	this.chooseFirstPlayer = () => {
+		return Math.floor(Math.random() * 6) + 1;
+	};
+
 	this.basicReinforcement = (holdings) => {
 		const ret = Math.floor(holdings.length / 3);
 		return (ret < 3) ? 3 : ret;

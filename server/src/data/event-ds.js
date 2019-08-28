@@ -82,14 +82,9 @@ class EventDS extends DataSource {
 				fltr1 = v.data.filter(d => (d.name === "playerToken"));
 				obj = this.store.players[this.store.idxPlayerToken[fltr1[0].value]];
 				if (obj) {
-					const game = this.store.games[this.store.idxGameToken[v.token]];
 					obj.joined = v.token;
-					obj.order = game.init_player;
 					obj.reinforcement = 0;
 					obj.cards = [];
-
-					game.init_player ++;
-					if (game.init_player > 6) game.init_player = 1;
 				}
 				break;
 			case consts.GAME_LEFT.id:
@@ -126,7 +121,7 @@ class EventDS extends DataSource {
 					cards: [],
 					territories: this.gameRules.buildTerritory(),
 					t_index: {},
-					init_player: Math.floor(Math.random() * 6) + 1
+					init_player: this.gameRules.chooseFirstPlayer()
 				};
 				for (let i = 0; i < obj.territories.length; i ++) {
 					obj.t_index[obj.territories[i].name] = i;
@@ -154,13 +149,14 @@ class EventDS extends DataSource {
 					let first = { token: null, min: 7};
 					for (const player of players) {
 						player.reinforcement = troops;
+						player.order = obj.init_player ++;
+						if (obj.init_player > 6) obj.init_player = 1;
 
 						if (player.order < first.min) {
 							first.min = player.order;
 							first.token = player.token;
 						}
 					}
-
 					obj.turn = first.token;
 					obj.rounds = 0;
 				}

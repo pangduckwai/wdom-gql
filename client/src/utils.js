@@ -25,9 +25,17 @@ export function getArrowHead({ a, b }, { c, d }, x, y) {
 	const x1 = c - a;
 	const y1 = d - b;
 	if (y1 === 0) {
-		return [{ p: (c - x), q: (d + y) }, { r: (c - x), s: (d - y) }];
+		if (c > a) {
+			return [{ p: (c - x), q: (d + y) }, { r: (c - x), s: (d - y) }];
+		} else {
+			return [{ p: (c + x), q: (d + y) }, { r: (c + x), s: (d - y) }];
+		}
 	} else if (x1 === 0) {
-		return [{ p: (c - y), q: (d - x) }, { r: (c + y), s: (d - x) }];
+		if (d > b) {
+			return [{ p: (c - y), q: (d - x) }, { r: (c + y), s: (d - x) }];
+		} else {
+			return [{ p: (c - y), q: (d + x) }, { r: (c + y), s: (d + x) }];
+		}
 	}
 
 	const l1 = Math.sqrt((x1 * x1) + (y1 * y1));

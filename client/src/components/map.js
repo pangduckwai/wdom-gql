@@ -47,6 +47,10 @@ export default function Map(props) {
 		setFocused("");
 	};
 
+	const disableSelect = (e) => {
+		e.preventDefault();
+	};
+
 	const handleClick = (e) => {
 		e.stopPropagation();
 		e.nativeEvent.stopImmediatePropagation();
@@ -66,7 +70,7 @@ export default function Map(props) {
 			setFocused(value);
 			setSelected(value); //can only select your own territory
 		} else if (props.rounds === 0) {
-			return; //can do nothing to other's territories during setup phase
+			return; //can do nothing to other's territories during setup phase.
 		}
 		takeAction({ variables: { name: value }});
 	};
@@ -150,6 +154,7 @@ export default function Map(props) {
 
 	return (
 		<svg viewBox="0 0 1225 628" preserveAspectRatio="xMidYMid meet"
+			onMouseDown={disableSelect}
 			onMouseMove={handleMouseMove}
 			onMouseUp={handleMouseUp}
 			onClick={handleClear}

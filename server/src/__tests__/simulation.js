@@ -10,7 +10,7 @@ const {
 	REGISTER, QUIT_PLAYER, OPEN_GAME, CLOSE_GAME, JOIN_GAME, LEAVE_GAME, START_GAME, TAKE_ACTION, END_TURN, REDEEM_CARD
 } = require('./mock-mutations');
 const { MYSELF, MY_GAME, FELLOW_PLAYERS, ALL_PLAYERS, ALL_GAMES, MY_TERRITORIES, PLAYER_TERRITORIES } = require('./mock-queries');
-const { mockShuffleCards, mockDoBattle } = require('./mock-rules');
+const { mockShuffleCards, mockDoBattle, mockInitTroops, mockInitPlayer } = require('./mock-rules');
 const testScripts = require('./mock-scripts');
 
 let eventStore;
@@ -27,6 +27,8 @@ beforeAll(() => {
 	console.log("Test setup...");
 	gameRules.shuffleCards = mockShuffleCards;
 	gameRules.doBattle = mockDoBattle;
+	gameRules.initialTroops = mockInitTroops;
+	gameRules.chooseFirstPlayer = mockInitPlayer;
 	eventStore = new EventStore();
 	eventDS = new EventDS({ store: eventStore, rules: gameRules });
 });
