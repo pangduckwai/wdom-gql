@@ -1,0 +1,17 @@
+#cards {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	width: 40vw;
+	height: 15vh;
+	padding: 5px;
+	border: 2px solid #454545;
+	border-radius: 4px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11pt;
+	background: #f0f0f080;
+}
+
+#cards li {
+	display: inline;
+}

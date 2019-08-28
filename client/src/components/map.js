@@ -5,7 +5,6 @@ import { MAP, LINK, LINE } from '../consts';
 import Territory from './map-territory';
 import DragIcon from './map-drag';
 import { convert, getMousePosition, getArrowHead } from '../utils';
-import './app.css';
 
 export default function Map(props) {
 	const [selected, setSelected] = useState("");

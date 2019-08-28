@@ -1,5 +1,4 @@
 import React from 'react';
-import './app.css';
 
 export default function DragIcon(props) {
 	let clazz = (props.dragging) ? 'drag show' : 'drag hide';

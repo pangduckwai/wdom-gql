@@ -1,0 +1,128 @@
+#control {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	width: 16vw;
+	height: 44vh;
+	padding: 5px;
+	border: 2px solid #454545;
+	border-radius: 4px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11pt;
+	background: #f0f0f080;
+
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+#greeting {
+	margin: 0 0 5px 0;
+	padding: 0 0 2px 0;
+	border-bottom: 1px solid #323232;
+}
+#greeting input[type="submit"] {
+	position: absolute;
+	right: 5px;
+	vertical-align: top;
+}
+#create input[type="submit"] {
+	width: 95%;
+}
+#msg {
+	margin-top: auto;
+	font-size: 0.9em;
+	font-style: italic;
+}
+#status {
+	font-size: 0.9em;
+	padding-left: 0;
+	margin-top: 0;
+	margin-bottom: 3px;
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 1;
+}
+input[type="submit"]:focus {
+	box-shadow: none;
+	border: 1px solid #4d90fe;
+	outline: none;
+}
+input[type="submit"]:hover {
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	border: 1px solid #c5c5c5;
+	color: #121212;
+}
+input[type="submit"] {
+	margin: 0 0 0 3px;
+	padding: 1px 4px 0 4px;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	cursor: pointer;
+	color: #2e3033;
+}
+input[type="text"]:focus {
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	border: 1px solid #c5c5c5;
+}
+input[type="text"] {
+	margin: 2px;
+	padding: 3px 3px 3px 7px;
+	border: 1px solid #f2f2f2;
+	border-radius: 10px;
+	width: 90%;
+}
+.game-ctrl {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	flex-grow: 1;
+}
+.game-ctrl input[type="submit"] {
+	margin-top: auto;
+}
+.list {
+	list-style-type: none;
+	font-size: 0.9em;
+	padding-left: 0;
+	margin-top: 0;
+	margin-bottom: 3px;
+
+	flex-grow: 1;
+	overflow-x: hidden;
+	overflow-y: auto;
+	min-height: 0;
+	scrollbar-color: #aaaaaa rgba(210,210,210,0.5);
+	scrollbar-width: thin;
+}
+.list li {
+	margin-bottom: 3px;
+}
+.list input {
+	display: inline-block;
+	margin-right: -100px;
+	margin-top: 2px;
+	vertical-align: top;
+}
+.list span {
+	display: inline-block;
+	margin-right: -100px;
+	margin-top: 2px;
+	vertical-align: top;
+}
+.list label {
+	display: inline-block;
+	margin-left: 102px;
+	margin-right: -100px;
+	overflow-wrap: break-word;
+}
+
+.title {
+	font-size: 1.1em;
+	font-weight: normal;
+	text-align: left;
+}
+.name {
+	font-size: 1.0em;
+	font-variant-caps: small-caps;
+	font-weight: bold;
+}

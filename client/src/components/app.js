@@ -8,8 +8,12 @@ import StartGame from './game-start';
 import JoinerList from './game-joiners';
 import GameStatus from './game-status';
 import Player from './player';
-import './app.css';
 import Game from './game';
+import Cards from './cards';
+import './app.css';
+import './cards.css';
+import './game.css';
+import './map.css';
 
 export default function App() {
 	const [playerKey, setPlayerKey] = useState(Math.floor(Math.random() * 100000));
@@ -19,6 +23,7 @@ export default function App() {
 
 	const [playerToken, setPlayerToken] = useState(null);
 	const [playerName, setPlayerName] = useState(null);
+	const [playerCards, setPlayerCards] = useState(null);
 	const [playerOrder, setPlayerOrder] = useState(0);
 	const [reinforcement, setReinforcement] = useState(0);
 	const [gameToken, setGameToken] = useState(null);
@@ -33,11 +38,13 @@ export default function App() {
 		if (player) {
 			setPlayerToken(player.token);
 			setPlayerName(player.name);
+			setPlayerCards(player.cards);
 			setReinforcement(player.reinforcement);
 			setPlayerOrder(player.order);
 		} else {
 			setPlayerToken(null);
 			setPlayerName(null);
+			setPlayerCards(null);
 			setReinforcement(0);
 			setPlayerOrder(0);
 		}
@@ -158,6 +165,10 @@ export default function App() {
 						territories={territories} />
 				}
 			</div>
+			<Cards
+				refresh={refresh}
+				playerToken={playerToken}
+				cards={playerCards} />
 			{registed &&
 				<Subscriber receiver={eventReceived} />
 			}

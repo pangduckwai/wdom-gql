@@ -1,6 +1,5 @@
 import React from 'react';
 import { MAP } from '../consts';
-import './app.css';
 
 export default function Territory(props) {
 	const local = MAP[props.tid];
