@@ -181,10 +181,11 @@ export default function Map(props) {
 	const curr = (selected !== "") ? LINK[selected].connected : [];
 	const order = (props.playerOrder) ? props.playerOrder : 0;
 
-	console.log(JSON.stringify(props.viewPortSize));
+	const w = (props.viewPortSize) ? props.viewPortSize.width - 20 : 1225;
+	const h = (props.viewPortSize) ? props.viewPortSize.height - 20 : 628;
 
 	return (
-		<svg viewBox="0 0 1225 628" preserveAspectRatio="xMidYMid meet"
+		<svg preserveAspectRatio="xMidYMin meet" viewBox="0 0 1225 628" width={w} height={h}
 			onMouseDown={disableSelect}
 			onMouseMove={handleMouseMove}
 			onMouseUp={handleMouseUp}
@@ -209,11 +210,11 @@ export default function Map(props) {
 			})}
 
 			{!(loading && fLoading) ? (
-				<text className="tname" x="380" y="600">
+				<text className="tname" x="350" y="600">
 					Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
 				</text>
 			) : (
-				<text className="tname" x="380" y="600">Loading...</text>
+				<text className="tname" x="350" y="600">Loading...</text>
 			)}
 
 			{(props.playerToken) &&
@@ -221,8 +222,8 @@ export default function Map(props) {
 					<polyline
 						className={`player${order}`}
 						points="0,0 0,-40 40,-30 0,-20"
-						transform="translate(394,580)" />
-					<text className="tname" x="398" y="578">Player: <tspan className="data">{props.playerName}</tspan></text>
+						transform="translate(364,580)" />
+					<text className="tname" x="368" y="578">Player: <tspan className="data">{props.playerName}</tspan></text>
 				</>
 			}
 

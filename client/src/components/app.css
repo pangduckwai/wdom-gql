@@ -1,15 +1,16 @@
-body {
-	margin: 0;
-	background: lightskyblue;
-}
 /* body {
 	margin: 0;
-	background: white;
+	background: lightskyblue;
+	overflow: hidden;
 } */
+body {
+	margin: 0;
+	background: white;
+	overflow: hidden;
+}
 
 #root {
-	width: 95vw;
-	margin: 1vh auto;
+	margin: 0 auto;
 }
 
 .pb {

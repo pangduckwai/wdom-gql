@@ -71,7 +71,12 @@ export default function App() {
 	};
 
 	useEffect(() => {
-		setViewPortSize({ width: window.innerWidth, height: window.innerHeight });
+		function onResized() {
+			setViewPortSize({ width: window.innerWidth, height: window.innerHeight });
+		}
+		onResized();
+		window.addEventListener('resize', onResized);
+		return () => window.removeEventListener('resize', onResized);
 	}, []);
 
 	const registed = (playerToken && !gameToken);
@@ -126,14 +131,7 @@ export default function App() {
 			territoryIndex[t.name] = i;
 		});
 	}
-	// console.log("Cards", JSON.stringify(playerCards));
-	// const cards = [
-	// 	{ name: "Congo", type: "Artillery" },
-	// 	{ name: "Western-United-States", type: "Infantry" },
-	// 	{ name: "Alberta", type: "Cavalry" },
-	// 	{ name: "China", type: "Artillery" },
-	// 	{ name: "India", type: "Infantry" }
-	// ]; // TODO TEMP!!!!!!!!!!!!!!!!!!!!!!  cards={(playerCards.length > 0) ? playerCards : cards}
+
 	return (
 		<>
 			<Map

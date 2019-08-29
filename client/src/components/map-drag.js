@@ -7,7 +7,7 @@ export default function DragIcon(props) {
 		<>
 			<line id="drag-icon-0" className={clazz}
 				pointerEvents="none"
-				x1="1" y1="1" x2="2" y2="2" strokeDasharray="20" />
+				x1="1" y1="1" x2="2" y2="2" strokeDasharray="10" />
 			<line id="drag-icon-1" className={clazz}
 				pointerEvents="none"
 				x1="1" y1="1" x2="2" y2="2" />
