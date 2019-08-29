@@ -17,25 +17,24 @@ export default function Map(props) {
 	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
 	const [endTurn, { loading: fLoading, error: fError }] = useMutation(END_TURN);
 
-	const territories = (props.gameToken) ? props.territories :
-		Object.keys(MAP).map((key) => {
-			const t = {};
-			t.name = key;
-			return t;
-		});
+	// const territories = (props.gameToken) ? props.territories :
+	// 	Object.keys(MAP).map((key) => {
+	// 		const t = {};
+	// 		t.name = key;
+	// 		return t;
+	// 	});
 
-	const territoryIdx = {};
+	// const territoryIdx = {};
 	const playerIdx = {};
-	if (props.gameToken) {
-		for (let i = 0; i < props.territories.length; i ++) {
-			territoryIdx[props.territories[i].name] = i;
-		}
-	}
-	if (props.players) {
-		for (let i = 0; i < props.players.length; i ++) {
-			playerIdx[props.players[i].name] = props.players[i].order;
-		}
-	}
+	// for (let i = 0; i < props.territories.length; i ++) {
+	// 	territoryIdx[props.territories[i].name] = i;
+	// }
+	props.players.forEach(p => {
+		playerIdx[p.name] = p.order;
+	});
+	// for (let i = 0; i < props.players.length; i ++) {
+	// 	playerIdx[props.players[i].name] = props.players[i].order;
+	// }
 
 	const handleClear = (e) => {
 		e.preventDefault();
@@ -66,7 +65,7 @@ export default function Map(props) {
 
 		if (props.turnToken !== props.playerToken) return;
 
-		if (props.territories[territoryIdx[value]].owner.token === props.playerToken) {
+		if (props.territories[props.territoryIdx[value]].owner.token === props.playerToken) {
 			setFocused(value);
 			setSelected(value); //can only select your own territory
 		} else if (props.rounds === 0) {
@@ -135,13 +134,16 @@ export default function Map(props) {
 		e.preventDefault();
 
 		setMouseDown(false);
-		if (dragged === focused) {
-			console.log("Drag cancelled");
-			return;
-		}
-
 		if (!focused || (focused === null) || (focused === "")) {
 			console.log("Drag to nothing");
+			return;
+		}
+		if (!dragged || (dragged === null) || (dragged === "")) {
+			console.log("Drag from nothing");
+			return;
+		}
+		if (dragged === focused) {
+			console.log("Drag cancelled");
 			return;
 		}
 
@@ -159,10 +161,10 @@ export default function Map(props) {
 		if (props.turnToken !== props.playerToken) return;
 
 		console.log("Fortifying from", dragged, "to", focused);
-		if ((props.territories[territoryIdx[dragged]].owner.token === props.playerToken) &&
-			(props.territories[territoryIdx[focused]].owner.token === props.playerToken)) {
+		if ((props.territories[props.territoryIdx[dragged]].owner.token === props.playerToken) &&
+			(props.territories[props.territoryIdx[focused]].owner.token === props.playerToken)) {
 			setSelected(focused);
-			endTurn({ variables: { from: dragged, to: focused, amount: props.territories[territoryIdx[dragged]].troops - 1 }});
+			endTurn({ variables: { from: dragged, to: focused, amount: props.territories[props.territoryIdx[dragged]].troops - 1 }});
 		}
 	};
 
@@ -190,16 +192,19 @@ export default function Map(props) {
 			{LINE.map((points, i) =>
 				<line key={i} x1={points[0]} y1={points[1]} x2={points[2]} y2={points[3]} />)}
 
-			{territories.map((territory) =>
-				(<Territory
-					key={territory.name} tid={territory.name}
+			{Object.keys(MAP).map(key => {
+				const idx = props.territoryIdx[key];
+				const territory = (typeof(idx) !== "undefined") && (idx >= 0) && (props.territories.length > 0) ? props.territories[idx] : {};
+				return (<Territory
+					key={key} tid={key}
 					player={(territory.owner) ? playerIdx[territory.owner.name] || 0 : 0}
 					army={territory.troops || 0}
 					sel={territory.name === selected}
 					lnk={curr.includes(territory.name)}
 					onMouseDown={handleMouseDown}
 					onClick={handleClick}
-					onMouseOver={handleHover} />))}
+					onMouseOver={handleHover} />);
+			})}
 
 			{!(loading && fLoading) ? (
 				<text className="tname" x="380" y="600">

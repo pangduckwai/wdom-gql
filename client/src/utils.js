@@ -49,3 +49,12 @@ export function getArrowHead({ a, b }, { c, d }, x, y) {
 	const s = Math.round((t * u) + f);
 	return [{ p, q }, { r, s }];
 }
+
+export function isRedeemable(cards) {
+	if (cards.length < 3) return false;
+	let a = cards.filter(c => (c.type === "Artillery") || (c.type === "Wildcard"));
+	let c = cards.filter(c => (c.type === "Cavalry") || (c.type === "Wildcard"));
+	let i = cards.filter(c => (c.type === "Infantry") || (c.type === "Wildcard"));
+
+	return ((a.length >= 3) || (c.length >= 3) || (i.length >= 3) || ((a.length >= 1) && (c.length >= 1) && (i.length >= 1)));
+}

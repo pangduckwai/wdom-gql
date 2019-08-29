@@ -13,6 +13,10 @@ export default function Register(props) {
 		}
 	});
 
+	const handleUpdate = (e) => {
+		setName(e.target.value);
+	};
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		if (name && (name != null) && (name !== "")) {
@@ -31,7 +35,7 @@ export default function Register(props) {
 		<>
 			<div id="greeting" className="title">Register as player</div>
 			<form id="create" onSubmit={handleSubmit}>
-				<input type="text" placeholder="Your name" autoFocus value={name} onChange={e => setName(e.target.value)} />
+				<input type="text" placeholder="Your name" autoFocus value={name} onChange={handleUpdate} />
 				<input type="submit" value="Register player" />
 			</form>
 		</>

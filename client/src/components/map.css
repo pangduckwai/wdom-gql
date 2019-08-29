@@ -1,4 +1,4 @@
-/* svg {
+svg {
 	background-color:lightskyblue;
 }
 path {
@@ -19,8 +19,8 @@ text {
 	text-anchor: middle;
 	dominant-baseline: middle;
 	display: block;
-} */
-svg {
+}
+/* svg {
 	background-color:#efefef;
 }
 path {
@@ -41,7 +41,7 @@ text {
 	text-anchor: middle;
 	dominant-baseline: middle;
 	display: block;
-}
+} */
 
 .c:hover path { opacity: 0.5; }
 .s path { opacity: 0.5; }
@@ -93,7 +93,7 @@ text {
 	}
 }
 
-/* .player0 { fill:lightskyblue; }
+.player0 { fill:lightskyblue; }
 .player1 { fill:red; }
 .player2 { fill:blueviolet; }
 .player3 { fill:orange; }
@@ -127,8 +127,8 @@ text {
 .North-America.v4 { fill:#ff6d33; }
 .South-America.v0 { fill:#9370d8; }
 .South-America.v1 { fill:#885fd8; }
-.South-America.v2 { fill:#7c4ed8; } */
-.player0 { fill:white; }
+.South-America.v2 { fill:#7c4ed8; }
+/* .player0 { fill:white; }
 .player1 { fill:white; }
 .player2 { fill:white; }
 .player3 { fill:white; }
@@ -162,4 +162,4 @@ text {
 .North-America.v4 { fill:#ededed; }
 .South-America.v0 { fill:#ededed; }
 .South-America.v1 { fill:#ededed; }
-.South-America.v2 { fill:#ededed; }
+.South-America.v2 { fill:#ededed; } */

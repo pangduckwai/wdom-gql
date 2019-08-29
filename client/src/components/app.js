@@ -114,6 +114,21 @@ export default function App() {
 		}
 	};
 
+
+	let territoryIndex = {};
+	if (territories && territories !== null) {
+		territories.forEach((t, i) => {
+			territoryIndex[t.name] = i;
+		});
+	}
+	// console.log("Cards", JSON.stringify(playerCards));
+	// const cards = [
+	// 	{ name: "Congo", type: "Artillery" },
+	// 	{ name: "Western-United-States", type: "Infantry" },
+	// 	{ name: "Alberta", type: "Cavalry" },
+	// 	{ name: "China", type: "Artillery" },
+	// 	{ name: "India", type: "Infantry" }
+	// ]; // TODO TEMP!!!!!!!!!!!!!!!!!!!!!!  cards={(playerCards.length > 0) ? playerCards : cards}
 	return (
 		<>
 			<Map
@@ -124,8 +139,9 @@ export default function App() {
 				gameToken={gameToken}
 				turnToken={turnToken}
 				rounds={rounds}
-				players={players}
-				territories={territories} />
+				players={(players && players !== null) ? players : []}
+				territories={(territories && territories !== null) ? territories : []}
+				territoryIdx={territoryIndex} />
 			<div id="control">
 				<Player
 					key={playerKey}
@@ -162,13 +178,15 @@ export default function App() {
 						turnToken={turnToken}
 						turnName={turnName}
 						rounds={rounds}
-						territories={territories} />
+						territories={(territories && territories !== null) ? territories : []} />
 				}
 			</div>
 			<Cards
 				refresh={refresh}
 				playerToken={playerToken}
-				cards={playerCards} />
+				cards={playerCards}
+				territories={(territories && territories !== null) ? territories : []}
+				territoryIdx={territoryIndex} />
 			{registed &&
 				<Subscriber receiver={eventReceived} />
 			}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// import { isRedeemable } from '../utils';
 
 export default function Cards(props) {
 	const [compKey, setCompKey] = useState(0);
@@ -11,12 +12,6 @@ export default function Cards(props) {
 			list.scrollLeft = scroll;
 		}
 	});
-
-	//TODO TEMP!!!!!!!!!!!!!!!!!
-	const cards = (props.cards && (props.cards.length > 0)) ? props.cards : [
-		{ name: "Congo", type: "Artillery" }, { name: "Western-United-States", type: "Infantry" }, { name: "Alberta", type: "Infantry" },
-		{ name: "China", type: "Artillery" }, { name: "India", type: "Infantry" }
-	];
 
 	const handleSelect = (e) => {
 		let array = values.map(c => c);
@@ -44,23 +39,28 @@ export default function Cards(props) {
 
 	return (
 		<>
-			{props.playerToken &&
+			{props.playerToken && (props.cards.length > 0) &&
 				<form key={compKey}
 					id="cards"
 					onSubmit={handleSubmit}>
 					<ul id="card-list" onChange={handleSelect}>
-						{cards.map(c =>
-							(<li key={c.name}>
+						{props.cards.map(c => {
+							const idx = props.territoryIdx[c.name];
+							const territory = (typeof(idx) !== "undefined") && (idx >= 0) && (props.territories.length > 0) ? props.territories[idx] : {};
+							return (<li key={c.name}>
 								<div className="card">
-									<div className="card-name">{c.name}</div>
+									<div className="card-name">
+										{territory.owner && (territory.owner.token === props.playerToken) ? "*" : "" }
+										{c.name}
+									</div>
 									<div className="card-type">{c.type}</div>
 									<input
 										type="checkbox"
 										value={c.name}
 										defaultChecked={values.includes(c.name)} />
 								</div>
-							</li>)
-						)}
+							</li>);
+						})}
 					</ul>
 					<input type="submit" value="&crarr;" />
 				</form>
