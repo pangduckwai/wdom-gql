@@ -181,6 +181,8 @@ export default function Map(props) {
 	const curr = (selected !== "") ? LINK[selected].connected : [];
 	const order = (props.playerOrder) ? props.playerOrder : 0;
 
+	console.log(JSON.stringify(props.viewPortSize));
+
 	return (
 		<svg viewBox="0 0 1225 628" preserveAspectRatio="xMidYMid meet"
 			onMouseDown={disableSelect}

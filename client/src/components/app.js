@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EVENTS } from '../consts';
 import Subscriber from './subscriber';
 import GameSubscriber from './subscriber-game';
@@ -16,6 +16,7 @@ import './game.css';
 import './map.css';
 
 export default function App() {
+	const [viewPortSize, setViewPortSize] = useState(null);
 	const [playerKey, setPlayerKey] = useState(Math.floor(Math.random() * 100000));
 	const [gameKey, setGameKey] = useState(Math.floor(Math.random() * 100000));
 	const [listKey, setListKey] = useState(Math.floor(Math.random() * 100000));
@@ -68,6 +69,10 @@ export default function App() {
 			setTerritories(null);
 		}
 	};
+
+	useEffect(() => {
+		setViewPortSize({ width: window.innerWidth, height: window.innerHeight });
+	}, []);
 
 	const registed = (playerToken && !gameToken);
 	const joined = (playerToken && gameToken);
@@ -132,6 +137,7 @@ export default function App() {
 	return (
 		<>
 			<Map
+				viewPortSize={viewPortSize}
 				callback={setGame}
 				playerToken={playerToken}
 				playerName={playerName}
