@@ -125,3 +125,17 @@ mutation EndTurn($from: String, $to: String, $amount: Int) {
 		}
 	}
 }`;
+
+export const REDEEM_CARDS = gql`
+mutation RedeemCards($cards: [String]!) {
+	redeemCards(cards: $cards) {
+		successful
+		message
+		event {
+			timestamp
+			event
+			type
+			token
+		}
+	}
+}`;

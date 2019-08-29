@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useMutation } from '@apollo/react-hooks';
+import { REDEEM_CARDS } from '../mutations';
 import { isRedeemable } from '../utils';
 
 export default function Cards(props) {
 	const [compKey, setCompKey] = useState(0);
 	const [values, setValues] = useState([]);
 	const [scroll, setScroll] = useState(0);
+
+	const [redeemCards, { loading, error }] = useMutation(REDEEM_CARDS, {
+		onCompleted(data) {
+			if (data.redeemCards.successful) {
+				props.refresh({ player: true, game: true });
+			}
+		}
+	});
 
 	useEffect(() => {
 		const list = document.getElementById("card-list");
@@ -47,11 +57,22 @@ export default function Cards(props) {
 		}
 
 		console.log("Redeem...", JSON.stringify(values));
+		redeemCards({ variables: { cards: values }}).then(r => {
+			props.refresh({ player: true, game: true });
+		});
 	};
+
+	if (error) {
+		console.log(JSON.stringify(error));
+		return <p>ERROR</p>;
+	}
 
 	return (
 		<>
-			{props.playerToken && (props.cards.length > 0) &&
+			{loading &&
+				<div id="cards">Loading...</div>
+			}
+			{!loading && props.playerToken && (props.cards.length > 0) &&
 				<form key={compKey}
 					id="cards"
 					onSubmit={handleSubmit}>
