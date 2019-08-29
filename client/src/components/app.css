@@ -1,6 +1,10 @@
-body {
+/* body {
 	margin: 0;
 	background: lightskyblue;
+} */
+body {
+	margin: 0;
+	background: white;
 }
 
 #root {

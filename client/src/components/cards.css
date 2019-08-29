@@ -12,10 +12,9 @@
 	background: #f0f0f080;
 
 	display: flex;
-	flex-direction: row-reverse;
+	flex-direction: row;
 	min-width: 0;
 }
-
 #cards ul {
 	display: flex;
 	flex-grow: 1;
@@ -27,13 +26,16 @@
 	margin: 0 2px 0 2px;
 	padding-inline-start: 2px;
 }
-
 #cards li {
 	display: inline-block;
 	vertical-align: top;
 }
+#cards input[type="submit"] {
+	margin: 2px 2px 2px 0;
+}
 
 .card {
+	position: relative;
 	width: 8vw;
 	height: 10vh;
 	border: 1px solid black;
@@ -42,4 +44,21 @@
 	padding: 3px;
 	margin: 2px;
 	text-align: center;
+}
+.card input[type="checkbox"] {
+	position: absolute;
+	top: -2px;
+	left: -3px;
+}
+.card-name {
+	--mywidth: min-content;
+	position: absolute;
+	top: 3px;
+	right: 2px;
+	text-align: right;
+}
+.card-type {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
 }

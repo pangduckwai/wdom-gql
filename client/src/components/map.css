@@ -1,4 +1,4 @@
-svg {
+/* svg {
 	background-color:lightskyblue;
 }
 path {
@@ -15,6 +15,28 @@ polyline {
 }
 text {
 	fill: #101010;
+	font-family: Arial, Helvetica, sans-serif;
+	text-anchor: middle;
+	dominant-baseline: middle;
+	display: block;
+} */
+svg {
+	background-color:#efefef;
+}
+path {
+	stroke:#ededed;
+	stroke-width: 2px;
+}
+line {
+	stroke:#ededed;
+	stroke-width: 2px;
+}
+polyline {
+	stroke:#ededed;
+	stroke-width: 2;
+}
+text {
+	fill: #e0e0e0;
 	font-family: Arial, Helvetica, sans-serif;
 	text-anchor: middle;
 	dominant-baseline: middle;
@@ -71,7 +93,7 @@ text {
 	}
 }
 
-.player0 { fill:lightskyblue; }
+/* .player0 { fill:lightskyblue; }
 .player1 { fill:red; }
 .player2 { fill:blueviolet; }
 .player3 { fill:orange; }
@@ -105,4 +127,39 @@ text {
 .North-America.v4 { fill:#ff6d33; }
 .South-America.v0 { fill:#9370d8; }
 .South-America.v1 { fill:#885fd8; }
-.South-America.v2 { fill:#7c4ed8; }
+.South-America.v2 { fill:#7c4ed8; } */
+.player0 { fill:white; }
+.player1 { fill:white; }
+.player2 { fill:white; }
+.player3 { fill:white; }
+.player4 { fill:white; }
+.player5 { fill:white; }
+.player6 { fill:white; }
+
+.Africa.v0 { fill:#ededed; }
+.Africa.v1 { fill:#ededed; }
+.Africa.v2 { fill:#ededed; }
+.Africa.v3 { fill:#ededed; }
+.Asia.v0 { fill:#ededed; }
+.Asia.v1 { fill:#ededed; }
+.Asia.v2 { fill:#ededed; }
+.Asia.v3 { fill:#ededed; }
+.Asia.v4 { fill:#ededed; }
+.Asia.v5 { fill:#ededed; }
+.Australia.v0 { fill:#ededed; }
+.Australia.v1 { fill:#ededed; }
+.Australia.v2 { fill:#ededed; }
+.Australia.v3 { fill:#ededed; }
+.Europe.v0 { fill:#ededed; }
+.Europe.v1 { fill:#ededed; }
+.Europe.v2 { fill:#ededed; }
+.Europe.v3 { fill:#ededed; }
+.Europe.v4 { fill:#ededed; }
+.North-America.v0 { fill:#ededed; }
+.North-America.v1 { fill:#ededed; }
+.North-America.v2 { fill:#ededed; }
+.North-America.v3 { fill:#ededed; }
+.North-America.v4 { fill:#ededed; }
+.South-America.v0 { fill:#ededed; }
+.South-America.v1 { fill:#ededed; }
+.South-America.v2 { fill:#ededed; }
