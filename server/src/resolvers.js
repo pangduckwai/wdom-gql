@@ -416,6 +416,7 @@ module.exports = {
 				if (!t.successful) throw new UserInputError(t.message);
 			}
 			await dataSources.eventDS.updateSnapshot();
+			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: d.event, token: g.token });
 			return d;
 		}
 	},

@@ -46,8 +46,8 @@ xprs.use(helmet());
 // 	next() ;
 // });
 let limiter = new limit({
-	windowMs: 900000, // 900,000 == 15*60*1000 == 15 minutes
-	max: 1500,
+	windowMs: 300000, // 900,000 == 15*60*1000 == 15 minutes; 300,000 == 5*60*1000 == 5 minutes
+	max: 3000,
 	delayMs: 0 // disabled
 });
 xprs.use(limiter);
