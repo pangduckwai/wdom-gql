@@ -84,7 +84,7 @@ export default function Cards(props) {
 								<div className="card">
 									<div className="card-name">
 										{territory.owner && (territory.owner.token === props.playerToken) ? "*" : "" }
-										{c.name}
+										{(c.type !== "Wildcard") ? c.name : ""}
 									</div>
 									<div className="card-type">{c.type}</div>
 									<input

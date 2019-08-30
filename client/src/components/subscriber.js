@@ -8,7 +8,7 @@ export default function Subscriber(props) {
 		onSubscriptionData: ({ _, subscriptionData }) => {
 			if (subscriptionData.data && subscriptionData.data.broadcastEvent) {
 				console.log(":O", JSON.stringify(subscriptionData.data.broadcastEvent));
-				props.receiver(subscriptionData.data.broadcastEvent.event);
+				props.receiver(subscriptionData.data.broadcastEvent);
 			}
 		}
 	});

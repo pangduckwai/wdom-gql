@@ -58,6 +58,7 @@ query MyGame {
 		}
 	}
 	myFellowPlayers {
+		token
 		name
 		order
 	}

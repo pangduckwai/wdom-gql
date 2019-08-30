@@ -6,7 +6,6 @@ subscription onBroadcastEvent {
 		eventid
 		timestamp
 		event
-		type
 		token
 	}
 }`;
@@ -17,7 +16,10 @@ subscription onBroadcastGameEvent($token: String!) {
 		eventid
 		timestamp
 		event
-		type
 		token
+		data {
+			name
+			value
+		}
 	}
 }`;

@@ -34,6 +34,7 @@ export default function App() {
 	const [rounds, setRounds] = useState(-1);
 	const [players, setPlayers] = useState(null);
 	const [territories, setTerritories] = useState(null);
+	const [redeemed, setRedeemed] = useState(null);
 
 	const setPlayer = (player) => {
 		if (player) {
@@ -91,8 +92,8 @@ export default function App() {
 		if (flags.joined) setJoinKey(joinKey + 1);
 	};
 
-	const eventReceived = (event) => {
-		switch (event) {
+	const eventReceived = (e) => {
+		switch (e.event) {
 		case EVENTS.GAME_CLOSED:
 			let flag = {
 				player: true,
@@ -118,8 +119,27 @@ export default function App() {
 				game: true
 			});
 			break;
+		case EVENTS.CARDS_REDEEMED:
+			const f0 = e.data.filter(d => name === "playerToken");
+			if (!players || (players === null) || (f0.length <= 0)) break;
+
+			const rd = players.filter(p => p.token === f0[0].value);
+			if (rd.length <= 0) break;
+
+			const f1 = e.data.filter(d => name === "card1");
+			const f2 = e.data.filter(d => name === "card2");
+			const f3 = e.data.filter(d => name === "card3");
+			if (f1.length > 0 && f2.length > 0 && f3.length > 0) {
+				setRedeemed({
+					player: rd[0].name,
+					card1: f1[0].value,
+					card2: f2[0].value,
+					card3: f3[0].value
+				});
+			}
+			break;
 		default:
-			console.log("Event", event, "received....");
+			console.log("Event", e.event, "received....");
 			break;
 		}
 	};
@@ -190,7 +210,8 @@ export default function App() {
 				playerToken={playerToken}
 				cards={playerCards}
 				territories={(territories && territories !== null) ? territories : []}
-				territoryIdx={territoryIndex} />
+				territoryIdx={territoryIndex}
+				temp={redeemed} />
 			{registed &&
 				<Subscriber receiver={eventReceived} />
 			}

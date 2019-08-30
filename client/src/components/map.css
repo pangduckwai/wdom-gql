@@ -56,7 +56,7 @@ text {
 .hide { display: none; }
 
 .tname {
-	font-size: 1.0em;
+	font-size: calc(0.7em + 0.7vw);
 	font-weight: bold;
 	text-anchor: start;
 }
