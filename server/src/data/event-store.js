@@ -1,6 +1,7 @@
 const { UserInputError } = require('apollo-server-express');
 const crypto = require('crypto');
 const consts = require('../consts');
+const fs = require('fs');
 
 let copy = (orig) => {
 	let copy = {};
@@ -74,6 +75,26 @@ class EventStore {
 				((typeof(event) === "undefined") || (event === null) || (v.event === event)) &&
 				((typeof(token) === "undefined") || (token === null) || (v.token === token))
 			).map(v => copy(v)));
+		});
+	}
+
+	export() {
+		this.games.forEach((g, i) => {
+			const players = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === g.token));
+			const events = this.events.filter(v => {
+				for (let p of players) {
+					if (v.token === p.token) return true;
+				}
+				return (v.token === g.token);
+			}).sort((a, b) => {
+				return a.timestamp - b.timestamp;
+			});
+
+			const writer = fs.createWriteStream(`/home/_temp/export${i}.txt`);
+			for (let v of events) {
+				writer.write(JSON.stringify(v));
+			}
+			writer.end();
 		});
 	}
 

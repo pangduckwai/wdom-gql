@@ -1,13 +1,13 @@
-/* body {
+body {
 	margin: 0;
 	background: lightskyblue;
 	overflow: hidden;
-} */
-body {
+}
+/* body {
 	margin: 0;
 	background: white;
 	overflow: hidden;
-}
+} */
 
 #root {
 	margin: 0 auto;
