@@ -58,3 +58,16 @@ export function isRedeemable(cards) {
 
 	return ((a.length >= 3) || (c.length >= 3) || (i.length >= 3) || ((a.length >= 1) && (c.length >= 1) && (i.length >= 1)));
 }
+
+export function mapCardType(type) {
+	switch (type) {
+	case "A":
+		return "Artillery";
+	case "C":
+		return "Cavalry";
+	case "I":
+		return "Infantry";
+	default:
+		return "Wildcard";
+	}
+}

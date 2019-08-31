@@ -56,7 +56,7 @@ export default function Cards(props) {
 			return;
 		}
 
-		console.log("Redeem...", JSON.stringify(values));
+		console.log("Redeem....", JSON.stringify(values));
 		redeemCards({ variables: { cards: values }}).then(r => {
 			props.refresh({ player: true, game: true });
 		});
@@ -73,9 +73,7 @@ export default function Cards(props) {
 				<div id="cards">Loading...</div>
 			}
 			{!loading && props.playerToken && (props.cards.length > 0) &&
-				<form key={compKey}
-					id="cards"
-					onSubmit={handleSubmit}>
+				<form key={compKey} id="cards" onSubmit={handleSubmit}>
 					<ul id="card-list" onChange={handleSelect}>
 						{props.cards.map(c => {
 							const idx = props.territoryIdx[c.name];

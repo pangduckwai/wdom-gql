@@ -322,10 +322,15 @@ module.exports = {
 											{ name: "defenderToken", value: q.token }
 										]});
 									if (!t.successful) throw new UserInputError(t.message);
+
+									await dataSources.eventDS.updateSnapshot();
+									pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: u.event, token: g.token });
+									return u;
+								} else {
+									await dataSources.eventDS.updateSnapshot();
+									pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
+									return k;
 								}
-								await dataSources.eventDS.updateSnapshot();
-								pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
-								return k;
 							} //otherwise not enough troop to attack, ignore the action
 						}
 					} else {

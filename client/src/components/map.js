@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { TAKE_ACTION, END_TURN } from '../mutations';
 import { MAP, LINK, LINE } from '../consts';
@@ -17,24 +17,17 @@ export default function Map(props) {
 	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
 	const [endTurn, { loading: fLoading, error: fError }] = useMutation(END_TURN);
 
-	// const territories = (props.gameToken) ? props.territories :
-	// 	Object.keys(MAP).map((key) => {
-	// 		const t = {};
-	// 		t.name = key;
-	// 		return t;
-	// 	});
+	useEffect(() => {
+		if (props.selected) {
+			setSelected(props.selected);
+			props.setSelected(null);
+		}
+	});
 
-	// const territoryIdx = {};
 	const playerIdx = {};
-	// for (let i = 0; i < props.territories.length; i ++) {
-	// 	territoryIdx[props.territories[i].name] = i;
-	// }
 	props.players.forEach(p => {
 		playerIdx[p.name] = p.order;
 	});
-	// for (let i = 0; i < props.players.length; i ++) {
-	// 	playerIdx[props.players[i].name] = props.players[i].order;
-	// }
 
 	const handleClear = (e) => {
 		e.preventDefault();
@@ -83,6 +76,8 @@ export default function Map(props) {
 		}
 	};
 
+	let aw = 2;
+	let ah = 6;
 	const handleMouseDown = (e) => {
 		e.preventDefault();
 
@@ -108,6 +103,8 @@ export default function Map(props) {
 
 		setMouseDown(true);
 		setDragged(convert(e.target.dataset.tid));
+		aw = 1;
+		ah = 5;
 	};
 
 	const handleMouseMove = (e) => {
@@ -116,7 +113,7 @@ export default function Map(props) {
 			const dragIcon1 = document.getElementById("drag-icon-1");
 			const dragIcon2 = document.getElementById("drag-icon-2");
 			const { xpos: x, ypos: y } = getMousePosition(e.target, e.clientX, e.clientY);
-			const [{ p, q }, { r, s }] = getArrowHead({ a: xpos, b: ypos }, { c: x, d: y}, 16, 12);
+			const [{ p, q }, { r, s }] = getArrowHead({ a: xpos, b: ypos }, { c: x, d: y}, ah, aw);
 			dragIcon0.setAttributeNS(null, "x2", x);
 			dragIcon0.setAttributeNS(null, "y2", y);
 			dragIcon1.setAttributeNS(null, "x1", x);
@@ -127,6 +124,8 @@ export default function Map(props) {
 			dragIcon2.setAttributeNS(null, "y1", y);
 			dragIcon2.setAttributeNS(null, "x2", r);
 			dragIcon2.setAttributeNS(null, "y2", s);
+			if (aw < 12) aw += 2;
+			if (ah < 16) ah += 2;
 		}
 	};
 

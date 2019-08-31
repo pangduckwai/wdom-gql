@@ -13,6 +13,17 @@ body {
 	margin: 0 auto;
 }
 
+.title {
+	font-size: 1.1em;
+	font-weight: normal;
+	text-align: left;
+}
+.name {
+	font-size: 1.0em;
+	font-variant-caps: small-caps;
+	font-weight: bold;
+}
+
 .pb {
 	padding-bottom: 5px;
 }

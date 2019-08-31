@@ -10,6 +10,7 @@ import GameStatus from './game-status';
 import Player from './player';
 import Game from './game';
 import Cards from './cards';
+import Redeemed from './card-redeemed';
 import './app.css';
 import './cards.css';
 import './game.css';
@@ -35,6 +36,7 @@ export default function App() {
 	const [players, setPlayers] = useState(null);
 	const [territories, setTerritories] = useState(null);
 	const [redeemed, setRedeemed] = useState(null);
+	const [selected, setSelected] = useState(null);
 
 	const setPlayer = (player) => {
 		if (player) {
@@ -92,6 +94,10 @@ export default function App() {
 		if (flags.joined) setJoinKey(joinKey + 1);
 	};
 
+	const clearRedeemed = () => {
+		setRedeemed(null);
+	};
+
 	const eventReceived = (e) => {
 		switch (e.event) {
 		case EVENTS.GAME_CLOSED:
@@ -113,22 +119,28 @@ export default function App() {
 		case EVENTS.TROOP_PLACED:
 		case EVENTS.TROOP_ADDED:
 		case EVENTS.TERRITORY_ATTACKED:
-		case EVENTS.TURN_ENDED:
 			refresh({
 				player: true,
 				game: true
 			});
 			break;
+		case EVENTS.TURN_ENDED:
+			refresh({
+				player: true,
+				game: true
+			});
+			clearRedeemed();
+			break;
 		case EVENTS.CARDS_REDEEMED:
-			const f0 = e.data.filter(d => name === "playerToken");
-			if (!players || (players === null) || (f0.length <= 0)) break;
+			const f0 = e.data.filter(d => d.name === "playerToken");
+			if (!players || (players === null) || (f0.length <= 0) || (f0[0].value === playerToken)) break;
 
 			const rd = players.filter(p => p.token === f0[0].value);
 			if (rd.length <= 0) break;
 
-			const f1 = e.data.filter(d => name === "card1");
-			const f2 = e.data.filter(d => name === "card2");
-			const f3 = e.data.filter(d => name === "card3");
+			const f1 = e.data.filter(d => d.name === "card1");
+			const f2 = e.data.filter(d => d.name === "card2");
+			const f3 = e.data.filter(d => d.name === "card3");
 			if (f1.length > 0 && f2.length > 0 && f3.length > 0) {
 				setRedeemed({
 					player: rd[0].name,
@@ -138,12 +150,27 @@ export default function App() {
 				});
 			}
 			break;
+		case EVENTS.TERRITORY_CONQUERED:
+			refresh({
+				player: true,
+				game: true
+			});
+
+			const f4 = e.data.filter(d => d.name === "playerToken");
+			if ((f4.length <= 0) || (f4[0].value !== playerToken)) break;
+
+			const f5 = e.data.filter(d => d.name === "toTerritory");
+			if (f5.length > 0) {
+				setSelected(f5[0].value);
+				console.log("WIN!!!", f5[0].value);
+			}
+
+			break;
 		default:
 			console.log("Event", e.event, "received....");
 			break;
 		}
 	};
-
 
 	let territoryIndex = {};
 	if (territories && territories !== null) {
@@ -165,7 +192,9 @@ export default function App() {
 				rounds={rounds}
 				players={(players && players !== null) ? players : []}
 				territories={(territories && territories !== null) ? territories : []}
-				territoryIdx={territoryIndex} />
+				territoryIdx={territoryIndex}
+				selected={selected}
+				setSelected={setSelected} />
 			<div id="control">
 				<Player
 					key={playerKey}
@@ -210,8 +239,10 @@ export default function App() {
 				playerToken={playerToken}
 				cards={playerCards}
 				territories={(territories && territories !== null) ? territories : []}
-				territoryIdx={territoryIndex}
-				temp={redeemed} />
+				territoryIdx={territoryIndex}  />
+			<Redeemed
+				redeemed={redeemed}
+				clear={clearRedeemed} />
 			{registed &&
 				<Subscriber receiver={eventReceived} />
 			}
