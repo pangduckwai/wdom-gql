@@ -1,3 +1,4 @@
+import { MAP } from './consts';
 
 export function convert(tid) {
 	const buff = tid.split("");
@@ -59,8 +60,9 @@ export function isRedeemable(cards) {
 	return ((a.length >= 3) || (c.length >= 3) || (i.length >= 3) || ((a.length >= 1) && (c.length >= 1) && (i.length >= 1)));
 }
 
-export function mapCardType(type) {
-	switch (type) {
+export function mapCardType(name) {
+	const card = (MAP[name]) ? MAP[name].card : "";
+	switch (card) {
 	case "A":
 		return "Artillery";
 	case "C":

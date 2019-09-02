@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { REDEEM_CARDS } from '../mutations';
-import { isRedeemable } from '../utils';
+import { convert, isRedeemable } from '../utils';
 
 export default function Cards(props) {
 	const [compKey, setCompKey] = useState(0);
@@ -62,6 +62,21 @@ export default function Cards(props) {
 		});
 	};
 
+	const handleHover = (e) => {
+		e.stopPropagation();
+		e.nativeEvent.stopImmediatePropagation();
+		if (typeof(e.target.dataset.cid) !== "undefined") {
+			props.onMouseOver(convert(e.target.dataset.cid));
+		}
+	};
+	const handleLeave = (e) => {
+		e.stopPropagation();
+		e.nativeEvent.stopImmediatePropagation();
+		if (typeof(e.target.dataset.cid) !== "undefined") {
+			props.onMouseOver(null);
+		}
+	};
+
 	if (error) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
@@ -78,14 +93,19 @@ export default function Cards(props) {
 						{props.cards.map(c => {
 							const idx = props.territoryIdx[c.name];
 							const territory = (typeof(idx) !== "undefined") && (idx >= 0) && (props.territories.length > 0) ? props.territories[idx] : {};
+							const cid = c.name.toLowerCase();
 							return (<li key={c.name}>
-								<div className="card">
-									<div className="card-name">
-										{territory.owner && (territory.owner.token === props.playerToken) ? "*" : "" }
-										{(c.type !== "Wildcard") ? c.name : ""}
+								<div data-cid={cid}
+									className="card"
+									onMouseOver={handleHover}
+									onMouseLeave={handleLeave}>
+									<div data-cid={cid} className="card-abbv">
+										{c.type.substring(0, 1)}
 									</div>
-									<div className="card-type">{c.type}</div>
-									<input
+									<div data-cid={cid} className="card-self">
+										{territory.owner && (territory.owner.token === props.playerToken) ? "@" : "" }
+									</div>
+									<input data-cid={cid}
 										type="checkbox"
 										value={c.name}
 										defaultChecked={values.includes(c.name)} />

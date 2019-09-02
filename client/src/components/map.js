@@ -32,6 +32,7 @@ export default function Map(props) {
 	const handleClear = (e) => {
 		e.preventDefault();
 		setSelected("");
+		props.setCardHover(null);
 	};
 
 	const handleUnhover = (e) => {

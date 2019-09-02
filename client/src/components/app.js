@@ -11,6 +11,7 @@ import Player from './player';
 import Game from './game';
 import Cards from './cards';
 import Redeemed from './card-redeemed';
+import CardCloseup from './card-closeup';
 import './app.css';
 import './cards.css';
 import './game.css';
@@ -37,6 +38,7 @@ export default function App() {
 	const [territories, setTerritories] = useState(null);
 	const [redeemed, setRedeemed] = useState(null);
 	const [selected, setSelected] = useState(null);
+	const [cardHover, setCardHover] = useState(null);
 
 	const setPlayer = (player) => {
 		if (player) {
@@ -194,7 +196,9 @@ export default function App() {
 				territories={(territories && territories !== null) ? territories : []}
 				territoryIdx={territoryIndex}
 				selected={selected}
-				setSelected={setSelected} />
+				setSelected={setSelected}
+				setCardHover={setCardHover}
+				 />
 			<div id="control">
 				<Player
 					key={playerKey}
@@ -239,10 +243,13 @@ export default function App() {
 				playerToken={playerToken}
 				cards={playerCards}
 				territories={(territories && territories !== null) ? territories : []}
-				territoryIdx={territoryIndex}  />
+				territoryIdx={territoryIndex}
+				onMouseOver={setCardHover} />
 			<Redeemed
 				redeemed={redeemed}
 				clear={clearRedeemed} />
+			<CardCloseup
+				card={cardHover} />
 			{registed &&
 				<Subscriber receiver={eventReceived} />
 			}

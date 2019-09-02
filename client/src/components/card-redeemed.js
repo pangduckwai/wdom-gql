@@ -1,5 +1,4 @@
 import React from 'react';
-import { MAP } from '../consts';
 import { mapCardType } from '../utils';
 
 export default function Redeemed(props) {
@@ -19,19 +18,19 @@ export default function Redeemed(props) {
 								<li>
 									<div className="rcard">
 										<div className="card-name">{props.redeemed.card1}</div>
-										<div className="card-type">{mapCardType(MAP[props.redeemed.card1].card)}</div>
+										<div className="card-type">{mapCardType(props.redeemed.card1)}</div>
 									</div>
 								</li>
 								<li>
 									<div className="rcard">
 										<div className="card-name">{props.redeemed.card2}</div>
-										<div className="card-type">{mapCardType(MAP[props.redeemed.card2].card)}</div>
+										<div className="card-type">{mapCardType(props.redeemed.card2)}</div>
 									</div>
 								</li>
 								<li>
 									<div className="rcard">
 										<div className="card-name">{props.redeemed.card3}</div>
-										<div className="card-type">{mapCardType(MAP[props.redeemed.card3].card)}</div>
+										<div className="card-type">{mapCardType(props.redeemed.card3)}</div>
 									</div>
 								</li>
 							</ul>
