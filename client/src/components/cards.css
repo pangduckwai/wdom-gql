@@ -38,10 +38,10 @@
 #redeemed {
 	position: absolute;
 	top: calc(50% - 17vh);
-	left: calc(50% - 21vw);
-	width: 42vw;
+	left: calc(50% - 20vw);
+	width: 40vw;
 	height: 35vh;
-	padding: 2px 0 2px 5px;
+	padding: 2px;
 	border: 2px solid #454545;
 	border-radius: 7px;
 	font-family: Arial, Helvetica, sans-serif;
@@ -52,6 +52,7 @@
 	display: flex;
 	flex-direction: row;
 	min-width: 0;
+	justify-content: center;
 }
 #redeemed input[type="submit"] {
 	position: absolute;
@@ -120,7 +121,7 @@
 
 .rcard {
 	position: relative;
-	width: 12vw;
+	width: 10vw;
 	height: 25vh;
 	border: 1px solid black;
 	border-radius: 4px;
