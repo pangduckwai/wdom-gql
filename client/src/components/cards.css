@@ -37,10 +37,10 @@
 
 #redeemed {
 	position: absolute;
-	top: calc(50% - 17vh);
-	left: calc(50% - 20vw);
-	width: 40vw;
-	height: 35vh;
+	top: calc(50% - 28vh);
+	left: calc(50% - 25vw);
+	width: 50vw;
+	height: 56vh;
 	padding: 2px;
 	border: 2px solid #454545;
 	border-radius: 7px;
@@ -63,11 +63,11 @@
 
 #closeup {
 	position: absolute;
-	bottom: 21vh;
+	bottom: 17vh;
 	right: 15vw;
-	width: 21vw;
-	height: 35vh;
-	padding: 2px;
+	width: 40vh;
+	height: 45vh;
+	padding-top: 4vh;
 	border: 2px solid #454545;
 	border-radius: 10px;
 	font-family: Arial, Helvetica, sans-serif;
@@ -121,8 +121,8 @@
 
 .rcard {
 	position: relative;
-	width: 10vw;
-	height: 25vh;
+	width: 26vh;
+	height: 40vh;
 	border: 1px solid black;
 	border-radius: 4px;
 	font-weight: bold;
