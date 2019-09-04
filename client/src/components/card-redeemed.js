@@ -1,5 +1,5 @@
 import React from 'react';
-import { mapCardType } from '../utils';
+import Card from './card';
 
 export default function Redeemed(props) {
 	const handleSubmit = (e) => {
@@ -16,22 +16,13 @@ export default function Redeemed(props) {
 							<label><span className="name">{props.redeemed.player}</span> redeeming...</label>
 							<ul>
 								<li>
-									<div className="rcard">
-										<div className="card-name">{props.redeemed.card1}</div>
-										<div className="card-type">{mapCardType(props.redeemed.card1)}</div>
-									</div>
+									<Card card={props.redeemed.card1} />
 								</li>
 								<li>
-									<div className="rcard">
-										<div className="card-name">{props.redeemed.card2}</div>
-										<div className="card-type">{mapCardType(props.redeemed.card2)}</div>
-									</div>
+									<Card card={props.redeemed.card2} />
 								</li>
 								<li>
-									<div className="rcard">
-										<div className="card-name">{props.redeemed.card3}</div>
-										<div className="card-type">{mapCardType(props.redeemed.card3)}</div>
-									</div>
+									<Card card={props.redeemed.card3} />
 								</li>
 							</ul>
 							<input type="submit" value="&times;" />

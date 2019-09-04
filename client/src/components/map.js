@@ -185,7 +185,7 @@ export default function Map(props) {
 	const h = (props.viewPortSize) ? props.viewPortSize.height - 20 : 628;
 
 	return (
-		<svg preserveAspectRatio="xMidYMin meet" viewBox="0 0 1225 628" width={w} height={h}
+		<svg className="map" preserveAspectRatio="xMidYMin meet" viewBox="0 0 1225 628" width={w} height={h}
 			onMouseDown={disableSelect}
 			onMouseMove={handleMouseMove}
 			onMouseUp={handleMouseUp}

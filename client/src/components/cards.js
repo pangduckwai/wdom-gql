@@ -96,7 +96,7 @@ export default function Cards(props) {
 							const cid = c.name.toLowerCase();
 							return (<li key={c.name}>
 								<div data-cid={cid}
-									className="card"
+									className="scard"
 									onMouseOver={handleHover}
 									onMouseLeave={handleLeave}>
 									<div data-cid={cid} className="card-abbv">
