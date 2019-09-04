@@ -72,7 +72,7 @@ const polo = new ApolloServer({
 });
 mockSetup({ eventDS: new EventDS({ store: eventStore, rules: gameRules })}); //TEMP!!!
 
-xprs.get('/export', (req, res) => {
+xprs.get('/export', (_, res) => {
 	eventStore.export();
 	res.send({"Exporting...": "...Done"});
 });
