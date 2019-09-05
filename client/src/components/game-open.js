@@ -9,7 +9,6 @@ export default function OpenGame(props) {
 		onCompleted(data) {
 			if (data.openGame.successful) {
 				sessionStorage.setItem("gameToken", data.openGame.event.token);
-				props.refresh({ player: true, game: true });
 			}
 		}
 	});
@@ -27,11 +26,16 @@ export default function OpenGame(props) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
 	}
-	if (loading) return <div className="bb mb pb">Loading...</div>;
 	return (
 		<form id="create" className="bb mb pb" onSubmit={handleSubmit}>
-			<input type="text" placeholder="Name of new game" autoFocus value={name} onChange={e => setName(e.target.value)} />
-			<input type="submit" value="Create" />
+			{!loading ? (
+				<>
+					<input type="text" placeholder="Name of new game" autoFocus value={name} onChange={e => setName(e.target.value)} />
+					<input type="submit" value="Create" />
+				</>
+			) : (
+				<div className="bb mb pb">Loading...</div>
+			)}
 		</form>
 	);
 }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import { MYSELF, MY_GAME } from '../queries';
 import { EVENTS } from '../consts';
 import Subscriber from './subscriber';
 import GameSubscriber from './subscriber-game';
@@ -19,8 +21,8 @@ import './map.css';
 
 export default function App() {
 	const [viewPortSize, setViewPortSize] = useState(null);
-	const [playerKey, setPlayerKey] = useState(Math.floor(Math.random() * 100000));
-	const [gameKey, setGameKey] = useState(Math.floor(Math.random() * 100000));
+	// const [playerKey, setPlayerKey] = useState(Math.floor(Math.random() * 100000));
+	// const [gameKey, setGameKey] = useState(Math.floor(Math.random() * 100000));
 	const [listKey, setListKey] = useState(Math.floor(Math.random() * 100000));
 	const [joinKey, setJoinKey] = useState(Math.floor(Math.random() * 100000));
 
@@ -31,6 +33,7 @@ export default function App() {
 	const [reinforcement, setReinforcement] = useState(0);
 	const [gameToken, setGameToken] = useState(null);
 	const [gameHost, setGameHost] = useState(null);
+	const [gameName, setGameName] = useState(null);
 	const [turnToken, setTurnToken] = useState(null);
 	const [turnName, setTurnName] = useState(null);
 	const [rounds, setRounds] = useState(-1);
@@ -59,6 +62,7 @@ export default function App() {
 		if (game) {
 			setGameToken(game.token);
 			setGameHost(game.host.token);
+			setGameName(game.name);
 			if (game.turn) setTurnToken(game.turn.token);
 			if (game.turn) setTurnName(game.turn.name);
 			setRounds(game.rounds);
@@ -67,6 +71,7 @@ export default function App() {
 		} else {
 			setGameToken(null);
 			setGameHost(null);
+			setGameName(null);
 			setTurnToken(null);
 			setTurnName(null);
 			setRounds(-1);
@@ -84,14 +89,35 @@ export default function App() {
 		return () => window.removeEventListener('resize', onResized);
 	}, []);
 
+	const { refetch: refetchMe } = useQuery(MYSELF, {
+		fetchPolicy: "cache-and-network",
+		onCompleted(data) {
+			if (data.me) {
+				setPlayer(data.me);
+			} else {
+				setPlayer(null);
+			}
+		}
+	});
+	const { refetch: refetchGame } = useQuery(MY_GAME, {
+		fetchPolicy: "cache-and-network",
+		onCompleted(data) {
+			if (data.myGame) {
+				setGame(data.myGame, data.myFellowPlayers);
+			} else {
+				setGame(null, null);
+			}
+		}
+	});
+
 	const registed = (playerToken && !gameToken);
 	const joined = (playerToken && gameToken);
 	const isHost = (gameHost === playerToken);
 	const isSetup = (rounds < 0);
 
 	const refresh = (flags) => {
-		if (flags.player) setPlayerKey(playerKey + 1);
-		if (flags.game) setGameKey(gameKey + 1);
+		if (flags.player) refetchMe();
+		if (flags.game) refetchGame();
 		if (flags.list) setListKey(listKey + 1);
 		if (flags.joined) setJoinKey(joinKey + 1);
 	};
@@ -201,16 +227,16 @@ export default function App() {
 				 />
 			<div id="control">
 				<Player
-					key={playerKey}
+					playerToken={playerToken}
+					playerName={playerName}
 					gameToken={gameToken}
 					gameHost={gameHost}
-					refresh={refresh}
-					setPlayer={setPlayer} />
+					refetch={refetchMe} />
 				<Game
-					key={gameKey}
 					playerToken={playerToken}
-					refresh={refresh}
-					setGame={setGame} />
+					gameToken={gameToken}
+					gameName={gameName}
+					refetch={refetchGame} />
 				{registed &&
 					<GameList
 						key={listKey}

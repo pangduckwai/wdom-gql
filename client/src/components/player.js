@@ -1,38 +1,30 @@
 import React from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { MYSELF } from '../queries';
 import Greetings from './player-greetings';
+import GreetHost from './player-hosting';
+import GreetJoiner from './player-joining';
 import Register from './player-register';
 
 export default function Player(props) {
-	const { data, loading, error, refetch } = useQuery(MYSELF, {
-		fetchPolicy: "cache-and-network",
-		onCompleted(data) {
-			if (data.me) {
-				props.setPlayer(data.me);
-			} else {
-				props.setPlayer(null);
-			}
-		}
-	});
-
-	if (error) {
-		return <><p>ERROR</p><p>{JSON.stringify(error)}</p></>;
-	}
-	if (loading) return <div id="greeting">Loading...</div>;
 	return (
 		<>
-			{(!data.me || !data.me.token) ? (
-				<Register refetch={refetch} />
-			) : (
+			{(!props.playerToken) &&
+				<Register refetch={props.refetch} />
+			}
+			{(props.playerToken && !props.gameToken) &&
 				<Greetings
-					refetch={refetch}
-					player={data.me}
-					gameToken={props.gameToken}
-					gameHost={props.gameHost}
-					setPlayer={props.setPlayer}
-					refresh={props.refresh} />
-			)}
+					refetch={props.refetch}
+					playerName={props.playerName} />
+			}
+			{(props.playerToken && props.gameToken && (props.gameHost === props.playerToken)) &&
+				<GreetHost
+					refetch={props.refetch}
+					playerName={props.playerName} />
+			}
+			{(props.playerToken && props.gameToken && (props.gameHost !== props.playerToken)) &&
+				<GreetJoiner
+					refetch={props.refetch}
+					playerName={props.playerName} />
+			}
 		</>
 	);
 }

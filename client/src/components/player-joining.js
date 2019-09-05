@@ -1,12 +1,12 @@
 import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
-import { QUIT_PLAYER } from '../mutations';
+import { LEAVE_GAME } from '../mutations';
 
-export default function Greetings(props) {
-	const [action, { loading, error }] = useMutation(QUIT_PLAYER, {
+export default function GreetJoiner(props) {
+	const [action, { loading, error }] = useMutation(LEAVE_GAME, {
 		onCompleted(data) {
-			if (data.quitPlayer.successful) {
-				sessionStorage.setItem("token", null);
+			if (data.leaveGame.successful) {
+				sessionStorage.setItem("gameToken", null);
 			}
 		}
 	});
