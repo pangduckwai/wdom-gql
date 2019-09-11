@@ -106,8 +106,7 @@ class EventStore {
 			let obj = {
 				eventid: eid,
 				timestamp: dtm,
-				event: event.id,
-				type: event.type
+				event: event
 			};
 			let rspn = { successful: false };
 
@@ -117,8 +116,8 @@ class EventStore {
 			}
 
 			let fltr1, fltr2, fltr3, fltr4, fltr5, fltr6;
-			switch (event.id) {
-				case consts.PLAYER_REGISTERED.id:
+			switch (event) {
+				case consts.PLAYER_REGISTERED:
 					fltr1 = payload.filter(d => (d.name === "playerName"));
 					if (fltr1.length !== 1) {
 						rspn.message = "[REGISTER] Missing player name";
@@ -126,7 +125,7 @@ class EventStore {
 						rspn.successful = populate(obj, eid); //event id is also the token of the player
 					}
 					break;
-				case consts.PLAYER_QUITTED.id:
+				case consts.PLAYER_QUITTED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					if (fltr1.length !== 1) {
 						rspn.message = "[QUIT] Missing player ID";
@@ -134,13 +133,13 @@ class EventStore {
 						rspn.successful = populate(obj, fltr1[0].value); //token of the player quitting
 					}
 					break;
-				case consts.GAME_JOINED.id:
-				case consts.GAME_LEFT.id:
-				case consts.GAME_CLOSED.id:
-				case consts.GAME_STARTED.id:
-				case consts.NEXT_PLAYER.id:
-				case consts.SETUP_FINISHED.id:
-				case consts.TURN_ENDED.id:
+				case consts.GAME_JOINED:
+				case consts.GAME_LEFT:
+				case consts.GAME_CLOSED:
+				case consts.GAME_STARTED:
+				case consts.NEXT_PLAYER:
+				case consts.SETUP_FINISHED:
+				case consts.TURN_ENDED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					if ((fltr1.length !== 1) || (fltr2.length !== 1)) {
@@ -149,7 +148,7 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value);
 					}
 					break;
-				case consts.GAME_OPENED.id:
+				case consts.GAME_OPENED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameName"));
 					if (fltr1.length !== 1) {
@@ -160,9 +159,9 @@ class EventStore {
 						rspn.successful = populate(obj, eid); //event id is also the token of the game
 					}
 					break;
-				case consts.TERRITORY_ASSIGNED.id:
-				case consts.TERRITORY_SELECTED.id:
-				case consts.CARD_RETURNED.id:
+				case consts.TERRITORY_ASSIGNED:
+				case consts.TERRITORY_SELECTED:
+				case consts.CARD_RETURNED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "territoryName"));
@@ -174,9 +173,9 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value);
 					}
 					break;
-				case consts.TROOP_PLACED.id:
+				case consts.TROOP_PLACED:
 					// NOTE - used during game setup, fired when an owned territory is clicked, and add 1 troop
-				case consts.TROOP_ADDED.id:
+				case consts.TROOP_ADDED:
 					// NOTE - used during start of turns when adding troops to owned territories, fired when an owned territory is clicked, and add 1 troop
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
@@ -189,7 +188,7 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value); //token of the game in question
 					}
 					break;
-				case consts.TROOP_DEPLOYED.id:
+				case consts.TROOP_DEPLOYED:
 					// NOTE - TROOP_DEPLOYED is used to subtract currently available reinforcement of a player after troops added to a territory
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
@@ -202,7 +201,7 @@ class EventStore {
 						rspn.successful = populate(obj, fltr1[0].value);
 					}
 					break;
-				case consts.TERRITORY_ATTACKED.id:
+				case consts.TERRITORY_ATTACKED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "fromTerritory"));
@@ -219,18 +218,19 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value); //token of the game in question
 					}
 					break;
-				case consts.TERRITORY_CONQUERED.id:
+				case consts.TERRITORY_CONQUERED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "fromTerritory"));
 					fltr4 = payload.filter(d => (d.name === "toTerritory"));
-					if ((fltr1.length !== 1) || (fltr2.length !== 1) || (fltr3.length !== 1) || (fltr4.length !== 1)) {
-						rspn.message = "[CONQUER] Missing player ID, game ID, and from/to territory IDs";
+					fltr5 = payload.filter(d => (d.name === "defenderToken"));
+					if ((fltr1.length !== 1) || (fltr2.length !== 1) || (fltr3.length !== 1) || (fltr4.length !== 1) || (fltr5.length !== 1)) {
+						rspn.message = "[CONQUER] Missing player ID, game ID, from/to territory IDs, or defender's token";
 					} else {
 						rspn.successful = populate(obj, fltr2[0].value);
 					}
 					break;
-				case consts.PLAYER_ATTACKED.id:
+				case consts.PLAYER_DEFEATED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "defenderToken"));
@@ -240,7 +240,7 @@ class EventStore {
 						rspn.successful = populate(obj, fltr1[0].value);
 					}
 					break;
-				case consts.FORTIFIED.id:
+				case consts.FORTIFIED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "fromTerritory"));
@@ -254,7 +254,7 @@ class EventStore {
 						rspn.successful = populate(obj, fltr2[0].value);
 					}
 					break;
-				case consts.CARDS_REDEEMED.id:
+				case consts.CARDS_REDEEMED:
 					fltr1 = payload.filter(d => (d.name === "playerToken"));
 					fltr2 = payload.filter(d => (d.name === "gameToken"));
 					fltr3 = payload.filter(d => (d.name === "card1"));
@@ -262,6 +262,15 @@ class EventStore {
 					fltr5 = payload.filter(d => (d.name === "card3"));
 					if ((fltr1.length !== 1) || (fltr2.length !== 1) || (fltr3.length !== 1) || (fltr4.length !== 1) || (fltr5.length !== 1)) {
 						rspn.message = "[REDEEM] Missing player ID, game ID, and IDs of the cards being redeemed";
+					} else {
+						rspn.successful = populate(obj, fltr2[0].value);
+					}
+					break;
+				case consts.GAME_WON:
+					fltr1 = payload.filter(d => (d.name === "playerToken"));
+					fltr2 = payload.filter(d => (d.name === "gameToken"));
+					if ((fltr1.length !== 1) || (fltr2.length !== 1)) {
+						rspn.message = "[WON] Missing player and/or game IDs";
 					} else {
 						rspn.successful = populate(obj, fltr2[0].value);
 					}

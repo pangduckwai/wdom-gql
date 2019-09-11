@@ -76,7 +76,7 @@ module.exports = {
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(consts.BROADCAST_EVENT.topic, { broadcastEvent: h.event });
+			pubsub.publish(consts.BROADCAST_EVENT, { broadcastEvent: h.event });
 			return h;
 		},
 		closeGame: async (_, __, { dataSources }) => {
@@ -99,8 +99,8 @@ module.exports = {
 			if (!q.successful) throw new UserInputError(q.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(consts.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
-			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
+			pubsub.publish(consts.BROADCAST_EVENT, { broadcastEvent: k.event });
+			pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: k.event, token: g.token });
 			return k;
 		},
 		joinGame: async (_, { token }, { dataSources }) => {
@@ -125,7 +125,7 @@ module.exports = {
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: token });
+			pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: k.event, token: token });
 			return k;
 		},
 		leaveGame: async (_, __, { dataSources }) => {
@@ -143,7 +143,7 @@ module.exports = {
 			if (!k.successful) throw new UserInputError(k.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
+			pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: k.event, token: g.token });
 			return k;
 		},
 		startGame: async (_, __, { dataSources }) => {
@@ -191,8 +191,8 @@ module.exports = {
 			}
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(consts.BROADCAST_EVENT.topic, { broadcastEvent: k.event });
-			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
+			pubsub.publish(consts.BROADCAST_EVENT, { broadcastEvent: k.event });
+			pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: k.event, token: g.token });
 			return k;
 		},
 		takeAction: async (_, { name }, { dataSources }) => {
@@ -255,13 +255,17 @@ module.exports = {
 					}
 
 					await dataSources.eventDS.updateSnapshot();
-					pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: a.event, token: g.token });
+					pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: a.event, token: g.token });
 					return a;
 				}
 			} else {
-				if (p.reinforcement > 0) {
+				if (p.cards.length >= dataSources.eventDS.gameRules.MAX_CARD_PER_PLAYER) {
+					// pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: consts.CARDS_FULL, token: g.token });
+					await dataSources.eventDS.updateSnapshot();
+					return c;
+				} else if (p.reinforcement > 0) {
 					// Reinforcement stage
-					if (owned && (p.cards.length < 5)) {
+					if (owned) {
 						const a = await dataSources.eventDS.add({
 							event: consts.TROOP_ADDED, payload: [
 								{ name: "playerToken", value: p.token },
@@ -277,12 +281,12 @@ module.exports = {
 						if (!d.successful) throw new UserInputError(d.message);
 
 						await dataSources.eventDS.updateSnapshot();
-						pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: a.event, token: g.token });
+						pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: a.event, token: g.token });
 						return a;
 					}
 				} else {
 					// Combat stage (moved to this stage automatically)
-					if (!owned && (p.cards.length < 5)) { // If click on owned territory at this stage, only means changing the attack-from territory to the newly clicked one
+					if (!owned) { // If click on owned territory at this stage, only means changing the attack-from territory to the newly clicked one
 						if (g.territories[g.t_index[name]].connected.filter(conn => conn.name === g.current).length > 0) {
 							//Connected, can attack
 							const fm = g.territories[g.t_index[g.current]];
@@ -302,33 +306,52 @@ module.exports = {
 								if (!k.successful) throw new UserInputError(k.message);
 
 								if (casualties.defender >= to.troops) {
+									//Only trigger this when a territory changed hand
+									const q = dataSources.eventDS.findPlayerByToken({ token: to.owner });
+									if (!q) throw new UserInputError(`[ACTION] Player '${to.owner}' not found`);
+
 									const u = await dataSources.eventDS.add({
 										event: consts.TERRITORY_CONQUERED, payload: [
 											{ name: "playerToken", value: p.token },
 											{ name: "gameToken", value: g.token },
 											{ name: "fromTerritory", value: g.current },
-											{ name: "toTerritory", value: name }
-										]});
-									if (!u.successful) throw new UserInputError(u.message);
-
-									//Only trigger this when a territory changed hand
-									const q = dataSources.eventDS.findPlayerByToken({ token: to.owner });
-									if (!q) throw new UserInputError(`[ACTION] Player '${to.owner}' not found`);
-
-									const t = await dataSources.eventDS.add({
-										event: consts.PLAYER_ATTACKED, payload: [
-											{ name: "playerToken", value: p.token },
-											{ name: "gameToken", value: g.token },
+											{ name: "toTerritory", value: name },
 											{ name: "defenderToken", value: q.token }
 										]});
-									if (!t.successful) throw new UserInputError(t.message);
-
+									if (!u.successful) throw new UserInputError(u.message);
 									await dataSources.eventDS.updateSnapshot();
-									pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: u.event, token: g.token });
+									pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: u.event, token: g.token });
+
+									const remain = dataSources.eventDS.listTerritoriesByPlayer({ token: q.token });
+									if (remain.length <= 0) {
+										const t = await dataSources.eventDS.add({
+											event: consts.PLAYER_DEFEATED, payload: [
+												{ name: "playerToken", value: p.token },
+												{ name: "gameToken", value: g.token },
+												{ name: "defenderToken", value: q.token }
+											]});
+										if (!t.successful) throw new UserInputError(t.message);
+										await dataSources.eventDS.updateSnapshot();
+										pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: t.event, token: g.token });
+
+										const playing = dataSources.eventDS.listPlayersByGame({ token: g.token }).filter(x => {
+											return (dataSources.eventDS.listTerritoriesByPlayer({ token: x.token }).length > 0);
+										});
+										if (playing.length === 1) {
+											const w = await dataSources.eventDS.add({
+												event: consts.GAME_WON, payload: [
+													{ name: "playerToken", value: playing[0].token },
+													{ name: "gameToken", value: g.token }
+												]});
+											if (!w.successful) throw new UserInputError(w.message);
+											await dataSources.eventDS.updateSnapshot();
+											pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: w.event, token: g.token });
+										}
+									}
 									return u;
 								} else {
 									await dataSources.eventDS.updateSnapshot();
-									pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: k.event, token: g.token });
+									pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: k.event, token: g.token });
 									return k;
 								}
 							} //otherwise not enough troop to attack, ignore the action
@@ -381,7 +404,7 @@ module.exports = {
 			if (!n.successful) throw new UserInputError(n.message);
 
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: e.event, token: g.token });
+			pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: e.event, token: g.token });
 			return e;
 		},
 		redeemCards: async (_, { cards }, { dataSources }) => {
@@ -421,17 +444,17 @@ module.exports = {
 				if (!t.successful) throw new UserInputError(t.message);
 			}
 			await dataSources.eventDS.updateSnapshot();
-			pubsub.publish(consts.BROADCAST_GAME_EVENT.topic, { broadcastGameEvent: d.event, token: g.token });
+			pubsub.publish(consts.BROADCAST_GAME_EVENT, { broadcastGameEvent: d.event, token: g.token });
 			return d;
 		}
 	},
 	Subscription: {
 		broadcastEvent: {
-			subscribe: () => pubsub.asyncIterator(consts.BROADCAST_EVENT.topic)
+			subscribe: () => pubsub.asyncIterator(consts.BROADCAST_EVENT)
 		},
 		broadcastGameEvent: {
 			subscribe: withFilter(
-				() => pubsub.asyncIterator(consts.BROADCAST_GAME_EVENT.topic),
+				() => pubsub.asyncIterator(consts.BROADCAST_GAME_EVENT),
 				(payload, variables) => {
 					return payload.token === variables.token;
 				}

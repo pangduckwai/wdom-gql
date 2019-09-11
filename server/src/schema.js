@@ -78,7 +78,6 @@ type Event {
 	eventid: String!
 	timestamp: String!
 	event: Int!
-	type: String!
 	token: String!
 	data: [EventData]!
 }

@@ -9,7 +9,6 @@ mutation Register($name: String!) {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -22,7 +21,6 @@ mutation Quit {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -35,7 +33,6 @@ mutation Open($name: String!) {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -48,7 +45,6 @@ mutation Close {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -61,7 +57,6 @@ mutation Join($token: String!) {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -74,7 +69,6 @@ mutation Leave {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -87,7 +81,6 @@ mutation Start {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -100,7 +93,6 @@ mutation Action($name: String!) {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -113,7 +105,6 @@ mutation EndTurn($from: String, $to: String, $amount: Int) {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}
@@ -126,7 +117,6 @@ mutation RedeemCards($cards: [String]!) {
 		event {
 			timestamp
 			event
-			type
 			token
 		}
 	}

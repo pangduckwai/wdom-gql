@@ -66,6 +66,7 @@ export default function Map(props) {
 			return; //can do nothing to other's territories during setup phase.
 		}
 		takeAction({ variables: { name: value }});
+		props.clicked();
 	};
 
 	const handleHover = (e) => {

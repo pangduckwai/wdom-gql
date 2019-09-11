@@ -9,6 +9,7 @@
 let gameRules = new function() {
 	this.MIN_PLAYER_PER_GAME = 3;
 	this.MAX_PLAYER_PER_GAME = 6;
+	this.MAX_CARD_PER_PLAYER = 5;
 
 	this.CONTINENTS = {
 		"Africa": {

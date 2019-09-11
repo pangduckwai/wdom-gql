@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { MYSELF, MY_GAME } from '../queries';
-import { EVENTS } from '../consts';
+import { EVENTS, MAX_CARD_PER_PLAYER } from '../consts';
 import Subscriber from './subscriber';
 import GameSubscriber from './subscriber-game';
 import Map from './map';
@@ -14,6 +14,7 @@ import Game from './game';
 import Cards from './cards';
 import Redeemed from './card-redeemed';
 import CardCloseup from './card-closeup';
+import Message from './game-msgbox';
 import './app.css';
 import './cards.css';
 import './game.css';
@@ -21,11 +22,9 @@ import './map.css';
 
 export default function App() {
 	const [viewPortSize, setViewPortSize] = useState(null);
-	// const [playerKey, setPlayerKey] = useState(Math.floor(Math.random() * 100000));
-	// const [gameKey, setGameKey] = useState(Math.floor(Math.random() * 100000));
 	const [listKey, setListKey] = useState(Math.floor(Math.random() * 100000));
 	const [joinKey, setJoinKey] = useState(Math.floor(Math.random() * 100000));
-
+	const [message, setMessage] = useState(null);
 	const [playerToken, setPlayerToken] = useState(null);
 	const [playerName, setPlayerName] = useState(null);
 	const [playerCards, setPlayerCards] = useState(null);
@@ -126,6 +125,17 @@ export default function App() {
 		setRedeemed(null);
 	};
 
+	const clearMessage = () => {
+		setMessage(null);
+	};
+
+	const mapClicked = () => {
+		if (playerCards.length >= MAX_CARD_PER_PLAYER) {
+			clearRedeemed();
+			setMessage("Please redeem cards before proceed.");
+		}
+	};
+
 	const eventReceived = (e) => {
 		switch (e.event) {
 		case EVENTS.GAME_CLOSED:
@@ -183,7 +193,6 @@ export default function App() {
 				player: true,
 				game: true
 			});
-
 			const f4 = e.data.filter(d => d.name === "playerToken");
 			if ((f4.length <= 0) || (f4[0].value !== playerToken)) break;
 
@@ -192,7 +201,29 @@ export default function App() {
 				setSelected(f5[0].value);
 				console.log("WIN!!!", f5[0].value);
 			}
+			break;
+		case EVENTS.PLAYER_DEFEATED:
+			const f6 = e.data.filter(d => d.name === "playerToken");
+			if ((f6.length <= 0) || (f6[0].value === playerToken)) break; //Don't need to announce who just got defeated by you...
 
+			const f7 = e.data.filter(d => d.name === "defenderToken");
+			if (f7.length <= 0) break;
+
+			clearRedeemed();
+			if (f7[0].value === playerToken) {
+				setMessage("You are defeated");
+			} else {
+				const loser = players.filter(p => p.token === f7[0].value);
+				if (loser.length > 0) {
+					setMessage(`${loser[0].name} defeated`);
+				}
+			}
+			break;
+		case EVENTS.GAME_WON:
+			const f8 = e.data.filter(d => d.name === "playerToken");
+			if ((f8.length <= 0) || (f8[0].value !== playerToken)) break;
+
+			setMessage("You won the game!");
 			break;
 		default:
 			console.log("Event", e.event, "received....");
@@ -224,6 +255,7 @@ export default function App() {
 				selected={selected}
 				setSelected={setSelected}
 				setCardHover={setCardHover}
+				clicked={mapClicked}
 				 />
 			<div id="control">
 				<Player
@@ -271,11 +303,14 @@ export default function App() {
 				territories={(territories && territories !== null) ? territories : []}
 				territoryIdx={territoryIndex}
 				onMouseOver={setCardHover} />
+			<CardCloseup
+				card={cardHover} />
 			<Redeemed
 				redeemed={redeemed}
 				clear={clearRedeemed} />
-			<CardCloseup
-				card={cardHover} />
+			<Message
+				message={message}
+				clear={clearMessage} />
 			{registed &&
 				<Subscriber receiver={eventReceived} />
 			}
