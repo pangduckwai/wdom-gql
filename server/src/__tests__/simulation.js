@@ -37,7 +37,7 @@ afterAll(() => {
 	console.log("Test teardown...");
 });
 
-let createServer = (token) => {
+let createServer = (session) => {
 	let obj = {
 		typeDefs,
 		resolvers,
@@ -45,9 +45,9 @@ let createServer = (token) => {
 			eventDS: eventDS
 		})
 	};
-	if (token) {
+	if (session) {
 		return {
-			context: () => ({ token: token }),
+			context: () => ({ sessionid: session }),
 			...obj
 		};
 	} else {
@@ -85,7 +85,7 @@ describe('Preparation', () => {
 				variables: { name: name },
 			}).then(response => {
 				if (response.data.registerPlayer) {
-					ptokens[name] = response.data.registerPlayer.event.token;
+					ptokens[name] = response.data.registerPlayer.event.eventid;
 					okay ++;
 				} else {
 					if (response.errors[0].message === "[REGISTER] Player 'Rick' already exists") fail ++;
@@ -333,12 +333,12 @@ describe('Wrap up', () => {
 		const { query } = createTestClient(server);
 
 		const res = await query({ query: FELLOW_PLAYERS });
-		const players = res.data.myFellowPlayers;
-		for (const player of players) {
-			const resp = await query({ query: PLAYER_TERRITORIES, variables: { token: ptokens[player.name] } });
-			const holdings = resp.data.listTerritories;
-			console.log("Players", JSON.stringify(player, null, 3), holdings.length, JSON.stringify(holdings, null, 3));
-		}
+		// const players = res.data.myFellowPlayers;
+		// for (const player of players) {
+		// 	const resp = await query({ query: PLAYER_TERRITORIES, variables: { token: ptokens[player.name] } });
+		// 	const holdings = resp.data.listTerritories;
+		// 	console.log("Players", JSON.stringify(player, null, 3), holdings.length, JSON.stringify(holdings, null, 3));
+		// }
 
 		await query({ query: ALL_GAMES }).then(v => {
 			const round = Math.floor((v.data.listGames[0].rounds - 1) / 5) + 1; //TODO get 'real' player numbers instead

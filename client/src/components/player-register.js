@@ -8,7 +8,7 @@ export default function Register(props) {
 	const [register, { loading, error }] = useMutation(REGISTER, {
 		onCompleted(data) {
 			if (data.registerPlayer.successful) {
-				sessionStorage.setItem("token", data.registerPlayer.event.token);
+				sessionStorage.setItem("sessionid", data.registerPlayer.event.eventid);
 			}
 		}
 	});

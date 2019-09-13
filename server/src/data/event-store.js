@@ -31,6 +31,7 @@ class EventStore {
 		this.events = [];
 		this.players = [];
 		this.games = [];
+		this.idxPlayerSession = {};
 		this.idxPlayerToken = {};
 		this.idxPlayerName = {};
 		this.idxGameToken = {};
@@ -40,9 +41,11 @@ class EventStore {
 
 	////////////////////////////////////////////////
 	rebuildPlayerIndex() {
+		this.idxPlayerSession = {};
 		this.idxPlayerToken = {};
 		this.idxPlayerName = {};
 		for (let i = 0; i < this.players.length; i ++) {
+			this.idxPlayerSession[this.players[i].sessionid] = i;
 			this.idxPlayerToken[this.players[i].token] = i;
 			this.idxPlayerName[this.players[i].name] = i;
 		}
@@ -122,7 +125,7 @@ class EventStore {
 					if (fltr1.length !== 1) {
 						rspn.message = "[REGISTER] Missing player name";
 					} else {
-						rspn.successful = populate(obj, eid); //event id is also the token of the player
+						rspn.successful = populate(obj, crypto.createHash('sha256').update('' + (dtm + Math.floor(Math.random()*10000))).digest('base64')); // Generate play token
 					}
 					break;
 				case consts.PLAYER_QUITTED:

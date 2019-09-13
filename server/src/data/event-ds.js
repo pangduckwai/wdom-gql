@@ -16,14 +16,17 @@ class EventDS extends DataSource {
 		return this.store.list({ index: 0 });
 	}
 	me() {
-		if (this.context && this.context.token)
-			return this.findPlayerByToken({ token: this.context.token });
+		if (this.context && this.context.sessionid)
+			return this.findPlayerBySession({ session: this.context.sessionid });
 		else
 			return null;
 	}
 	listPlayers() {
 		return this.store.players;
 	};
+	findPlayerBySession({ session }) {
+		return this.store.players[this.store.idxPlayerSession[session]];
+	}
 	findPlayerByToken({ token }) {
 		return this.store.players[this.store.idxPlayerToken[token]];
 	}
@@ -62,6 +65,7 @@ class EventDS extends DataSource {
 			case consts.PLAYER_REGISTERED:
 				fltr1 = v.data.filter(d => (d.name === "playerName"));
 				obj = {
+					sessionid: v.eventid,
 					ready: true,
 					token: v.token,
 					name: fltr1[0].value,

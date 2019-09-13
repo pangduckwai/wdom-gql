@@ -7,6 +7,7 @@ mutation Register($name: String!) {
 		successful
 		message
 		event {
+			eventid
 			timestamp
 			event
 			token

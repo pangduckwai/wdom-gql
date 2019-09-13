@@ -5,13 +5,7 @@ import { OPEN_GAME } from '../mutations';
 export default function OpenGame(props) {
 	const [name, setName] = useState("");
 
-	const [openGame, { loading, error }] = useMutation(OPEN_GAME, {
-		onCompleted(data) {
-			if (data.openGame.successful) {
-				sessionStorage.setItem("gameToken", data.openGame.event.token);
-			}
-		}
-	});
+	const [openGame, { loading, error }] = useMutation(OPEN_GAME);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();

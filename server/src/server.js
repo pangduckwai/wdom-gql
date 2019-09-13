@@ -57,9 +57,9 @@ xprs.use(limiter);
 const eventStore = new EventStore();
 const polo = new ApolloServer({
 	context: async ({ req }) => {
-		const token = (req.headers && req.headers.authorization) ? req.headers.authorization : null;
-		if (token) {
-			return { token: token };
+		const auth = (req.headers && req.headers.authorization) ? req.headers.authorization : null;
+		if (auth) {
+			return { sessionid: auth };
 		}
 		return null;
 	},

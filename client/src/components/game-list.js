@@ -10,13 +10,7 @@ export default function GameList(props) {
 		fetchPolicy: "cache-and-network"
 	});
 
-	const [joinGame, { loading: mLoading, error: mError }] = useMutation(JOIN_GAME, {
-		onCompleted(data) {
-			if (data.joinGame.successful) {
-				sessionStorage.setItem("gameToken", data.joinGame.event.token);
-			}
-		}
-	});
+	const [joinGame, { loading: mLoading, error: mError }] = useMutation(JOIN_GAME);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();

@@ -6,7 +6,7 @@ export default function Greetings(props) {
 	const [action, { loading, error }] = useMutation(QUIT_PLAYER, {
 		onCompleted(data) {
 			if (data.quitPlayer.successful) {
-				sessionStorage.setItem("token", null);
+				sessionStorage.setItem("sessionid", null);
 			}
 		}
 	});

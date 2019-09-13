@@ -3,13 +3,7 @@ import { useMutation } from '@apollo/react-hooks';
 import { CLOSE_GAME } from '../mutations';
 
 export default function GreetHost(props) {
-	const [action, { loading, error }] = useMutation(CLOSE_GAME, {
-		onCompleted(data) {
-			if (data.closeGame.successful) {
-				sessionStorage.setItem("gameToken", null);
-			}
-		}
-	});
+	const [action, { loading, error }] = useMutation(CLOSE_GAME);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
