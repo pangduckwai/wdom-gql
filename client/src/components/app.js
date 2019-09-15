@@ -13,6 +13,7 @@ import Player from './player';
 import Game from './game';
 import Cards from './cards';
 import Redeemed from './card-redeemed';
+import Fortify from './map-fortify';
 import CardCloseup from './card-closeup';
 import Message from './game-msgbox';
 import './app.css';
@@ -41,6 +42,7 @@ export default function App() {
 	const [redeemed, setRedeemed] = useState(null);
 	const [selected, setSelected] = useState(null);
 	const [cardHover, setCardHover] = useState(null);
+	const [fortified, setFortified] = useState(null);
 
 	const setPlayer = (player) => {
 		if (player) {
@@ -134,6 +136,18 @@ export default function App() {
 			clearRedeemed();
 			setMessage("Please redeem cards before proceed.");
 		}
+	};
+
+	const doFortify = (from, to, amount) => {
+		setFortified({
+			from,
+			to,
+			amount
+		});
+	};
+
+	const onFortified = (from, to, amount) => {
+		console.log("Fortfied", from, to, amount);
 	};
 
 	const eventReceived = (e) => {
@@ -256,6 +270,7 @@ export default function App() {
 				setSelected={setSelected}
 				setCardHover={setCardHover}
 				clicked={mapClicked}
+				fortify={doFortify}
 				 />
 			<div id="control">
 				<Player
@@ -308,6 +323,9 @@ export default function App() {
 			<Redeemed
 				redeemed={redeemed}
 				clear={clearRedeemed} />
+			<Fortify
+				fortified={fortified}
+				onFortified={onFortified} />
 			<Message
 				message={message}
 				clear={clearMessage} />
