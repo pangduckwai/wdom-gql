@@ -71,6 +71,13 @@ export default function App() {
 			setRounds(game.rounds);
 			if (players) setPlayers(players);
 			if (game.territories) setTerritories(game.territories);
+			if (game.winner) {
+				if (playerToken === game.winner.tokne) {
+					setMessage("You won the game!");
+				} else {
+					setMessage(`${game.winner.name} won the game!`);
+				}
+			}
 		} else {
 			setGameToken(null);
 			setGameHost(null);
@@ -112,7 +119,6 @@ export default function App() {
 			}
 		}
 	});
-	const [endTurn, { loading, error }] = useMutation(END_TURN);
 
 	const registed = (playerToken && !gameToken);
 	const joined = (playerToken && gameToken);
@@ -125,6 +131,17 @@ export default function App() {
 		if (flags.list) setListKey(listKey + 1);
 		if (flags.joined) setJoinKey(joinKey + 1);
 	};
+
+	const [endTurn] = useMutation(END_TURN, {
+		onCompleted(data) {
+			if (data.endTurn.successful) {
+				refresh({
+					player: true,
+					game: true
+				});
+			}
+		}
+	});
 
 	const clearRedeemed = () => {
 		setRedeemed(null);
@@ -152,12 +169,7 @@ export default function App() {
 	const onFortified = (from, to, amount) => {
 		setFortified(null);
 		if (amount > 0) {
-			endTurn({ variables: { from, to, amount }}).then(r => {
-				refresh({
-					player: true,
-					game: true
-				});
-			});
+			endTurn({ variables: { from, to, amount }});
 		}
 	};
 
@@ -211,6 +223,7 @@ export default function App() {
 					card2: f2[0].value,
 					card3: f3[0].value
 				});
+				clearMessage();
 			}
 			break;
 		case EVENTS.TERRITORY_CONQUERED:
@@ -263,11 +276,6 @@ export default function App() {
 		});
 	}
 
-	if (error) {
-		console.log(JSON.stringify(error));
-		return <p>ERROR</p>;
-	}
-
 	return (
 		<>
 			<Map
@@ -315,7 +323,7 @@ export default function App() {
 						<div id="msg" className="mt mb">Wait for game to start...</div>
 					</>
 				}
-				{(joined && !isSetup && !loading) &&
+				{(joined && !isSetup) &&
 					<GameStatus
 						refresh={refresh}
 						playerToken={playerToken}
@@ -324,9 +332,6 @@ export default function App() {
 						turnName={turnName}
 						rounds={rounds}
 						territories={(territories && territories !== null) ? territories : []} />
-				}
-				{(joined && !isSetup && loading) &&
-					<p>Loading...</p>
 				}
 			</div>
 			<Cards
