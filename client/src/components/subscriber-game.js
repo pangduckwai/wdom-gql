@@ -8,7 +8,6 @@ export default function GameSubscriber(props) {
 		shouldResubscribe: false,
 		onSubscriptionData: ({ _, subscriptionData }) => {
 			if (subscriptionData.data && subscriptionData.data.broadcastGameEvent) {
-				console.log(":p", JSON.stringify(subscriptionData.data.broadcastGameEvent));
 				props.receiver(subscriptionData.data.broadcastGameEvent);
 			}
 		}

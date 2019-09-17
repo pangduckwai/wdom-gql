@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import { MYSELF, MY_GAME } from '../queries';
+import { END_TURN } from '../mutations';
 import { EVENTS, MAX_CARD_PER_PLAYER } from '../consts';
 import Subscriber from './subscriber';
 import GameSubscriber from './subscriber-game';
@@ -110,6 +112,7 @@ export default function App() {
 			}
 		}
 	});
+	const [endTurn, { loading, error }] = useMutation(END_TURN);
 
 	const registed = (playerToken && !gameToken);
 	const joined = (playerToken && gameToken);
@@ -147,7 +150,15 @@ export default function App() {
 	};
 
 	const onFortified = (from, to, amount) => {
-		console.log("Fortfied", from, to, amount);
+		setFortified(null);
+		if (amount > 0) {
+			endTurn({ variables: { from, to, amount }}).then(r => {
+				refresh({
+					player: true,
+					game: true
+				});
+			});
+		}
 	};
 
 	const eventReceived = (e) => {
@@ -252,6 +263,11 @@ export default function App() {
 		});
 	}
 
+	if (error) {
+		console.log(JSON.stringify(error));
+		return <p>ERROR</p>;
+	}
+
 	return (
 		<>
 			<Map
@@ -270,8 +286,7 @@ export default function App() {
 				setSelected={setSelected}
 				setCardHover={setCardHover}
 				clicked={mapClicked}
-				fortify={doFortify}
-				 />
+				fortify={doFortify} />
 			<div id="control">
 				<Player
 					playerToken={playerToken}
@@ -300,7 +315,7 @@ export default function App() {
 						<div id="msg" className="mt mb">Wait for game to start...</div>
 					</>
 				}
-				{(joined && !isSetup) &&
+				{(joined && !isSetup && !loading) &&
 					<GameStatus
 						refresh={refresh}
 						playerToken={playerToken}
@@ -309,6 +324,9 @@ export default function App() {
 						turnName={turnName}
 						rounds={rounds}
 						territories={(territories && territories !== null) ? territories : []} />
+				}
+				{(joined && !isSetup && loading) &&
+					<p>Loading...</p>
 				}
 			</div>
 			<Cards
@@ -320,15 +338,23 @@ export default function App() {
 				onMouseOver={setCardHover} />
 			<CardCloseup
 				card={cardHover} />
-			<Redeemed
-				redeemed={redeemed}
-				clear={clearRedeemed} />
-			<Fortify
-				fortified={fortified}
-				onFortified={onFortified} />
-			<Message
-				message={message}
-				clear={clearMessage} />
+			{redeemed &&
+				<Redeemed
+					redeemed={redeemed}
+					clear={clearRedeemed} />
+			}
+			{message &&
+				<Message
+					message={message}
+					clear={clearMessage} />
+			}
+			{(fortified && (fortified.amount > 0)) &&
+				<Fortify
+					from={fortified.from}
+					to={fortified.to}
+					amount={fortified.amount}
+					onFortified={onFortified} />
+			}
 			{registed &&
 				<Subscriber receiver={eventReceived} />
 			}

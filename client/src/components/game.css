@@ -42,17 +42,17 @@
 	flex-direction: column;
 	flex-shrink: 1;
 }
-input[type="submit"]:focus {
+input[type="submit"]:focus, button:focus {
 	box-shadow: none;
 	border: 1px solid #4d90fe;
 	outline: none;
 }
-input[type="submit"]:hover {
+input[type="submit"]:hover, button:hover {
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 	border: 1px solid #c5c5c5;
 	color: #121212;
 }
-input[type="submit"] {
+input[type="submit"], button {
 	margin: 0 0 0 3px;
 	padding: 1px 4px 0 4px;
 	border: 1px solid #e0e0e0;
@@ -151,6 +151,70 @@ input[type="text"] {
 }
 #msgbox input[type="submit"] {
 	margin-top: auto;
+}
+
+#fortify {
+	position: absolute;
+	left: calc(50% - 20vw);
+	top: calc(50% - 23vh);
+	width: 40vw;
+	height: 46vh;
+	padding: 2px;
+	border: 2px solid #454545;
+	border-radius: 7px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: calc(9pt + 0.8vw);
+	background: #f0f0f0D0;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+#fortify form {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	flex-grow: 1;
+}
+#fortify .lbl {
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	margin: 4px;
+}
+#fortify input[type="range"] {
+	width: 70%;
+	margin: 0 auto;
+	padding: 3px 3px 3px 7px;
+	align-items: center;
+}
+#fortify p {
+	width: 100%;
+	font-size: calc(11pt + 0.8vw);
+	font-weight: bold;
+	text-align: center;
+	margin: 2%;
+}
+#fortify div {
+	margin-top: auto;
+	width: 100%;
+	text-align: center;
+}
+#fortify label {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	justify-content: center;
+	align-items: center;
+}
+#fortify .small {
+	font-size: calc(7pt + 0.8vw);
+}
+#fortify input[type="submit"], #fortify button {
+	width: 46%;
+	padding: 1%;
+	margin: 1%;
 }
 
 #overlay {

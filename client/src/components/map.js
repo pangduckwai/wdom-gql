@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/react-hooks';
-import { TAKE_ACTION } from '../mutations'; //, END_TURN
+import { TAKE_ACTION } from '../mutations';
 import { MAP, LINK, LINE } from '../consts';
 import Territory from './map-territory';
 import DragIcon from './map-drag';
@@ -15,8 +15,6 @@ export default function Map(props) {
 	const [ypos, setYPos] = useState(0);
 
 	const [takeAction, { loading, error }] = useMutation(TAKE_ACTION);
-	// const [endTurn, { loading: fLoading, error: fError }] = useMutation(END_TURN);
-	const fLoading = true;// TODO TEMP!!!
 
 	useEffect(() => {
 		if (props.selected) {
@@ -166,7 +164,6 @@ export default function Map(props) {
 		if ((props.territories[props.territoryIdx[dragged]].owner.token === props.playerToken) &&
 			(props.territories[props.territoryIdx[focused]].owner.token === props.playerToken)) {
 			setSelected(focused);
-			// endTurn({ variables: { from: dragged, to: focused, amount: props.territories[props.territoryIdx[dragged]].troops - 1 }});
 			props.fortify(dragged, focused, props.territories[props.territoryIdx[dragged]].troops - 1);
 		}
 	};
@@ -175,11 +172,6 @@ export default function Map(props) {
 		console.log(JSON.stringify(error));
 		return <p>ERROR</p>;
 	}
-
-	// if (fError) {
-	// 	console.log(JSON.stringify(fError));
-	// 	return <p>ERROR</p>;
-	// }
 
 	const curr = (selected !== "") ? LINK[selected].connected : [];
 	const order = (props.playerOrder) ? props.playerOrder : 0;
@@ -212,7 +204,7 @@ export default function Map(props) {
 					onMouseOver={handleHover} />);
 			})}
 
-			{!(loading && fLoading) ? (
+			{!loading ? (
 				<text className="tname" x="350" y="600">
 					Territory: <tspan className="data">{(selected === "") ? focused : selected}</tspan>
 				</text>
