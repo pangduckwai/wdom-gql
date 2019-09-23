@@ -35,6 +35,7 @@ beforeAll(() => {
 
 afterAll(() => {
 	console.log("Test teardown...");
+	eventStore.export();
 });
 
 let createServer = (session) => {
