@@ -1,7 +1,9 @@
 const { UserInputError } = require('apollo-server-express');
 const crypto = require('crypto');
 const consts = require('../consts');
+const os = require('os');
 const fs = require('fs');
+const path = require('path');
 
 let copy = (orig) => {
 	let copy = {};
@@ -82,6 +84,7 @@ class EventStore {
 	}
 
 	export() {
+		const tmp = path.join(os.tmpdir(), `wdom${Date.now()}`);
 		this.games.forEach((g, i) => {
 			const players = this.players.filter(p => (typeof(p.joined) !== "undefined") && (p.joined === g.token));
 			const events = this.events.filter(v => {
@@ -90,12 +93,17 @@ class EventStore {
 				}
 				return (v.token === g.token);
 			}).sort((a, b) => {
-				return a.timestamp - b.timestamp;
+				if (a.timestamp === b.timestamp) {
+					return a.event - b.event;
+				} else {
+					return a.timestamp - b.timestamp;
+				}
 			});
 
-			const writer = fs.createWriteStream(`/home/_temp/export${i}.txt`);
+			fs.mkdirSync(tmp, { recursive: true});
+			const writer = fs.createWriteStream(path.join(tmp, `wdom-export${i}.txt`));
 			for (let v of events) {
-				writer.write(JSON.stringify(v));
+				writer.write(JSON.stringify(v) + '\n');
 			}
 			writer.end();
 		});

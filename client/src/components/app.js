@@ -187,7 +187,10 @@ export default function App() {
 			break;
 		case EVENTS.GAME_JOINED:
 		case EVENTS.GAME_LEFT:
-			refresh({ joined: true });
+			refresh({
+				game: true,
+				joined: true
+			});
 			break;
 		case EVENTS.GAME_STARTED:
 			if (gameHost === playerToken) break;
@@ -301,6 +304,7 @@ export default function App() {
 					playerName={playerName}
 					gameToken={gameToken}
 					gameHost={gameHost}
+					rounds={rounds}
 					refetch={refetchMe} />
 				<Game
 					playerToken={playerToken}

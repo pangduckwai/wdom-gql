@@ -135,7 +135,17 @@ module.exports = {
 
 			const g = dataSources.eventDS.findGameByToken({ token: p.joined });
 			if (!g) throw new UserInputError(`[LEAVE] Game '${p.joined}' not found`);
-			if (g.host === p.token) throw new UserInputError("[LEAVE] Cannot leave your own game");
+			if ((g.host === p.token) && (g.rounds <= 0)) throw new UserInputError("[LEAVE] Cannot leave your own game"); //Can leave after game started
+
+			if (typeof g.turn !== 'undefined') {
+				if (g.turn === p.token) {
+					const n = await dataSources.eventDS.add({
+						event: consts.NEXT_PLAYER,
+						payload: [{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }]
+					});
+					if (!n.successful) throw new UserInputError(n.message);
+				}
+			}
 
 			const k = await dataSources.eventDS.add({ event: consts.GAME_LEFT, payload: [
 				{ name: "playerToken", value: p.token }, { name: "gameToken", value: g.token }

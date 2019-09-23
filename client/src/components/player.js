@@ -15,12 +15,12 @@ export default function Player(props) {
 					refetch={props.refetch}
 					playerName={props.playerName} />
 			}
-			{(props.playerToken && props.gameToken && (props.gameHost === props.playerToken)) &&
+			{(props.playerToken && props.gameToken && (props.gameHost === props.playerToken) && (props.rounds <= 0)) &&
 				<GreetHost
 					refetch={props.refetch}
 					playerName={props.playerName} />
 			}
-			{(props.playerToken && props.gameToken && (props.gameHost !== props.playerToken)) &&
+			{(props.playerToken && props.gameToken && ((props.gameHost !== props.playerToken) || (props.rounds > 0))) &&
 				<GreetJoiner
 					refetch={props.refetch}
 					playerName={props.playerName} />

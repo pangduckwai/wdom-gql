@@ -1,10 +1,3 @@
-/*
-- Setup Phase
-- Playing Phase
-- Reinforce Stage
-- Combat Stage
-- Fortify Stage
-*/
 
 let gameRules = new function() {
 	this.MIN_PLAYER_PER_GAME = 3;
